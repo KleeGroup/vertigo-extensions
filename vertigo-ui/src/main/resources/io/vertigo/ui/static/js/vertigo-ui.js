@@ -25,7 +25,10 @@ var VUi = {
 					  notif.message = 'API Route Method Not Allowed'
 				  } else if(response.status === 422){
 				     //Validation Message
-					  notif.message = 'Data validation errors'
+					 notif.message = '';
+					 Object.keys(response.body).forEach(function (key) {
+						this.$data.uiMessageStack[key] = response.body[key];
+					 }.bind(this));
 				  } else if(response.status >= 500){
 					  notif.message = 'Server Error'
 				  }
@@ -50,12 +53,6 @@ var VUi = {
 						return { value: object[valueField], label: object[labelField].toString()} // a label is always a string
 					});
 				},
-				transformListForStaticSelection: function (list, valueField, labelField) {
-					var finalList =  this.$data.vueData[list].map(function (object) {
-						return { value: object[valueField], label: object[labelField].toString()} // a label is always a string
-					});
-					return {field : 'label', list : finalList}
-				},
 				paginationAndSortHandler : function (params) {
 					var pagination = params.pagination;
 					var filter = params.filter;
@@ -68,8 +65,8 @@ var VUi = {
 								pagination.page = 1 //reset pagination
 								this.$http.post(pagination.sortUrl, { sortFieldName : pagination.sortBy, sortDesc : pagination.descending, CTX: this.$data.vueData.CTX}, { emulateJSON: true })
 								.then( function (response ) {
-									vueData[pagination.listKey] = response.body[pagination.listKey];
-									this.$data.vueData.CTX = response.body['CTX'];
+									vueData[pagination.listKey] = response.body.model[pagination.listKey];
+									this.$data.vueData.CTX = response.body.model['CTX'];
 								});
 							} else {
 								//do locally
@@ -93,61 +90,58 @@ var VUi = {
 				selectedFunction : function (object, field, item, keyboard) {
 					this.$data.vueData[object][field] = item.value;
 				},
-				searchAutocomplete : function (list, valueField, labelField, url, terms, done) {
+				searchAutocomplete : function (list, valueField, labelField, componentId, url, terms, update, abort) {
+					if (terms.length < 2) {
+				        abort();
+				        return
+				    }
 					this.$http.post(url, {terms: terms, list : list , valueField : valueField,labelField : labelField, CTX: this.$data.vueData.CTX}, { emulateJSON: true }).then( function (response ) {
 						var finalList =  response.body.map(function (object) {
 							return { value: object[valueField], label: object[labelField].toString()} // a label is always a string
 						});
-						done(finalList);
+						update(function() {
+							this.componentStates[componentId].options = finalList;
+						});
 					}, 
 					function (response) {
 						this.$q.notify(response.status + ":" +response.statusText);
-						done([]);
+						update([]);
 					});
 					
 				},
-				formatDate : function (object, field, newValue, format) {
-					this.$data.vueData[object][field] = Quasar.utils.date.formatDate(newValue, format);
-				},
-				parseDate : function (object, field, format) {
-					return this.parseDateAsString(this.$data.vueData[object][field], format)
-				},
-				parseDateAsString : function (dateAsString, format) {
-					if (dateAsString) {
-						var parts = dateAsString.match(/(\d+)/g);
-						var i=0;
-						var fmt={};
-						format.replace(/(YYYY|MM|DD)/g, function(part) { fmt[part] = i++; });
-						return Quasar.utils.date.buildDate({year :parts[fmt['YYYY']], month :parts[fmt['MM']], date : parts[fmt['DD']]});
+				decodeDate : function (object, field, format) {
+					var value = this.$data.vueData[object][field];
+					if(value === Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(value, 'DD/MM/YYYY'), 'DD/MM/YYYY')) {
+						return Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(value, 'DD/MM/YYYY'), format);
 					} else {
-						return null;
+						return value;
+					}
+				},
+				encodeDate : function (object, field, newValue, format) {
+					if(newValue === Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(newValue, format ), format)) {
+						this.$data.vueData[object][field] = Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(newValue, format ), 'DD/MM/YYYY');
+					} else {
+						this.$data.vueData[object][field] = newValue;
+					}
+				},
+				decodeDatetime : function (object, field, format) {
+					var value = this.$data.vueData[object][field];
+					if(value === Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(value, 'DD/MM/YYYY HH:mm'), 'DD/MM/YYYY HH:mm')) {
+						return Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(value, 'DD/MM/YYYY HH:mm'), format);
+					} else {
+						return value;
+					}
+				},
+				encodeDatetime : function (object, field, newValue, format) {
+					if(newValue === Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(newValue, format ), format)) {
+						this.$data.vueData[object][field] = Quasar.utils.date.formatDate(Quasar.utils.date.extractDate(newValue, format ), 'DD/MM/YYYY HH:mm');
+					} else {
+						this.$data.vueData[object][field] = newValue;
 					}
 				},
 				sortDatesAsString : function (format) {
 					return function (date1, date2) {
-						return (VUi.methods.parseDateAsString(date1, format).getTime() > VUi.methods.parseDateAsString(date2, format).getTime()) ? 1 : -1;
-					}
-				},
-				formatDateTime : function (object, field, newValue, format) {
-					this.$data.vueData[object][field] = Quasar.utils.date.formatDate(newValue, format);
-				},
-				parseDateTime : function (object, field, format) {
-					return this.parseDateTimeAsString(this.$data.vueData[object][field], format);
-				},
-				parseDateTimeAsString : function (dateTimeAsString, format) {
-					if (dateTimeAsString) {
-						var parts = dateTimeAsString.match(/(\d+)/g);
-						var i=0;
-						var fmt={};
-						format.replace(/(YYYY|MM|DD|HH|mm)/g, function(part) { fmt[part] = i++; });
-						return Quasar.utils.date.buildDate({year :parts[fmt['YYYY']], month :parts[fmt['MM']], date : parts[fmt['DD']], date : parts[fmt['DD']], hours : parts[fmt['HH']], minutes : parts[fmt['mm']]});
-					} else {
-						return null;
-					}
-				},
-				sortDateTimesAsString : function (format) {
-					return function (dateTime1, dateTime2) {
-						return (VUi.methods.parseDateTimeAsString(date1, format).getTime() > VUi.methods.parseDateTimeAsString(date2, format).getTime()) ? 1 : -1;
+						return (Quasar.utils.date.extractDate(date1, format).getTime() > Quasar.utils.date.extractDate(date2, format).getTime()) ? 1 : -1;
 					}
 				},
 				goTo : function (url) {
@@ -202,23 +196,14 @@ var VUi = {
 						params['sortFieldName'] = collectionPagination.sortBy;
 						params['sortDesc'] = collectionPagination.descending;
 					}
-					
-					this.$http.post(searchUrl, params, { emulateJSON: true }).then( function (response ) {
-						if (response.body.CTX) {
-							this.$data.vueData.CTX = response.body.CTX;
-						}
-						Object.keys(response.body).forEach(function (key) {
-							if ('CTX' != key) {
-								vueData[key] = response.body[key];
+					this.httpPostAjax(searchUrl, params, {  
+						onSuccess : function (response ) {
+							if (componentStates[collectionComponentId].pagination) {
+								var collectionPagination = componentStates[collectionComponentId].pagination;
+								collectionPagination.page = 1 // reset page
+								collectionPagination.rowsNumber = response.body.model[contextKey+'_list'].length
 							}
-						});
-						if (componentStates[collectionComponentId].pagination) {
-							var collectionPagination = componentStates[collectionComponentId].pagination;
-							collectionPagination.page = 1 // reset page
-							collectionPagination.rowsNumber = response.body[contextKey+'_list'].length
-						}
-						
-					});
+						}});
 				}, 400),
 				showMore : function (componentId) {
 					var showMoreCount = componentStates[componentId].pagination.showMoreCount;
@@ -229,19 +214,25 @@ var VUi = {
 					}
 					componentStates[componentId].pagination.rowsPerPage = componentStates[componentId].pagination.rowsPerPage / showMoreCount * (showMoreCount + 1);
 				},
-				uploader_uploadFile : function(componentId) {
-						this.$refs[componentId].upload()
+				uploader_addedFile : function(isMultiple, componentId) {
+					if (!isMultiple) {
+						this.$refs[componentId].removeUploadedFiles();
+						componentStates[componentId].fileUris = [];
+					}
 				},				
-				uploader_uploadedFile : function(file, componentId) {
+				uploader_uploadedFiles : function(uploadInfo, componentId) {
+					uploadInfo.files.forEach(function(file) {
 						componentStates[componentId].fileUris.push(file.xhr.response);
 						file.fileUri = file.xhr.response;
+					});
 				},
-				uploader_removeFile : function(removedFile, componentId) {
+				uploader_removeFiles : function(removedFiles, componentId) {
+					removedFiles.forEach(function(removedFile) {
 						var component = this.$refs[componentId];
 						var componentFileUris = componentStates[componentId].fileUris;
 						var indexOfFileUri = componentFileUris.indexOf(removedFile.fileUri);
 						var xhrParams = {};
-						xhrParams[component.name] = removedFile.fileUri;
+						xhrParams[component.fieldName] = removedFile.fileUri;
 						this.$http.delete(component.url, {params : xhrParams, credentials:component.withCredentials})
 						.then( function (response) { //Ok
 							if (component.multiple) {
@@ -252,25 +243,69 @@ var VUi = {
 						}, function(response) { //Ko
 							this.$q.notify(response.status + ":" +response.statusText+ " Can't remove temporary file");
 						});
-						
+					}.bind(this));
 				},
-				httpPostAjax : function(url, params, handler) {
+				httpPostAjax : function(url, params, options) {
 					params['CTX'] = vueData.CTX;
-					Vue.http.post(url, params , { emulateJSON: true }).then( function (response ) {
-						if (response.body.CTX) {
-							vueData.CTX = response.body.CTX;
+					this.$http.post(url, params , { emulateJSON: true }).then( function (response ) {
+						if (response.body.model.CTX) {
+							vueData.CTX = response.body.model.CTX;
 						}
-						Object.keys(response.body).forEach(function (key) {
+						Object.keys(response.body.model).forEach(function (key) {
 							if ('CTX' != key) {
-								vueData[key] = response.body[key];
+								vueData[key] = response.body.model[key];
 							}
 						});
-						if (handler) {
-							handler.bind(this).apply(response);
+						Object.keys(response.body.uiMessageStack).forEach(function (key) {
+							uiMessageStack[key] = response.body.uiMessageStack[key];
+						});
+						if (options && options.onSuccess) {
+							options.onSuccess(response);
 						}
-					}.bind(this));
+					}.bind(this)).catch(function (response) {
+						if (options && options.onError) {
+							options.onError(error);
+						}
+					})
+					;
+				},
+				hasFieldsError: function (object, field) {
+					var fieldsErrors = this.$data.uiMessageStack.objectFieldErrors;
+					return fieldsErrors.hasOwnProperty(object) && fieldsErrors[object].hasOwnProperty(field) && fieldsErrors[object][field].length > 0;
+				},
+				getErrorMessage: function (object, field) {
+					var fieldsErrors = this.$data.uiMessageStack.objectFieldErrors;
+					if (fieldsErrors.hasOwnProperty(object) && fieldsErrors[object].hasOwnProperty(field)) {
+						return fieldsErrors[object][field].toString(); 
+					} else { 
+						return '';
+					}
+				},
+				vueDataParams: function (keys) {
+					var params = {};
+					for (var i = 0; i < keys.length; i++) {
+						var contextKey = keys[i];
+						var vueDataValue = this.$data.vueData[contextKey];
+						if (vueDataValue !== null && typeof vueDataValue === 'object' && Array.isArray(vueDataValue) === false) {
+							// object
+							Object.keys(vueDataValue).forEach(function (propertyKey) {
+								if (Array.isArray(vueDataValue[propertyKey])) {
+									vueDataValue[propertyKey].forEach(function (value, index) {
+										params['vContext['+contextKey+']['+propertyKey+']['+index+']'] = vueDataValue[propertyKey][index];
+									});
+								} else {
+									params['vContext['+contextKey+']['+propertyKey+']'] = vueDataValue[propertyKey];
+								}
+							});
+						} else {
+							//primitive
+							params['vContext['+contextKey+']'] = vueDataValue;
+						}
+					}
+					return params;
+					
 				}
-			  }
+		}
 	}
 
 Vue.http.interceptors.push(function(request) {

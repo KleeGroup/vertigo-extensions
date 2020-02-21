@@ -330,8 +330,8 @@ public abstract class AbstractPublisherMergerTest extends AbstractTestCaseJU5 {
 	}
 
 	private static void save(final VFile result) {
-		try {
-			FileUtil.copy(result.createInputStream(), new File(result.getFileName()));
+		try (final InputStream in = result.createInputStream()) {
+			FileUtil.copy(in, new File(result.getFileName()));
 		} catch (final IOException e) {
 			throw WrappedException.wrap(e);
 		}

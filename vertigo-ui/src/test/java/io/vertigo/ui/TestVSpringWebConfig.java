@@ -22,7 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 import io.vertigo.ui.impl.springmvc.config.VSpringWebConfig;
 
-@ComponentScan("io.vertigo.ui.data.controller")
+@ComponentScan("io.vertigo.ui.data.controllers")
 public class TestVSpringWebConfig extends VSpringWebConfig {
 	// nothing basic config is enough
 }

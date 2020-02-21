@@ -18,7 +18,6 @@
  */
 package io.vertigo.stella.plugins.work.redis;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.Map;
 import io.vertigo.commons.codec.CodecManager;
 import io.vertigo.commons.impl.connectors.redis.RedisConnector;
 import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
 import io.vertigo.stella.impl.master.WorkResult;
 import io.vertigo.stella.impl.work.WorkItem;
 import io.vertigo.stella.work.WorkEngine;
@@ -89,8 +87,6 @@ public final class RedisDB {
 				tx.lpush("works:todo:" + workItem.getWorkEngineClass().getName(), workItem.getId());
 
 				tx.exec();
-			} catch (final IOException e) {
-				throw WrappedException.wrap(e); //actual tx.close impl never throw IOException :(
 			}
 		}
 	}
@@ -157,8 +153,6 @@ public final class RedisDB {
 				tx.lrem("works:in progress", 0, workId);
 				tx.lpush("works:done", workId);
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
 		}
 	}

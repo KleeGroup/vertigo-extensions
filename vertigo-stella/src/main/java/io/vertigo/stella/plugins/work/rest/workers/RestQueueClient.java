@@ -78,9 +78,9 @@ final class RestQueueClient {
 		try {
 			try {
 				final String jsonResult;
-				lockByWorkType.putIfAbsent(workType, new Object());
+				final Object lockWork = lockByWorkType.putIfAbsent(workType, new Object());
 				//Cette tache est synchronized sur le workType, pour éviter de surcharger le serveur en demandes multiple
-				synchronized (lockByWorkType.get(workType)) {
+				synchronized (lockWork) {
 					checkInterrupted(); //must be check because Thread.interrupt() doesn't freed the synchronized lock
 
 					final WebTarget remoteWebResource = prepareTarget(serverUrl + "/pollWork/" + workType + "?nodeUID=" + nodeId);
@@ -102,11 +102,11 @@ final class RestQueueClient {
 			} catch (final ProcessingException c) {
 				LOG.warn("[pollWork] Erreur de connexion au serveur " + serverUrl + "/pollWork/" + workType + " (" + c.getMessage() + ")", c);
 				//En cas d'erreur on attend quelques secondes, pour attendre que le serveur revienne
-				lockByWorkType.putIfAbsent(serverUrl, new Object());
+				final Object lockWork = lockByWorkType.putIfAbsent(serverUrl, new Object());
 				//En cas d'absence du serveur,
 				//ce synchronized permet d'étaler les appels au serveur de chaque worker : le premier attendra 2s, le second 2+2s, le troisième : 4+2s, etc..
 				//dés le retour du serveur, on récupère un worker toute les 2s
-				synchronized (lockByWorkType.get(serverUrl)) {
+				synchronized (lockWork) {
 					checkInterrupted();//must be check because Thread.interrupt() doesn't freed the synchronized lock
 					Thread.sleep(2000); //on veut bien un sleep
 				}

@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_4_0.xsd">
 
-	<display-name>Test Vertigo Struts</display-name>
+	<display-name>Test Vertigo SpringMvc</display-name>
 	<listener>
 		<listener-class>io.vertigo.vega.impl.webservice.servlet.AppServletContextListener
 		</listener-class>
@@ -44,11 +44,11 @@
 		<param-value>false</param-value>
 	</context-param>
 	<!-- serve static files by jetty -->
+
 	<servlet-mapping>
 		<servlet-name>default</servlet-name>
 		<url-pattern>/static/*</url-pattern>
 	</servlet-mapping>
-
 
 	<session-config>
 		<session-timeout>60</session-timeout>

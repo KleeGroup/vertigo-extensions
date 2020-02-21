@@ -22,16 +22,30 @@
  */
 Vue.directive('scroll-spy', {
         bind: function(elNav, args) {
+        	const debugMode = args.value.debug?args.value.debug:false;
+        	
         	const offset = args.value.offset?args.value.offset:0;
+        	const padding = args.value.padding?args.value.padding:24;
         	const scanner = args.value.scanner?args.value.scanner:offset+30; //scanner is 30px bottom of offset, must be smaller than the smallest first element
         	const elAs = elNav.querySelectorAll('a')
         	elAs[0].classList.add("active") //first active
         	const scrollContainer = Quasar.utils.scroll.getScrollTarget(document.querySelector(elAs[0].hash))
     		
+        	if(debugMode) {
+	        	const scannerLine1 = document.createElement("HR");  
+	        	scannerLine1.style.position='absolute';
+	        	scannerLine1.style.top=scanner+'px';
+	        	scannerLine1.style.border='none';
+	        	scannerLine1.style.borderTop='red solid 1px';
+	        	scannerLine1.style.width='100%';
+	        	scannerLine1.style.zIndex='10000';
+	        	document.querySelector('body').appendChild(scannerLine1);
+	        }
+        	
         	Vue.scrollSpyHandler = function(scroll) {
         		// Add the fixed class to the header when you reach its scroll position. Remove "fixed" when you leave the scroll position
         		if (window.pageYOffset > offset) {
-        			elNav.style.top = offset+"px";
+        			elNav.style.top = offset+padding+"px";
         			//when fixed, we must set a valid width, for that we use parent width
         			elNav.style.width = elNav.parentElement.getBoundingClientRect().width+"px";
         			elNav.classList.add("fixed");
@@ -47,9 +61,9 @@ Vue.directive('scroll-spy', {
         		//We looks between which breakpoints we are
         		for(var i = 0 ; i < elAs.length; i++) {
         			if(scrollBreakpoints[i] <= scrollPosition && (i >= elAs.length-1 || scrollPosition < scrollBreakpoints[i+1])) {
-				      elAs[i].classList.add("active")
+        				elAs[i].classList.add("active")
 				  } else {
-					  elAs[i].classList.remove("active");
+					  	elAs[i].classList.remove("active");
 				  }
 			    }
         	};
@@ -73,13 +87,13 @@ Vue.directive('scroll-spy', {
             };
         	
         	Vue.computeBreakPoints = function(scrollPosition){
-        		var scrollBreakpoints = []
-        		scrollBreakpoints.push(0)
-        		for(var i = 1 ; i < elAs.length; i++) {
+        		var blockHeight = []
+        		for(var i = 0 ; i < elAs.length; i++) {
         			const elScrollId = elAs[i].hash;
 				    const elScroll = document.querySelector(elScrollId)
 				    if(elScroll) {
-				    	scrollBreakpoints.push(scrollPosition+elScroll.getBoundingClientRect().top-scanner);      
+				    	blockHeight.push(scrollPosition+elScroll.getBoundingClientRect().top);
+				    	console.log(i+'  top: '+blockHeight[i] )
 					} else {
 						console.warn('ScrollSpy element '+elScrollId+' not found')
 					}
@@ -88,16 +102,24 @@ Vue.directive('scroll-spy', {
         		const windowHeight = (window.innerHeight || document.documentElement.clientHeight); /** visible height */
         		const scrollHeight = Quasar.utils.scroll.getScrollHeight(scrollContainer) /** height of scrollable element */ 
         		const scrollMax = scrollHeight - windowHeight /** Maximum possible scroll */  
-        		const lastHeight = Quasar.utils.scroll.getScrollHeight(scrollContainer) - scrollBreakpoints[scrollBreakpoints.length-1]; /** Last element height */
-        		const scrollStart = scrollMax - lastHeight + scanner /** Start linear move at this scroll position */
+        		const scrollStart = scrollMax - windowHeight + scanner; /** Start linear move at this scroll position */
+        		const blockHeightDelta = blockHeight[blockHeight.length-1] - scanner - scrollStart //block position linear regression "from" length
+        		const scrollDelta = windowHeight - scanner //scroll linear regression "to" length
+				
+        		var scrollBreakpoints = []
+        		scrollBreakpoints.push(0)
         		
         		for(var i = 1 ; i < elAs.length; i++) {
-        			var prev = scrollBreakpoints[i];
-        			if(scrollBreakpoints[i] > scrollStart) {
-        				scrollBreakpoints[i] = scrollStart + ((scrollBreakpoints[i] - scrollStart)/lastHeight) * (scrollMax-scrollStart-scanner)
-        			}	
+        			if(blockHeight[i] > scrollStart) {
+        				const blockScanFromStart = blockHeight[i] - scrollStart - scanner
+        				scrollBreakpoints[i] = scrollStart + (blockScanFromStart/blockHeightDelta) * scrollDelta
+        			} else {
+        				scrollBreakpoints[i] = blockHeight[i] - scanner;
+        			}
         			scrollBreakpoints[i] = Math.round(scrollBreakpoints[i])
-        			//console.log(i+'  from: '+prev+ '  to:'+scrollBreakpoints[i] )
+        		}
+        		if(debugMode) {
+        			scannerLine1.style.top=scrollBreakpoints[scrollBreakpoints.length-1]+'px';
         		}
         		return scrollBreakpoints;
             };

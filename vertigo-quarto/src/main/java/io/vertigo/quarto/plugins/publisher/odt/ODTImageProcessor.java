@@ -19,7 +19,6 @@
 package io.vertigo.quarto.plugins.publisher.odt;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -123,10 +122,10 @@ final class ODTImageProcessor implements MergerProcessor {
 	}
 
 	private static Dimension getImageSize(final VFile imageFile) throws IOException {
-		final InputStream is = new BufferedInputStream(imageFile.createInputStream());
-		final BufferedImage image = ImageIO.read(is);
-
-		return new Dimension(image.getWidth(), image.getHeight());
+		try (final InputStream is = imageFile.createInputStream()) {
+			final BufferedImage image = ImageIO.read(is);
+			return new Dimension(image.getWidth(), image.getHeight());
+		}
 	}
 
 	private static class Dimension {

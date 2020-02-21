@@ -1,17 +1,24 @@
 <th:block th:fragment="select-edit(object,list,field, label, valueField, labelField, label_attrs, input_attrs)" vu:alias="select" vu:selector="${viewMode=='edit'}"
 	  th:assert="${object} != null and ${field} != null and ${list} != null"
-	  th:with="myValueField=${valueField != null ? valueField : model.util.getIdField(list)}, myLabelField=${labelField != null ? labelField : model.util.getDisplayField(list)}">
+	  th:with="myValueField=${valueField != null ? valueField : model.util.getIdField(list)}, myLabelField=${labelField != null ? labelField : model.util.getDisplayField(list)}, myLabel=${label?:model.util.label(object + '.' + field)}">
 	<vu:include-data object="${object}" field="${field}"/>
 	<vu:include-data object="${list}" field="${myValueField}"/>
 	<vu:include-data object="${list}" field="${myLabelField}"/>
-	<vu:label-edit object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
-		<q-select
-				th:v-model="|vueData.${object}.${field}|" 
-				th::options="|transformListForSelection('${list}', '${myValueField}', '${myLabelField}')|"
-				th:attr="__${input_attrs}__"
-				>
-		</q-select>
-	</vu:label-edit>
+	<q-select
+			th:v-model="|vueData.${object}.${field}|" 
+			fill-input
+	        map-options
+	        emit-value
+			th::options="|transformListForSelection('${list}', '${myValueField}', '${myLabelField}')|"
+			th::label-width="${overridedLabelWidth?:3}"
+			th:label="${myLabel}"
+			th::error="|hasFieldsError('${object}', '${field}')|"
+			th::error-message="|getErrorMessage('${object}', '${field}')|"
+			orientation="vertical"
+			stack-label
+			th:attr="__${input_attrs}__"
+			>
+	</q-select>
 	<input type="hidden" th:name="|vContext[${object}][${field}]|" th:v-bind:value="|vueData.${object}.${field}|" />
 </th:block> 
 

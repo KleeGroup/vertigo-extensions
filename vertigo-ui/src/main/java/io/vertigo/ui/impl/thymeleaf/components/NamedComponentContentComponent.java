@@ -18,11 +18,18 @@
  */
 package io.vertigo.ui.impl.thymeleaf.components;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+import org.thymeleaf.standard.StandardDialect;
 
 import io.vertigo.lang.Assertion;
 
@@ -34,6 +41,7 @@ public final class NamedComponentContentComponent {
 	private final boolean standaloneTag;
 	private final boolean openTag;
 	private final boolean closeTag;
+	private final Map<String, String> attributes;
 
 	public NamedComponentContentComponent(final IModel innerModel) {
 		Assertion.checkNotNull(innerModel);
@@ -45,6 +53,7 @@ public final class NamedComponentContentComponent {
 		standaloneTag = firstLevelTag instanceof IStandaloneElementTag;
 		openTag = firstLevelTag instanceof IOpenElementTag;
 		closeTag = firstLevelTag instanceof ICloseElementTag;
+		attributes = readAttributes(innerModel);
 	}
 
 	/**
@@ -84,9 +93,32 @@ public final class NamedComponentContentComponent {
 		return innerModel;
 	}
 
+	public String getAttribute(final String attributeName) {
+		return attributes.get(attributeName);
+	}
+
 	@Override
 	public String toString() {
 		return innerModel.toString();
 	}
 
+	private static Map<String, String> readAttributes(final IModel model) {
+		final ITemplateEvent firstEvent = model.get(0);
+		final Map<String, String> attributes = new HashMap<>();
+
+		if (firstEvent instanceof IProcessableElementTag) {
+			final IProcessableElementTag processableElementTag = (IProcessableElementTag) firstEvent;
+			for (final IAttribute attribute : processableElementTag.getAllAttributes()) {
+				final String completeName = attribute.getAttributeCompleteName();
+				if (!isDynamicAttribute(completeName, StandardDialect.PREFIX)) {
+					attributes.put(completeName, attribute.getValue());
+				}
+			}
+		}
+		return attributes;
+	}
+
+	private static boolean isDynamicAttribute(final String attribute, final String prefix) {
+		return attribute.startsWith(prefix + ":") || attribute.startsWith("data-" + prefix + "-");
+	}
 }

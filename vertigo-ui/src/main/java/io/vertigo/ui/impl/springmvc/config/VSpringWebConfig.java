@@ -47,7 +47,7 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import io.vertigo.app.Home;
 import io.vertigo.core.component.Component;
-import io.vertigo.ui.controller.ListAutocompleteController;
+import io.vertigo.ui.controllers.ListAutocompleteController;
 import io.vertigo.ui.impl.springmvc.argumentresolvers.DtListStateMethodArgumentResolver;
 import io.vertigo.ui.impl.springmvc.argumentresolvers.FileInfoURIConverterValueHandler;
 import io.vertigo.ui.impl.springmvc.argumentresolvers.UiMessageStackMethodArgumentResolver;
@@ -81,7 +81,7 @@ public class VSpringWebConfig implements WebMvcConfigurer, ApplicationContextAwa
 			"table/table", "table/column", //table
 			"collections/collection", "collections/list", "collections/cards", "collections/field-read", // collections
 			"collections/search", "collections/facets", //search
-			"buttons/button-submit", "buttons/button-link" //buttons
+			"buttons/button-submit", "buttons/button-link", "buttons/buttons-group" //buttons
 	};
 
 	/*

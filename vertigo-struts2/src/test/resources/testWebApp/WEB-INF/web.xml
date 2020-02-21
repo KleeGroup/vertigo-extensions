@@ -8,7 +8,7 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	<listener>
-		<listener-class>io.vertigo.vega.impl.webservice.servlet.AppServletContextListener2</listener-class>
+		<listener-class>io.vertigo.vega.impl.webservice.servlet.AppServletContextListenerXml</listener-class>
 	</listener>
 	
 	<!-- Paramètrage des variables du managers.xml -->

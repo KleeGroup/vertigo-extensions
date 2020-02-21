@@ -1,16 +1,20 @@
-<th:block th:fragment="block(title, subtitle, icon, withFab, header_attrs, content_attrs, card_attrs)" 
+<th:block th:fragment="block(title, subtitle, icon, withFab, actions_slot, header_attrs, content_attrs, card_attrs)" 
 	th:assert="${title} != null">
-	<div th:class="${'q-card bg-white col-12 ' + ((withFab!=null && withFab)?'withFab':'')}" th:attr="__${card_attrs}__">
-		<div class="q-card-container row no-wrap" th:attr="__${header_attrs}__">
-			<div class="col column">
-				<div class="q-card-title" th:text="${title?:''}" />
-				<div class="q-card-subtitle" th:text="${subtitle?:''}" />
+	<div class="col-12">
+		<div th:class="${'q-card bg-white ' + ((withFab!=null && withFab)?'withFab':'')}" th:attr="__${card_attrs}__">
+			<div class="q-card__section no-padding" th:attr="__${header_attrs}__">
+				<q-item>
+					<q-item-section>
+						<div class="text-h6" th:text="${title?:''}" />
+						<div class="text-subtitle2" th:text="${subtitle?:''}" />
+					</q-item-section>
+					<q-item-section side vu:slot="actions_slot"><q-icon th-if="${icon != null}" th:name="${icon}"></q-icon></q-item-section>
+				</q-item>
 			</div>
-			<div class="col-auto self-center q-card-title-extra" th:if="${icon != null}" ><q-icon th:name="${icon}"></q-icon></div>
-		</div>
-		<div class="q-card-separator"></div>
-		<div class="q-card-main q-card-container" th:attr="__${content_attrs}__">
-			<vu:content/>
+			<div class="q-separator q-separator--horizontal"></div>
+			<div class="q-card__section" th:attr="__${content_attrs}__">
+				<vu:content/>
+			</div>
 		</div>
 	</div>
 </th:block> 

@@ -21,6 +21,8 @@ package io.vertigo.ui.impl.springmvc.util;
 import java.io.Serializable;
 import java.util.List;
 
+import io.vertigo.app.Home;
+import io.vertigo.core.locale.LocaleManager;
 import io.vertigo.dynamo.domain.metamodel.DataType;
 import io.vertigo.dynamo.domain.metamodel.DtDefinition;
 import io.vertigo.dynamo.domain.metamodel.DtField;
@@ -30,6 +32,7 @@ import io.vertigo.dynamox.domain.formatter.FormatterDefault;
 import io.vertigo.lang.Assertion;
 import io.vertigo.ui.core.AbstractUiListUnmodifiable;
 import io.vertigo.ui.core.ViewContext;
+import io.vertigo.util.StringUtil;
 import io.vertigo.vega.webservice.model.UiList;
 import io.vertigo.vega.webservice.model.UiObject;
 
@@ -214,6 +217,37 @@ public final class UiUtil implements Serializable {
 		}
 		final DtDefinition dtDefinition = getUiList(uiListKey).getDtDefinition();
 		return dtDefinition.getIdField().get().getName();
+	}
+
+	/**
+	 * Get the current locale prefix (either the user's or the app (see LocaleManager javadoc)
+	 * ex : fr, en-us, en-gb, es, it
+	 * @return the locale (in the quasar's style) to download the right js file
+	 */
+	public static String getCurrentLocalePrefixForQuasar() {
+		final LocaleManager localeManager = Home.getApp().getComponentSpace().resolve(LocaleManager.class);
+		final String currentLocaleTag = localeManager.getCurrentLocale().toLanguageTag();
+		// not so great but not other solutions (quasar's doesn't respect the standard...)
+		if (currentLocaleTag.startsWith("fr")) {
+			return "fr";
+		} else if (currentLocaleTag.startsWith("es")) {
+			return "es";
+		} else if (currentLocaleTag.startsWith("it")) {
+			return "it";
+		} else if ("en".equals(currentLocaleTag)) {
+			return "en-us"; //we need to make a choice...
+		} else {
+			return currentLocaleTag.toLowerCase();
+		}
+	}
+
+	/**
+	 * Get the current locale tag (either the user's or the app (see LocaleManager javadoc)
+	 * ex : fr, enUs, enGb, es, it
+	 * @return the locale (in the quasar's style) to select the right language in quasar
+	 */
+	public static String getCurrentLocaleForQuasar() {
+		return StringUtil.constToLowerCamelCase(getCurrentLocalePrefixForQuasar().toUpperCase().replace('-', '_'));
 	}
 
 	private static UiList getUiList(final String uiListKey) {

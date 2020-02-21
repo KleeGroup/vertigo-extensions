@@ -19,6 +19,8 @@
 package io.vertigo.ui.impl.springmvc.argumentresolvers;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
@@ -54,7 +56,10 @@ public class ViewContextReturnValueAndArgumentResolver extends AbstractMessageCo
 		final ServletServerHttpResponse outputMessage = createOutputMessage(webRequest);
 
 		// Try even with null return value. ResponseBodyAdvice could get involved.
-		writeWithMessageConverters(((ViewContext) returnValue).asUpdatesMap(), returnType, inputMessage, outputMessage);
+		final Map<String, Object> responseMap = new HashMap<>();
+		responseMap.put("model", ((ViewContext) returnValue).asUpdatesMap());
+		responseMap.put("uiMessageStack", UiRequestUtil.obtainCurrentUiMessageStack());
+		writeWithMessageConverters(responseMap, returnType, inputMessage, outputMessage);
 
 	}
 

@@ -186,6 +186,9 @@ public final class KActionContext extends HashMap<String, Serializable> {
 		if (CTX.equals(key)) { //struts tente de mettre a jour la clé lors de la reception de la request
 			return super.put(INPUT_CTX, value);
 		}
+		
+		remove(key); // vide les reverse index de potentielles anciennes valeurs sur la même clé
+		
 		if (value instanceof UiObject) {
 			reverseUiObjectIndex.put(value, key);
 			reverseUiObjectIndex.put(((UiObject<?>) value).getServerSideObject(), key);
@@ -206,8 +209,8 @@ public final class KActionContext extends HashMap<String, Serializable> {
 		Assertion.checkArgNotEmpty(keyString);
 		//---
 		// on garde les index en cohérence après un remove
-		reverseUiObjectIndex.values().removeIf((val) -> keyString.equals(val));
-		reverseUiListIndex.values().removeIf((val) -> keyString.equals(val));
+		reverseUiObjectIndex.values().removeIf(keyString::equals);
+		reverseUiListIndex.values().removeIf(keyString::equals);
 		// on fait le remove
 		return super.remove(key);
 	}

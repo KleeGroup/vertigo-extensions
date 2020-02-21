@@ -1,7 +1,11 @@
 # vertigo-extensions
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Maven Central](https://img.shields.io/maven-central/v/io.vertigo/vertigo.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.vertigo%22)
+
 =================
 
-Vertigo extensions are **ready to use** mini-appplications that provide **high value services** on a given topic.
+Vertigo extensions are mini-appplications that provide **high value services** on a given topic.
 Use them to enhance your applications!
 
 Each extension can be used :
@@ -9,49 +13,57 @@ Each extension can be used :
  - as a standalone app for microservices architectures
 
 
-## vertigo-social
+## vertigo-social [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
 ### Add collaboration features to help your users
 
-* __comment__ : a simple way to add comments and metadata to business objects
+* __comment__ :  a simple way to add comments and metadata to business objects
 * __notification__ : a standalone way to push notification to users
+* __mail__ : a simple api to send mails
+* __handle__ : *WIP*
 
-## vertigo-orchestra
+## vertigo-orchestra [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
 ### Manage, execute and monitor background operations and communications.
 For more details see [here](/vertigo-orchestra/)
 
-## vertigo-stella : 
-* __node__ : node of worker for distributed operations
-* __work__ : process, shedule or distribute your tasks
-
-## vertigo-quarto
+## vertigo-quarto [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
 ### Publishing managment.
 
 * __converter__ : obviously, converts your documents from one format to another
 * __publisher__ : lightweight publishing tool. Produces documents from user defined templates and application data. Templates are really easy to modify because they are just ODT or DOCX with tags.
 * __export__ : exports collections and object to usefull files formats (built-in: CSV, PDF, RTF, XLS)
 
-## vertigo-rules
-* Simple rule engine. Can be used in a standalone use case or integrated with the workflow module.
-
-## vertigo-workflow
-* Simple workflow module to handle linear workflows. A rule system can be used to dynamically skip activities.
-
-## vertigo-struts2
+## vertigo-struts2 [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
 ### Bridge to use vertigo for Struts2 applications.
 
-## vertigo-mail
-A simple mailer for your app
+## vertigo-ui [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
+### Bridge to use vertigo for SpringMVC/Thymeleaf applications, use [VueJS](https://vuejs.org) & [Quasar](https://quasar.dev) for UI.
 
-## vertigo-audit
+## vertigo-stella : [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-no-red.svg)]()
+* __node__ : node of worker for distributed operations
+* __work__ : process, shedule or distribute your tasks
 
-## vertigo-adapters
+## vertigo-dashboard [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
+Create dashboard for analytics. Using Timeseries database.
+
+## vertigo-ledger [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-yes-green.svg)]()
+POC api for using blockchain data proof.
+
+## vertigo-rules [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-no-red.svg)]()
+* Simple rule engine. Can be used in a standalone use case or integrated with the workflow module.
+
+## vertigo-workflow [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-no-red.svg)]()
+* Simple workflow module to handle linear workflows. A rule system can be used to dynamically skip activities.
+
+## vertigo-audit [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-no-red.svg)]()
+
+## vertigo-adapters [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-no-red.svg)]()
 Standalone adapters to easily use third party services (Twitter, IFTTT, etc...) with your vertigo app
 
-## vertigo-geo
+## vertigo-geo [![Ready to use?](https://img.shields.io/badge/Ready%20to%20use%3F-no-red.svg)]()
 
 -----
 #License
-                Copyright (C) 2017, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
+                Copyright (C) 2017-2019, Vertigo.io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
                 KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
                 
                 Licensed under the Apache License, Version 2.0 (the "License");

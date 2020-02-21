@@ -1,6 +1,6 @@
 <th:block th:fragment="grid(cols, contentTags)" 
 	th:with="layout='grid', currentColumnCount=0, tableCols=${cols?:2}, overridedLabelWidth=${cols?:2}" >
-	<div class="row gutter-md" >
+	<div class="row q-col-gutter-md" >
 		<th:block th:each="contentItem:${contentTags}">
 			<th:block th:if="${contentItem.isTag('grid-cell')}"><vu:content-item/></th:block>
 			<div th:if="${!contentItem.isTag('grid-cell')}" th:class="${'col-xs-12 col-md-'+(12/tableCols)}"><vu:content-item/></div>

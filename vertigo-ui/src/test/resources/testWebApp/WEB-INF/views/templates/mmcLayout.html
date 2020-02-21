@@ -12,154 +12,91 @@
     
   	<link rel="stylesheet" th:href="@{/static/css/mars.css}"/>
 	<link rel="icon" th:href="@{/static/img/favicon.ico}"/>
-    
-   	<script th:src="@{/static/js/mars.js}"></script>
+   	<script src="https://unpkg.com/vue-cookies@1.5.12/vue-cookies.js"></script> 
 </head>
 
 <body class="mat desktop no-touch platform-mat">
+
 	<vu:page>
-      <q-layout view="hHh LpR lff" id="page" v-cloak>
+	
+      <q-layout view="hHh LpR fff" id="page" v-cloak>
 			<!-- BEGIN HEADER-->
-			<q-layout-header class="items-center">
+			<q-header class="items-center">
 				<q-toolbar class="justify-between">
 					<div class="row">
-						<q-btn flat round dense 
-						th:with="showLeft=${model.vContext['componentStates'].addComponentState('navDrawer').addPrimitive('showLeft', true)}"
+						<q-btn flat round dense class="lt-lg"
+						th:with="showLeft=${model.vContext['componentStates'].addComponentState('navDrawer').addPrimitive('showLeft', true)}, mini=${model.vContext['componentStates']['navDrawer'].addPrimitive('mini', false)}"
 						@click="componentStates.navDrawer.showLeft = !componentStates.navDrawer.showLeft" icon="menu" aria-label="Toggle menu on left side"></q-btn>
-						<div><img th:src="@{/static/img/logo MMC v0.1.png}" height="40px"/></div>
-						<q-toolbar-title>
-								MMC Managment 
-								<span slot="subtitle">Mars Mining Company</span>
+						<div class="gt-md">Demo</div>
+						<q-toolbar-title class="gt-md">
+								Command Center 
+								<span slot="subtitle">Observe, Orient, Decide and Act</span>
 						</q-toolbar-title>
 					</div>
 					<!-- Brand and toggle get grouped for better mobile display -->
-					<div>
-						<input type="text"/>
-						<i aria-hidden="true" class="q-icon material-icons">search</i>
-					</div>
-					<div>
-						<q-btn round dense color="primary" icon="mail" class="on-left" >
-							<q-chip floating color="red">22</q-chip>
-						</q-btn>
-						<q-btn icon-right="arrow_drop_down"  class="on-left">
-							<img th:src="@{/static/img/woman.png}" class="avatar"/>
-							<div  class="on-right">Daniel Johnson<br/><small>Administrator</small></div>
-						</q-btn>
-						<q-btn flat round dense icon="apps" aria-label="Toggle apps"></q-btn>
-					</div>
 				</q-toolbar>
-			</q-layout-header>
+			</q-header>
         	<!-- END HEADER-->
-        				
-			<q-layout-footer>
-    			<q-toolbar class="justify-between">
-					<div class="row col-4 justify-between">
-					<div >
-						Connected since 
-						<div class="q-chip row no-wrap inline items-center q-chip-square bg-secondary text-white">
-						<div class="q-chip-main ellipsis">2</div></div> hours
-					</div>
-					<!-- Brand and toggle get grouped for better mobile display -->
-					<div>
-						Base managers connected to system : 
-						<div class="q-chip row no-wrap inline items-center q-chip-square bg-secondary text-white">
-						<div class="q-chip-main ellipsis">5</div></div>
-					</div>
-					</div>
-					<div class="row col-2 justify-between items-center">
-						<img th:src="@{/static/img/logo MMC grey v0.1.png}" height="30px"/>
-						&copy; 2153 Mars Mining Corp.
-					</div>
-				</q-toolbar>
-  			</q-layout-footer>
+        			
   			
-  			<q-layout-drawer
+  			<q-drawer
+  			  content-class="bg-white text-primary"
 		      side="left"
-		      :overlay="!componentStates.navDrawer.miniState"
-		      v-model="componentStates.navDrawer.showLeft"
-		      th:with="miniState=${model.vContext['componentStates']['navDrawer'].addPrimitive('miniState', true)}"
-		      :mini="componentStates.navDrawer.miniState"
-			    @mouseover="componentStates.navDrawer.miniState = false"
-			    @mouseout="componentStates.navDrawer.miniState = true"
-			  >
+		      :mini="function() {var miniMenu = this.$cookies.get('miniMenu', true) === 'true';componentStates.navDrawer.mini = miniMenu;return miniMenu;}()"
+		      v-model="componentStates.navDrawer.showLeft">
 		      
-		      <div slot="mini" style="height:100%">
-		      	 <q-list link style="height:100%">
-			      <nav>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-globe-asia"></q-item-side>
-			        </q-item>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-store-alt"></q-item-side>
-			        </q-item>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-user-friends"></q-item-side>
-			        </q-item>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-box-open"></q-item-side>
-			        </q-item>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-cubes"></q-item-side>
-			        </q-item>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-thermometer-empty"></q-item-side>
-			        </q-item>
-			        <q-item tag="a" th:href="@{#}">
-			          <q-item-side icon="fas fa-chart-pie" ></q-item-side>
-			        </q-item>
-			        </nav>
-			        </q-list>
-		      </div>
-		      
-		      <q-list link style="height:100%">
+		      <q-list :class="{'dense-list-header':!componentStates.navDrawer.mini}" style="height:100%">
 		      <nav class="text-no-wrap">
-		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-globe-asia "></q-item-side>
-		          <q-item-main label="Planetary Status"></q-item-main>
+		      	<q-item-label header>Home</q-item-label>
+		        <q-item tag="a" th:href="@{/movies/}">
+		          <q-item-section avatar>
+		          	<q-icon name="fas fa-globe-europe"></q-icon>
+		          </q-item-section>
+		          <q-item-section>Home</q-item-section>
+		        </q-item>
+		        <q-separator></q-separator>
+		       	<q-item-label header>Base managment</q-item-label>
+		        <q-item tag="a" th:href="@{/movies/}">
+		          <q-item-section avatar>
+		          	<q-icon name="fas fa-dice-d20"></q-icon>
+		          </q-item-section>
+		          <q-item-section>Movies</q-item-section>
+		          <q-item-section side><q-chip color="primary" dense square class="q-mr-xs">VR</q-chip></q-item-section>
 		        </q-item>
 		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-store-alt"></q-item-side>
-		          <q-item-main label="Managed Bases"></q-item-main>
+		          <q-item-section avatar>
+		          	<q-icon name="fas fa-rocket"></q-icon>
+		          </q-item-section>
+		          <q-item-section>Equipments</q-item-section>
 		        </q-item>
-		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-user-friends"></q-item-side>
-		          <q-item-main label="Personnel" sublabel="Base managers, Workers,..."></q-item-main>
-		        </q-item>
-		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-box-open"></q-item-side>
-		          <q-item-main label="Open Data"></q-item-main>
-		        </q-item>
-		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-cubes"></q-item-side>
-		          <q-item-main label="Equipment Catalog"></q-item-main>
-		        </q-item>
-		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-thermometer-empty"></q-item-side>
-		          <q-item-main label="Environment Monitoring" ></q-item-main>
-		        </q-item>
-		        <q-item tag="a" th:href="@{#}">
-		          <q-item-side icon="fas fa-chart-pie" ></q-item-side>
-		          <q-item-main label="My Analytics" ></q-item-main>
-		        </q-item>
+		       	<q-separator></q-separator>
+		        <q-item v-if="componentStates.navDrawer.mini"
+						@click.native="componentStates.navDrawer.mini = false; $cookies.set('miniMenu', false)" title="Expand menu">
+						<q-item-section avatar>
+		          			<q-icon name="arrow_right"></q-icon>
+		          		</q-item-section>
+				</q-item>
+				 <q-item v-if="!componentStates.navDrawer.mini"
+						@click.native="componentStates.navDrawer.mini = true; $cookies.set('miniMenu', true)" title="Minify menu">
+					<q-item-section side>
+		          		<q-icon name="arrow_left"></q-icon>
+		          	</q-item-section>
+				</q-item>
 		        </nav>
 		        </q-list>
-		    </q-layout-drawer>
+		        
+		    </q-drawer>
 		    
-		    <q-layout-drawer side="right" show-if-above>
-		    
-		     	<section layout:fragment="content-nav"></section>
-		     	
-		    </q-layout-drawer>
-  			
-			<q-page-container class="row justify-center">
-			 	<q-page class="layout-padding col-12">
-					<section layout:fragment="content"></section>
+			<q-page-container class="row justify-center q-pb-lg" >
+				<q-page padding class="row col-12">			
+			 		<section class="col content-body"  layout:fragment="content"></section>
 				</q-page>
 			</q-page-container>
-  			
 		</q-layout>
 		
 	</vu:page>
+	<div layout:fragment="javascript-footer">
+	</div>
+			
 </body>
-
 </html>

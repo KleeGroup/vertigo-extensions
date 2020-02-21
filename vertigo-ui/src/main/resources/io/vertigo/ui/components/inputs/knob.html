@@ -6,6 +6,7 @@
 	<vu:label-edit label="${label}" th:attr="__${label_attrs}__">
 		<q-knob
 			th:v-model="${'vueData.' + object + '.' + field}" 
+			show-value
 			th::min="${myMin}"
 			th::max="${myMax}"
 			th::step="${myStep}"

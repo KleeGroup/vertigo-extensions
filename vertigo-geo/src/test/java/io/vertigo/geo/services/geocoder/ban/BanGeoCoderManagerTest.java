@@ -82,7 +82,7 @@ public class BanGeoCoderManagerTest extends AbstractTestCaseJU5 {
 		AssertNear(geoLocation, 49.213506, 5.63623222988, 2);
 		Assertions.assertEquals("étain", geoLocation.getLocality().toLowerCase());
 		Assertions.assertEquals("meuse", geoLocation.getLevel2().toLowerCase());
-		Assertions.assertEquals("grand-est (lorraine)", geoLocation.getLevel1().toLowerCase());
+		Assertions.assertEquals("grand est", geoLocation.getLevel1().toLowerCase());
 		Assertions.assertEquals("FR", geoLocation.getCountryCode());
 	}
 
@@ -129,7 +129,8 @@ public class BanGeoCoderManagerTest extends AbstractTestCaseJU5 {
 	public final void testManyResults() {
 		// Géolocalisation
 		final GeoLocation coordinates = geoCoderManager.findLocation("paris");
-		AssertNear(coordinates, 48.8589, 2.346950, 2);
+		AssertNear(coordinates, 48.8589, 2.346950, 3); //47 rue de Rivoli
+		//Distance 3km car la BAN retourne un point à 100m de la gare de Lyon
 	}
 
 	private void AssertNear(final GeoLocation geoLocation, final double latitude, final double longitude, final double distanceMaxKm) {

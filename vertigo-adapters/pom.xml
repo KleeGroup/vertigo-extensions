@@ -5,16 +5,12 @@
 	<parent>
 		<groupId>io.vertigo</groupId>
 		<artifactId>vertigo-extensions</artifactId>
-		<version>2.1.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>vertigo-adapters</artifactId>
 	<packaging>jar</packaging>
 	<name>vertigo-adapters</name>
-
-	<properties>
-		<jersey2.version>2.25.1</jersey2.version>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -28,19 +24,19 @@
 		<dependency>
 			<groupId>org.twitter4j</groupId>
 			<artifactId>twitter4j-core</artifactId>
-			<version>4.0.6</version>
+			<version>4.0.7</version>
 		</dependency>
 
 		<!-- Jersey 2 -->
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
-			<version>${jersey2.version}</version>
+			<version>2.29.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>${jersey2.version}</version>
+			<version>2.29.1</version>
 		</dependency>
 	</dependencies>
 

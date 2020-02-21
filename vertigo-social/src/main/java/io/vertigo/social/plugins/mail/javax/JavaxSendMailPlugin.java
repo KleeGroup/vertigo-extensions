@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.mail.BodyPart;
@@ -34,7 +33,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
@@ -56,7 +54,6 @@ import io.vertigo.lang.WrappedException;
 import io.vertigo.social.impl.mail.Resources;
 import io.vertigo.social.impl.mail.SendMailPlugin;
 import io.vertigo.social.services.mail.Mail;
-import io.vertigo.util.StringUtil;
 
 /**
  * Plugin de gestion des mails, pour l'implémentation du jdk.
@@ -70,59 +67,34 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 
 	private final String charset;
 	private final FileManager fileManager;
-	private final String mailStoreProtocol;
-	private final String mailHost;
+	private final MailSessionConnector mailSessionConnector;
 	private final boolean developmentMode;
 	private final String developmentMailTo;
-	private final Optional<Integer> mailPort;
-	private final Optional<String> mailLogin;
-	private final Optional<String> mailPassword;
 
 	/**
 	 * Crée le plugin d'envoie de mail.
 	 *
 	 * @param fileManager Manager de gestion des fichiers
-	 * @param mailStoreProtocol Protocole utilisé
-	 * @param mailHost Serveur de mail
+	 * @param mailSessionConnector Provider d'accès au MailSession
 	 * @param developmentMode Indique s'il le mode developpement est activé (surcharge des emails destinataires)
 	 * @param developmentMailTo Email destinataire forcé pour développement
-	 * @param mailPort port à utiliser (facultatif)
-	 * @param mailLogin Login à utiliser lors de la connexion au serveur mail (facultatif)
-	 * @param mailPassword mot de passe à utiliser lors de la connexion au serveur mail (facultatif)
 	 * @param charsetOpt charset to use, default is ISO-8859-1
 	 */
 	@Inject
 	public JavaxSendMailPlugin(
 			final FileManager fileManager,
-			@ParamValue("storeProtocol") final String mailStoreProtocol,
-			@ParamValue("host") final String mailHost,
+			final MailSessionConnector mailSessionConnector,
 			@ParamValue("developmentMode") final boolean developmentMode,
 			@ParamValue("developmentMailTo") final String developmentMailTo,
-			@ParamValue("port") final Optional<Integer> mailPort,
-			@ParamValue("login") final Optional<String> mailLogin,
-			@ParamValue("pwd") final Optional<String> mailPassword,
 			@ParamValue("charset") final Optional<String> charsetOpt) {
 		Assertion.checkNotNull(fileManager);
-		Assertion.checkArgNotEmpty(mailStoreProtocol);
-		Assertion.checkArgNotEmpty(mailHost);
+		Assertion.checkNotNull(mailSessionConnector);
 		Assertion.checkArgNotEmpty(developmentMailTo);
-		Assertion.checkNotNull(mailPort);
-		Assertion.checkNotNull(mailLogin);
-		Assertion.checkNotNull(mailPassword);
-		Assertion.when(mailLogin.isPresent())
-				.check(() -> !StringUtil.isEmpty(mailLogin.get()), // if set, login can't be empty
-						"When defined Login can't be empty");
-		Assertion.checkArgument(!mailLogin.isPresent() ^ mailPassword.isPresent(), // login and password must be null or not null both
-				"Password is required when login is defined");
 		//-----
 		this.fileManager = fileManager;
-		this.mailStoreProtocol = mailStoreProtocol;
-		this.mailHost = mailHost;
+		this.mailSessionConnector = mailSessionConnector;
 		this.developmentMailTo = developmentMailTo;
 		this.developmentMode = developmentMode;
-		this.mailPort = mailPort;
-		this.mailLogin = mailLogin;
-		this.mailPassword = mailPassword;
 		charset = charsetOpt.orElseGet(StandardCharsets.ISO_8859_1::name);
 	}
 
@@ -131,12 +103,12 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	public void sendMail(final Mail mail) {
 		Assertion.checkNotNull(mail);
 		//-----
+		final Session session = mailSessionConnector.createSession();
 		try {
-			final Session session = createSession();
 			final Message message = createMessage(mail, session);
 			Transport.send(message);
 		} catch (final MessagingException e) {
-			throw createMailException(Resources.TEMPO_MAIL_SERVER_TIMEOUT, e, mailHost, mailPort.isPresent() ? mailPort.get() : "default");
+			throw createMailException(Resources.TEMPO_MAIL_SERVER_TIMEOUT, e, session.getProperty("mail.host"), session.getProperty("mail.port"));
 		} catch (final UnsupportedEncodingException e) {
 			throw WrappedException.wrap(e, "Probleme d'encodage lors de l'envoi du mail");
 		}
@@ -170,36 +142,6 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 			message.setContent(multiPart);
 		}
 		return message;
-	}
-
-	private Session createSession() {
-		final Properties properties = new Properties();
-		properties.setProperty("mail.store.protocol", mailStoreProtocol);
-		properties.setProperty("mail.host", mailHost);
-		if (mailPort.isPresent()) {
-			properties.setProperty("mail.port", mailPort.get().toString());
-		}
-		properties.setProperty("mail.debug", "false");
-		final Session session;
-		if (mailLogin.isPresent()) {
-			properties.setProperty("mail.smtp.ssl.trust", mailHost);
-			properties.setProperty("mail.smtp.starttls.enable", "true");
-			properties.setProperty("mail.smtp.auth", "true");
-
-			final String username = mailLogin.get();
-			final String password = mailPassword.get();
-			session = Session.getInstance(properties, new javax.mail.Authenticator() {
-
-				@Override
-				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(username, password);
-				}
-			});
-		} else {
-			session = Session.getDefaultInstance(properties);
-		}
-		session.setDebug(false);
-		return session;
 	}
 
 	private static void setFromAddress(final String from, final Message message) throws MessagingException {
@@ -311,16 +253,16 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	public HealthMeasure checkConnexion() {
 		// -----
 		try {
-			final Session session = createSession();
-			try (final Transport transport = session.getTransport(mailStoreProtocol)) {
+			final Session session = mailSessionConnector.createSession();
+			try (final Transport transport = session.getTransport()) {
 				// On tente la connexion
 				transport.connect();
 				transport.close();
 			} // La connexion s'est passée correctement. On peut la fermer
 				// si on est ici, c'est que tout va bien
-			return HealthMeasure.builder().withGreenStatus("Connection OK to Mail Server " + mailHost + " with " + mailStoreProtocol).build();
+			return HealthMeasure.builder().withGreenStatus("Connection OK to Mail Server " + session.getProperty("mail.host")).build();
 		} catch (final Exception e) {
-			return HealthMeasure.builder().withRedStatus("Can't connect Mail Server " + mailHost + " with " + mailStoreProtocol, e).build();
+			return HealthMeasure.builder().withRedStatus("Can't connect Mail Server", e).build();
 		}
 	}
 }

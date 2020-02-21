@@ -18,7 +18,6 @@
  */
 package io.vertigo.social.plugins.notification.redis;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ import io.vertigo.commons.daemon.DaemonScheduled;
 import io.vertigo.commons.impl.connectors.redis.RedisConnector;
 import io.vertigo.dynamo.domain.model.UID;
 import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
 import io.vertigo.social.impl.notification.NotificationEvent;
 import io.vertigo.social.impl.notification.NotificationPlugin;
 import io.vertigo.social.services.notification.Notification;
@@ -102,8 +100,6 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 					tx.lpush(typedTarget, uuid);
 				}
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
 
 		}
@@ -180,8 +176,6 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 				//we store the data of this notification
 				tx.hset("userContent:" + uuid, updatedAccount, userContent != null ? userContent : "");
 				tx.exec();
-			} catch (final IOException ex) {
-				throw WrappedException.wrap(ex);
 			}
 		}
 	}

@@ -18,6 +18,8 @@
  */
 package io.vertigo.ui.impl.springmvc.util;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.web.context.request.RequestAttributes;
@@ -43,7 +45,6 @@ public final class UiRequestUtil {
 	 * Invalide la session Http (ie Logout)
 	 */
 	public static void invalidateHttpSession() {
-
 		final HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
 		if (session != null) {
 			session.invalidate();
@@ -76,4 +77,19 @@ public final class UiRequestUtil {
 		attributes.removeAttribute("uiMessageStack", RequestAttributes.SCOPE_SESSION);
 	}
 
+	public static void setRequestScopedAttribute(final String name, final Object value) {
+		Assertion.checkArgNotEmpty(name);
+		//---
+		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
+		attributes.setAttribute(name, value, RequestAttributes.SCOPE_REQUEST);
+	}
+
+	public static <O extends Object> Optional<O> getRequestScopedAttribute(final String name, final Class<O> valueClass) {
+		Assertion.checkArgNotEmpty(name);
+		Assertion.checkNotNull(valueClass);
+		//---
+		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
+		final O value = valueClass.cast(attributes.getAttribute(name, RequestAttributes.SCOPE_REQUEST));
+		return Optional.ofNullable(value);
+	}
 }

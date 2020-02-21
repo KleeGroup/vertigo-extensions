@@ -1,9 +1,9 @@
 <th:block th:fragment="cards(list, componentId, rowsPerPage, showMore, showMoreLabel, selectable, rowKey, sortUrl, cardClass)" 
 	th:with="myRowKey=${rowKey?:model.util.getIdField('__${list}__')}, mySelectable=${selectable?:false}" >
 	<vu:collection list="${list}" componentId="${componentId}" rowsPerPage="${rowsPerPage}" showMore=${showMore} showMoreLabel="${showMoreLabel}" selectable="${mySelectable}" sortUrl="${sortUrl}">
-		<div class="row wrap justify-start gutter-sm">
+		<div class="row wrap justify-start q-col-gutter-md">
 			<div th:v-for="|item in paginatedData('${list}', '${componentId}' )|" th::key="|item.${myRowKey}|" th:class="${cardClass}">
-				<q-card inline color="white" text-color="grey" >
+				<q-card>
 					<vu:content/>
 				</q-card>
 			</div>

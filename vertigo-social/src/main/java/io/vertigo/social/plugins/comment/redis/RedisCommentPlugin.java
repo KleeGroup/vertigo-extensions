@@ -18,7 +18,6 @@
  */
 package io.vertigo.social.plugins.comment.redis;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,6 @@ import io.vertigo.commons.impl.connectors.redis.RedisConnector;
 import io.vertigo.dynamo.domain.model.KeyConcept;
 import io.vertigo.dynamo.domain.model.UID;
 import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
 import io.vertigo.social.impl.comment.CommentPlugin;
 import io.vertigo.social.services.comment.Comment;
 import io.vertigo.util.MapBuilder;
@@ -64,8 +62,6 @@ public final class RedisCommentPlugin implements CommentPlugin {
 				tx.hmset("comment:" + comment.getUuid(), toMap(comment));
 				tx.lpush("comments:" + keyConceptUri.urn(), comment.getUuid().toString());
 				tx.exec();
-			} catch (final IOException e) {
-				throw WrappedException.wrap(e, "Can't publish comment onto {0}", keyConceptUri.urn());
 			}
 		}
 
@@ -104,8 +100,6 @@ public final class RedisCommentPlugin implements CommentPlugin {
 					responses.add(tx.hgetAll("comment:" + uuid));
 				}
 				tx.exec();
-			} catch (final IOException e) {
-				throw WrappedException.wrap(e);
 			}
 		}
 		//----- we are using tx to avoid roundtrips

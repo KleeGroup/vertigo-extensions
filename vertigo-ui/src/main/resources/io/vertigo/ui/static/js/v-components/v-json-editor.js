@@ -2,9 +2,9 @@ Vue.component('v-json-editor', {
 	template : 
 '	<div class="row">'
 +'		<div v-for="(value, key) in jsonAsObject" :key="key" :class="\'col-\'+(12/cols)">'
-+'			<q-field :label="key" orientation="vertical">'
-+'				<q-input v-if="!readonly"  v-model="jsonAsObject[key]" @input="updateJson" ></q-input>'
-+'				<span v-else>{{value}}</span>'					
++'			<q-input  v-if="!readonly" :label="key" orientation="vertical" stack-label  v-model="jsonAsObject[key]" @input="updateJson" ></q-input>'
++ '			<q-field v-else :label="key" orientation="vertical" stack-label borderless readonly>'
++'				<span >{{value}}</span>'					
 +'			</q-field>'
 +'		</div>'
 +'	</div>'

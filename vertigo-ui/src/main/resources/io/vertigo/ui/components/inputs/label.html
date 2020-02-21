@@ -4,10 +4,11 @@
 	<q-field
 		th::label-width="${overridedLabelWidth?:3}"
 		th:label="${myLabel}"
-		th::error="${uiMessageStack.hasFieldErrors('__${object}__', '__${field}__')}"
-		th:error-label="${uiMessageStack.hasFieldErrors('__${object}__', '__${field}__') ? uiMessageStack.objectFieldErrors[__${object}__][__${field}__] : ''}"
-		th::warning="${uiMessageStack.hasFieldWarnings('__${object}__', '__${field}__')}"
+		th::error="|hasFieldsError('${object}', '${field}')|"
+			th::error-message="|getErrorMessage('${object}', '${field}')|"
 		orientation="vertical"
+		stack-label
+		borderless
 		th:attr="__${other_attrs}__"
 		>
 		 <vu:content/>
@@ -21,6 +22,9 @@
 		th::label-width="${overridedLabelWidth?:3}"
 		th:label="${myLabel}"
 		orientation="vertical"
+		stack-label
+		readonly
+		borderless 
 		th:attr="__${other_attrs}__"
 		>
 		<vu:content/>

@@ -1,18 +1,20 @@
 <th:block th:fragment="modal(componentId, title, closeLabel, srcUrl, iframe_attrs, modal_attrs)" 
 	  th:assert="${componentId} != null"
 	  th:attr="objectKey=${model.vContext['componentStates'].addComponentState(componentId).addPrimitive('opened', false)}, objectKey=${model.vContext['componentStates']['__${componentId}__'].addPrimitive('srcUrl', srcUrl?:'')}" >
-	<q-modal th:v-model="|componentStates.${componentId}.opened|" th:attr="__${modal_attrs}__">
-		<q-modal-layout footer-class="row q-layout-footer no-shadow justify-end">
+	<q-dialog th:v-model="|componentStates.${componentId}.opened|" th:attr="__${modal_attrs}__">
 			<vu:content>
-			<q-toolbar slot="header" th:if="${title} != null">
-		      <q-btn flat round dense v-close-overlay icon="keyboard_arrow_left"></q-btn>
-		      <q-toolbar-title th:text="${title}"></q-toolbar-title>
-		    </q-toolbar>
-			<iframe th:v-bind:src="|componentStates.${componentId}.srcUrl|" frameBorder="0"  th:attr="__${iframe_attrs}__" ></iframe>
-			<template slot="footer" th:if="${closeLabel} != null">
-			    <q-btn flat v-close-overlay th:label="${closeLabel}" ></q-btn>
-		    </template>
+			<q-card class="bg-white" style="max-width:unset;">
+				<q-toolbar class="bg-primary" th:if="${title != null}">
+				    <q-btn flat round dense v-close-popup icon="keyboard_arrow_left" text-color="white" ></q-btn>
+				    <q-toolbar-title th:text="${title}" class="text-white"></q-toolbar-title>
+				</q-toolbar>
+				<q-card-section class="q-pa-none">
+					<iframe th:v-bind:src="|componentStates.${componentId}.srcUrl|" frameBorder="0"  th:attr="__${iframe_attrs}__" ></iframe>
+				</q-card-section>
+				<q-toolbar th:if="${closeLabel} != null" class="bg-primary" >
+				    <q-btn flat v-close-popup th:label="${closeLabel}" text-color="white" ></q-btn>
+				</q-toolbar>
+			</q-card>
 		    </vu:content>
-	    </q-modal-layout>
-  	</q-modal>
+  	</q-dialog>
 </th:block> 

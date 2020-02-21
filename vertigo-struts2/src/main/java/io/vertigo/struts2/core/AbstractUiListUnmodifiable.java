@@ -131,13 +131,10 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	/** {@inheritDoc} */
 	@Override
 	public final UiObject<O> get(final int index) {
-		UiObject<O> element = uiObjectByIndex.get(index);
-		if (element == null) {
-			element = new StrutsUiObject<>(obtainDtList().get(index));
-			uiObjectByIndex.put(index, element);
+		return uiObjectByIndex.computeIfAbsent(index, i -> {
 			Assertion.checkState(uiObjectByIndex.size() < 1000, "Trop d'élément dans le buffer uiObjectByIndex de la liste de {0}", getDtDefinition().getName());
-		}
-		return element;
+			return new StrutsUiObject<>(obtainDtList().get(i));
+		});
 	}
 
 	/** {@inheritDoc} */
@@ -224,12 +221,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @return Index des UiObjects par Id
 	 */
 	protected final Map<String, UiObject<O>> obtainUiObjectByIdMap(final String keyFieldName) {
-		Map<String, UiObject<O>> uiObjectById = uiObjectByFieldValue.get(keyFieldName);
-		if (uiObjectById == null) {
-			uiObjectById = new HashMap<>();
-			uiObjectByFieldValue.put(keyFieldName, uiObjectById);
-		}
-		return uiObjectById;
+		return uiObjectByFieldValue.computeIfAbsent(keyFieldName, fieldName -> new HashMap<>());
 	}
 
 	/**

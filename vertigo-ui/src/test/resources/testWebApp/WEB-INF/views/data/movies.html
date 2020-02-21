@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+  xmlns:vu="http://www.morphbit.com/thymeleaf/component"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{templates/mmcLayout}"
+>
+	<head>
+		<title>Movie List</title>
+		<script th:src="@{/vertigo-ui/static/js/v-components/v-scroll-spy.js}"></script>
+		<script th:src="@{/vertigo-ui/static/js/v-components/v-facets.js}"></script>
+	</head>
+	
+	<body>
+		
+		<section layout:fragment="content-nav">
+			<q-list style="height:100%">
+			      <nav v-scroll-spy="{offset:80}">
+			        <q-item tag="a" href="#recherche">Recherche</q-item>			        
+			        <q-item tag="a" href="#first">First section label</q-item>			        
+			        <q-item tag="a" href="#second">Second section label</q-item>
+			        <q-item tag="a" href="#third">Third section label</q-item>
+			        <q-item tag="a" href="#fourth">Fourth section label</q-item>
+			        <q-item tag="a" href="#fith">Fith section label</q-item>
+			        </nav>
+	        </q-list>		    
+		</section>
+		
+		<section layout:fragment="content" >
+			<div id="recherche">
+			<h2>Recherche</h2>
+			<div class="row">
+				<vu:search resultKey="result" searchUrl="@{/movies/_search}" collectionComponentId="moviesRecherche">
+					<div class="col-3 q-pr-xl">
+						<vu:facets resultKey="result" />
+					</div>
+					<div class="col-9">
+						<vu:include-data-primitive key="criteria"/>
+						<q-input placeholder="Titre, Année, Acteur, ..." v-model="vueData.criteria" name="vContext[criteria]" @input="search('result')"></q-input>
+						<vu:table list="result_list" componentId="moviesRecherche" selectable="true" sortUrl="${searchUrl}">
+							<vu:column field="movId" />
+							<vu:column field="originalTitle" sortable="true" />
+							<vu:column name="TestVT" label="TestVT">
+								<vu:field-read field="movId" list="result_list" listKey="movId" listDisplay="title" />
+							</vu:column>
+						</vu:table>
+					</div>
+				</vu:search>
+			</div>
+			</div>
+			<div id="first">
+			<h2>First</h2>
+			<vu:table list="movies" componentId="movieTable" selectable="true" sortUrl="@{/movies/_sort}" >
+				<vu:column field="movId" >
+					<a th::href="|'@{/movie/}?movId='+props.row.movId|" >{{props.row.movId}}</a>
+				</vu:column>
+				<vu:column field="title" sortable="true" />
+				<vu:column name="tata" label="Tata">
+					another column  : {{props.row.movId}} : {{props.row.title}}
+				</vu:column>
+				<vu:column name="action" label="Actions">
+					<q-btn label="View detail" th:@click="|openModal('movieDetailModal', '@{/movie/}', { 'movId' : props.row.movId })|"></q-btn>
+				</vu:column>
+			</vu:table>
+			</div>
+			
+			<div id="second">
+			<h2>Second</h2>
+			<vu:table list="movies" componentId="movieTable2" selectable="true" sortUrl="@{/movies/_sort}">
+				<vu:column field="movId" />
+				<vu:column field="title" sortable="true" />
+			</vu:table>
+			</div>
+			
+			<div id="third">
+			<h2>Third</h2>
+			aaaa<br/>aaaa<br/>aaaa<br/>aaaa<br/>aaaa<br/>aaaa<br/></div>
+			<div id="fourth">
+			<h2>Fourth</h2>
+			bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/>bbbb<br/></div>
+			<div id="fith">
+			<h2>Fith</h2>
+			cccc<br/>cccc<br/>cccc<br/>cccc<br/>cccc<br/>cccc<br/></div>
+			<vu:modal componentId="movieDetailModal" closeLabel="Close" />
+						
+		</section>
+	</body>
+</html>

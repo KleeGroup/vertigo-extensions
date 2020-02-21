@@ -63,10 +63,11 @@ public final class MailManagerTest extends AbstractTestCaseJU5 {
 				.addModule(new SocialFeatures()
 						.withMails()
 						.withJavaxMail(
-								Param.of("storeProtocol", "smtp"),
-								Param.of("host", "localdelivery.klee.lan.net"),
 								Param.of("developmentMode", "true"),
 								Param.of("developmentMailTo", "klee-DevTest@yopmail.com"))
+						.withNativeMailConnector(
+								Param.of("storeProtocol", "smtp"),
+								Param.of("host", "localdelivery.klee.lan.net"))
 						.build())
 				.build();
 	}

@@ -1,4 +1,4 @@
-<th:block th:fragment="button-link(label, icon, url, ariaLabel, other_attrs)"
+<th:block th:fragment="button-link(label, icon, url, ariaLabel, disabled, other_attrs)"
 	  th:assert="(${label} != null or ${icon} != null) and ${url} != null">
-	<q-btn type="a" th:label="${label?:''}" th:icon="${icon?:''}" th:href="${url}" th:aria-label="${ariaLabel?:label?:''}" th:title="${ariaLabel?:label?:''}" th:attr="__${other_attrs}__"><vu:content/></q-btn>
+	<q-btn type="a" th:label="${label?:''}" th:icon="${icon?:''}" th::disabled="${disabled}" th::ripple="|!${disabled}|" th::href="|${disabled}?null:'${url}'|" th:aria-label="${ariaLabel?:label?:''}" th:title="${ariaLabel?:label?:''}" th:attr="__${other_attrs}__"><vu:content/></q-btn>
 </th:block> 

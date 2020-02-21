@@ -1,32 +1,62 @@
-<th:block th:fragment="table(list, componentId, selectable, rowKey, rowsPerPage, sortUrl, navOnRow, color, tableClass, autoColClass, top_right_slot, top_left_slot, actions_slot, tr_attrs, other_attrs)" 
-	th:with="tableKey=${list}, listSize=${model.vContext[__${list}__].size()}, mySelectable=${selectable?:false}, myRowKey=${rowKey?:model.util.getIdField('__${list}__')}, myRowsPerPage=${rowsPerPage?:10}, myAutoColClass=${autoColClass?:false}"
-	th:attr="objectKey=${model.vContext['componentStates'].addComponentState(componentId).addList('columns')}, objectKey=${model.vContext['componentStates'][__${componentId}__].addList('selected')}, objectKey=${model.vContext['componentStates'][__${componentId}__][loading] = false }, objectKey=${model.vContext['componentStates'][__${componentId}__].addObject('pagination', {page: 1 , rowsNumber: __${listSize}__, rowsPerPage : __${myRowsPerPage}__, componentId : '__${componentId}__', listKey : '__${list}__'})}" >
+<th:block th:fragment="table(list, componentId, selectable, rowKey, rowsPerPage, sortUrl, sortBy, descending, navOnRow, color, tableClass, autoColClass, title, subtitle, top_right_slot, top_left_slot, actions_slot, tr_attrs, other_attrs)"
+	th:assert="${componentId} != null and !(${sortUrl} != null and ${sortBy} != null) and !(${descending} != null and ${sortBy} == null)" 
+	th:with="tableKey=${list}, listSize=${model.vContext[__${list}__].size()}, mySelectable=${selectable?:false}, myRowKey=${rowKey?:model.util.getIdField('__${list}__')}, myRowsPerPage=${rowsPerPage?:10}, myAutoColClass=${autoColClass?:false}">
+	<th:block th:attr="objectKey=${model.vContext['componentStates'].addComponentState(componentId).addList('columns')}, objectKey=${model.vContext['componentStates'][__${componentId}__].addList('selected')}, objectKey=${model.vContext['componentStates'][__${componentId}__][loading] = false }, objectKey=${model.vContext['componentStates'][__${componentId}__].addObject('pagination', {page: 1 , rowsPerPage : __${myRowsPerPage}__, componentId : '__${componentId}__', listKey : '__${list}__'})}" th:remove="all" />
 	<th:block th:if="${sortUrl != null}" th:attr="objectKey=${model.vContext['componentStates'][__${componentId}__]['pagination'].put('sortUrl', '__${sortUrl}__')}" th:remove="all" />
-	<q-table
-		th::ref="|'${componentId}'|"
-	    th::data="|paginatedData('${list}', '${componentId}' )|"
-	    th::columns="|componentStates.${componentId}.columns|"
-	    th:row-key="${myRowKey}"
-	    th:selection="${mySelectable ? 'multiple' : ''}"
-	    th::selected.sync="|componentStates.${componentId}.selected|"
-	    th::loading="|componentStates.${componentId}.loading|"
-	    th::pagination.sync="|componentStates.${componentId}.pagination|"
-	    th:table-class="${tableClass?:'table-'+(color?:'secondary')}"
-	    th:@request="paginationAndSortHandler"
-	    class="col-12"
-	    th:attr="__${other_attrs}__"
-	  >
-	  
-	  <template slot="top-left" slot-scope="props" vu:slot="top_left_slot"/>
-	  <template slot="top-right" slot-scope="props" vu:slot="top_right_slot"/>
-	  <q-tr slot="body" slot-scope="props" :props="props" th:attr="__${tr_attrs}__" >
-	  	<q-td th:if="${mySelectable}" auto-width>
-			<q-checkbox th:color="${color?:'primary'}" v-model="props.selected" ></q-checkbox>
-		</q-td>
-		<vu:content></vu:content>
-		<vu:column name="action" label="" sortable="false" class="showButtonOnHover" auto-width>
-			<vu:content-slot name="actions_slot" />
-		</vu:column>
-	  </q-tr>
-	</q-table>
+	<th:block th:if="${sortUrl != null}" th:attr="objectKey=${model.vContext['componentStates'][__${componentId}__]['pagination'].put('rowsNumber', __${listSize}__)}" th:remove="all" />
+	<th:block th:if="${sortBy != null}" th:attr="objectKey=${model.vContext['componentStates'][__${componentId}__]['pagination'].put('sortBy', '__${sortBy}__')}" th:remove="all" />
+	<th:block th:if="${descending != null}" th:attr="objectKey=${model.vContext['componentStates'][__${componentId}__]['pagination'].put('descending', __${descending}__)}" th:remove="all" />
+	
+	<div class="col-12">
+		<th:block th:if="${sortUrl == null}">
+			<q-table
+			    th::ref="|'${componentId}'|"
+			    th::data="|vueData.${list}|"
+			    th::columns="|componentStates.${componentId}.columns|"
+			    th:row-key="${myRowKey}"
+			    th:selection="${mySelectable ? 'multiple' : ''}"
+			    th::selected.sync="|componentStates.${componentId}.selected|"
+			    th::loading="|componentStates.${componentId}.loading|"
+			    th::pagination.sync="|componentStates.${componentId}.pagination|"
+			    th:table-class="${tableClass?:'table-'+(color?:'secondary')}"
+			    th:attr="__${other_attrs}__"
+			  >
+		</th:block>
+		
+		<th:block th:if="${sortUrl != null}">
+			<q-table
+			    th::ref="|'${componentId}'|"
+			    th::data="|paginatedData('${list}', '${componentId}' )|"
+			    th::columns="|componentStates.${componentId}.columns|"
+			    th:row-key="${myRowKey}"
+			    th:selection="${mySelectable ? 'multiple' : ''}"
+			    th::selected.sync="|componentStates.${componentId}.selected|"
+			    th::loading="|componentStates.${componentId}.loading|"
+			    th::pagination.sync="|componentStates.${componentId}.pagination|"
+			    th:table-class="${tableClass?:'table-'+(color?:'secondary')}"
+			    th:@request="paginationAndSortHandler"
+			    th:attr="__${other_attrs}__"
+			  >
+		</th:block>
+		
+		  
+		  <template slot="top-left" slot-scope="props" th:if="${title!=null}">
+		  	<div class="text-h6" th:text="${title?:''}" />
+			<div class="text-subtitle2" th:text="${subtitle?:''}" />
+		  </template>
+		  <template slot="top-left" slot-scope="props" vu:slot="top_left_slot"/>
+		  <template slot="top-right" slot-scope="props" vu:slot="top_right_slot"/>
+		  <q-tr slot="body" slot-scope="props" :props="props" th:attr="__${tr_attrs}__" >
+		  	<q-td th:if="${mySelectable}" auto-width>
+				<q-checkbox th:color="${color?:'primary'}" v-model="props.selected" ></q-checkbox>
+			</q-td>
+			<vu:content></vu:content>
+			<vu:column name="action" label="" sortable="false" th:if="${actions_slot != null}">
+				<div class="row self-center justify-end col showButtonOnHover">						
+					<vu:content-slot name="actions_slot" />
+				</div>
+			</vu:column>
+		  </q-tr>
+		</q-table>
+	</div>
 </th:block> 

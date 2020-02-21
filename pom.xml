@@ -13,11 +13,11 @@
 	<parent>
 		<groupId>io.vertigo</groupId>
 		<artifactId>vertigo-parent</artifactId>
-		<version>2.0.0</version>
+		<version>2.1.0</version>
 	</parent>
 
 	<artifactId>vertigo-extensions</artifactId>
-	<version>2.1.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<name>vertigo-extensions</name>
 	<packaging>pom</packaging>
 
@@ -28,17 +28,17 @@
 	</properties>
 
 	<modules>
-		<module>vertigo-social</module>
 		<module>vertigo-audit</module>
-		<module>vertigo-orchestra</module>
 		<module>vertigo-struts2</module>
 		<module>vertigo-quarto</module>
 		<module>vertigo-stella</module>
 		<module>vertigo-geo</module>
 		<module>vertigo-adapters</module>
-		<module>vertigo-dashboard</module>
 		<module>vertigo-ui</module>
 		<module>vertigo-ledger</module>
+		<module>vertigo-dashboard</module>
+		<module>vertigo-orchestra</module>
+		<module>vertigo-social</module>
 	</modules>
 
 	<scm>

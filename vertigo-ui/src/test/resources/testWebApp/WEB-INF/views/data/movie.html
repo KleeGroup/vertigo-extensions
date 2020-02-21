@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+  xmlns:vu="http://www.morphbit.com/thymeleaf/component"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{templates/mmcLayout}"
+>
+
+<head>
+	<title>Movie Detail</title>
+	<link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css" type="text/css"/>
+	<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+	<script th:src="@{/vertigo-ui/static/js/v-components/v-map.js}"></script>
+</head>
+
+<body>
+	<div layout:fragment="content">
+			<div style="width:100%">
+				<v-map style="width:100%; height: 600px;" id="map" marker-color="#027BE3" :list="[{location : {lon : 2.239230, lat: 48.773744}, label:'titi' }, {location : {lon : 2.280263, lat: 48.827317}, label:'toto' },{location : {lon : -4.570026, lat: 48.357621}, label:'tata' }]" field="location" name-field="label"></v-map>
+			</div>
+			<vu:form>
+				<vu:grid cols="3">
+					<vu:text-field object="movie" field="movId"/>
+					<vu:text-field object="movie" field="title" />
+					<vu:text-field object="movie" field="year" />
+					<vu:slider object="movie" field="year"  />
+					<vu:knob object="movie" field="year"/>
+					<vu:select object="movie" field="movId" list="movies" />
+					<vu:grid-cell>
+						<vu:text-area object="movie" field="title"/>
+					</vu:grid-cell>
+					<vu:date object="movie" field="released"  />
+					<vu:datetime object="movie" field="lastModified" />
+					<vu:autocomplete object="movie" field="movId" list="movies" />
+					<vu:radio object="movie" field="movId" list="movies" layout="horizontal" labelField="movId"/>
+					<vu:radio object="movie" field="movId" list="movies" />
+					<vu:text-field object="movie" field="movId"/>
+					<vu:text-field object="movie" field="title" />
+					<vu:chips-autocomplete object="movie" field="tags" list="movies" staticData="false"/>
+					<vu:modal componentId="myModal" closeLabel="Close"/>
+					<vu:grid-cell>
+						<vu:button-submit th:if="${!model.modeEdit}" label="Edit" action="@{_edit}" color="primary"/>
+						<vu:button-submit th:if="${model.modeEdit}"  label="Save" action="@{_save}" color="primary" />
+						<q-btn  th:label="Movies" type="a" th:href="@{/movies/}"></q-btn>
+						<q-btn  th:label="OpenModal" th:@click="|openModal('myModal', '@{/movies/}')|"></q-btn>
+					</vu:grid-cell>
+				</vu:grid>
+			</vu:form>
+	</div>
+</body>
+</html>

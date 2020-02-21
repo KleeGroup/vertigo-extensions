@@ -1,8 +1,10 @@
 Vue.component('v-map', {
 	template : '<div :id="id" >'
-+'					<q-popover v-model="popupDisplayed" id="popup" self="top middle" class="q-pa-md">'
-+'						{{popupTitle}}'
-+'					</q-popover>'
++'					<div id="popup">'
++'						<q-card  v-if="popupDisplayed" class="q-px-md">'
++'							<div class="text-subtitle2">{{popupTitle}}</div>'
++'						</q-card>'
++'					</div>'			
 +'				</div>'
 ,
 	props : {
@@ -75,13 +77,15 @@ Vue.component('v-map', {
 		});
 		
 		// fit view
-		map.getView().fit(vectorLayer.getSource().getExtent(), map.getSize());
+		if (features.length > 0) {
+			map.getView().fit(vectorLayer.getSource().getExtent(), map.getSize());
+		}
 		
 		var popup = new ol.Overlay({
 	        element: this.$el.querySelector('#popup'),
 	        positioning: 'bottom-center',
 	        stopEvent: false,
-	        offset: [0, -50]
+	        offset: [0, -10]
 	      });
 	    map.addOverlay(popup);
 		// display popup on click

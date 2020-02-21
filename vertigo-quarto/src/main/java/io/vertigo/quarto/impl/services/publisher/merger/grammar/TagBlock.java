@@ -27,7 +27,7 @@ import io.vertigo.util.StringUtil;
  * @author pchretien, npiedeloup
  */
 //public car instancié dynamiquement
-public final class TagBlock extends AbstractKScriptTag implements ScriptTag {
+public final class TagBlock extends AbstractScriptTag implements ScriptTag {
 	/** {@inheritDoc} */
 	@Override
 	public String renderOpen(final ScriptTagContent tag, final ScriptContext context) {

@@ -1,19 +1,18 @@
 Vue.component('v-notifications', {
 	template : 
 '<q-btn round dense :color="hasNew?\'primary\':\'white\'" :textColor="hasNew?\'white\':\'primary\'" :icon="count>0?icon:iconNone" class="on-left" >'
-+'	<q-chip floating color="red" v-if="count>0" >{{count}}</q-chip>'
-+'	<q-popover class="notifications">'
-+'		<q-list link style="width:300px">'
-+'          <q-item v-for="notif in list" :key="notif.uuid" class="q-py-none" tag="a" :href="notif.targetUrl" >'
-+'    			<q-item-side><q-icon :name="toIcon(notif.type)" size="2rem"></q-icon></q-item-side>'
-+'    			<q-item-main :label="notif.title" :sublabel="notif.content" label-lines="1" sublabel-lines="3" >'
-+'				</q-item-main>'
-+'    			<q-item-side right>'
-+'    				<q-item-tile stamp>{{toDelay(new Date(notif.creationDate))}}</q-item-tile>'
-+'    			</q-item-side>'
++'	<q-badge color="red" text-color="white" floating v-if="count>0" >{{count}}</q-badge>'
++'	<q-menu class="notifications">'
++'		<q-list style="width:300px">'
++'          <q-item v-for="notif in list" :key="notif.uuid" tag="a" :href="notif.targetUrl" >'
++'    			<q-item-section avatar><q-icon :name="toIcon(notif.type)" size="2rem"></q-icon></q-item-section>'
++'    			<q-item-section><q-item-label>{{notif.title}}</q-item-label><q-item-label caption lines="3">{{notif.content}}</q-item-label></q-item-section>'
++'				<q-item-section side top>'
++'    				<q-item-label caption>{{toDelay(new Date(notif.creationDate))}}</q-item-label>'
++'    			</q-item-section>'
 +'    		</q-item>'
 +'  	</q-list>'
-+'	</q-popover>'
++'	</q-menu>'
 +'</q-btn>'
 	,
 	props : {
@@ -58,7 +57,7 @@ Vue.component('v-notifications', {
 	    },
 	    updateNotificationsData : function (newList) {
 	    	// Tri par ordre décroissant de date de création
-	    	const sortedList = newList.sort((a,b) => b.creationDate - a.creationDate);
+	    	const sortedList = newList.sort(function(a,b) {return  b.creationDate - a.creationDate});
 	    	var newElements = [];	    	
 	    	// Traverse both arrays simultaneously.
 	    	var lastOldElement = this.list[0];
@@ -104,20 +103,20 @@ Vue.component('v-notifications', {
 	    toDelay : function(creationDate) {
 	    	let diff = Quasar.utils.date.getDateDiff(Date.now(),creationDate, 'days');
 	    	if(diff>0)
-	    		return diff+' days';
+	    		return diff+' '+ this.$q.lang.vui.notifications.days;
 	    	diff = Quasar.utils.date.getDateDiff(Date.now(),creationDate, 'hours');
 	    	if(diff>0)
-	    		return diff+' hours';
+	    		return diff+' '+ this.$q.lang.vui.notifications.hours;
 	    	diff = Quasar.utils.date.getDateDiff(Date.now(),creationDate, 'minutes');
 	    	if(diff>0)
-	    		return diff+' min';
+	    		return diff+' ' +this.$q.lang.vui.notifications.minutes;
 	    	diff = Quasar.utils.date.getDateDiff(Date.now(),creationDate, 'seconds');
-	    	return diff+' s';	    	
+	    	return diff+' '+this.$q.lang.vui.notifications.seconds;	    	
 	    }
 	    
 
 	},
-	beforeDestroy() {
+	beforeDestroy : function() {
 	  clearInterval(this.timer)
 	}
 })

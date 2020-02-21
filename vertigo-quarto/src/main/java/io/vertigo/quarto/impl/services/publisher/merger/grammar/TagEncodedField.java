@@ -26,7 +26,7 @@ import io.vertigo.quarto.impl.services.publisher.merger.script.ScriptTagContent;
  * @author pchretien, npiedeloup
  */
 //public car instancié dynamiquement
-public final class TagEncodedField extends AbstractKScriptTag implements ScriptTag {
+public final class TagEncodedField extends AbstractScriptTag implements ScriptTag {
 	public static final String ENCODER = "encoder";
 
 	private static final String CALL = "=" + ENCODER + ".encode({0})";

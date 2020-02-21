@@ -50,10 +50,20 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 	private static final long serialVersionUID = -4639050257543017072L;
 	private static final String DOMAIN_MULTIPLE_IDS = "DoMultipleIds";
 
+	/**
+	 * Constructor.
+	 * @param serverSideDto DtObject
+	 */
 	public MapUiObject(final D serverSideDto) {
 		this(serverSideDto, (D) DtObjectUtil.createDtObject(DtObjectUtil.findDtDefinition(serverSideDto)), Collections.emptySet());
 	}
 
+	/**
+	 * Constructor.
+	 * @param serverSideDto  DtObject
+	 * @param inputDto Input DtObject
+	 * @param modifiedFields List of modified fields
+	 */
 	public MapUiObject(final D serverSideDto, final D inputDto, final Set<String> modifiedFields) {
 		super(inputDto, modifiedFields);
 		setServerSideObject(serverSideDto);
@@ -174,13 +184,13 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 		return fieldIndex;
 	}
 
-	/** Non implémenté. */
+	/** Not supported. */
 	@Override
 	public void putAll(final Map<? extends String, ? extends Serializable> arg0) {
 		throw new UnsupportedOperationException();
 	}
 
-	/** Non implémenté. */
+	/** Not supported. */
 	@Override
 	public String remove(final Object arg0) {
 		throw new UnsupportedOperationException();
@@ -192,12 +202,27 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 		return fieldIndex.size();
 	}
 
-	/** Non implémenté. */
+	/** Not supported. */
 	@Override
 	public Collection<Serializable> values() {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Return the typed value.
+	 * @param fieldName Field
+	 * @return Typed value
+	 */
+	public Serializable getTypedValue(final String fieldName) {
+		return getTypedValue(fieldName, Serializable.class);
+	}
+
+	/**
+	 * Return a Serializable Map for client.
+	 * @param fieldsForClient List of fields
+	 * @param valueTransformers Map of transformers
+	 * @return HashMap (needed for Serializable)
+	 */
 	public HashMap<String, Serializable> mapForClient(final Set<String> fieldsForClient, final Map<String, Function<Serializable, String>> valueTransformers) {
 		final Set<String> filterSet;
 		if (fieldsForClient.contains("*")) {
@@ -260,7 +285,4 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 		return typedValue != null ? dtField.getDomain().valueToString(typedValue) : null;
 	}
 
-	public Serializable getTypedValue(final String fieldName) {
-		return getTypedValue(fieldName, Serializable.class);
-	}
 }

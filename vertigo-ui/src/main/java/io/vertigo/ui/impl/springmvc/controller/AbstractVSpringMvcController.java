@@ -86,8 +86,6 @@ public abstract class AbstractVSpringMvcController {
 	@Inject
 	private VTransactionManager transactionManager;
 
-	private boolean createdContext = true;
-
 	public void prepareContext(final HttpServletRequest request) throws ExpiredViewContextException {
 		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
 		ViewContext viewContext = null;
@@ -99,7 +97,7 @@ public abstract class AbstractVSpringMvcController {
 				ViewContextMap viewContextMap;
 				try (VTransactionWritable transactionWritable = transactionManager.createCurrentTransaction()) {
 					viewContextMap = kvStoreManager.find(CONTEXT_COLLECTION_NAME, ctxId, ViewContextMap.class).orElse(null);
-					createdContext = false;
+					UiRequestUtil.setRequestScopedAttribute("createdContext", false);
 				}
 				if (viewContextMap == null) {
 					contextMiss(ctxId);
@@ -120,7 +118,17 @@ public abstract class AbstractVSpringMvcController {
 			//initContext();
 		}
 		viewContext.setCtxId();
-		request.setAttribute(DEFAULT_VIEW_NAME_ATTRIBUTE, getDefaultViewName(this));
+		if (useDefaultViewName()) {
+			request.setAttribute(DEFAULT_VIEW_NAME_ATTRIBUTE, getDefaultViewName(this));
+		}
+	}
+
+	/**
+	 * Definition if whe should use the vertigo conventions to determine the default viewname
+	 * @return if we should use it
+	 */
+	protected boolean useDefaultViewName() {
+		return true;
 	}
 
 	private static String getDefaultViewName(final AbstractVSpringMvcController controller) {
@@ -130,8 +138,8 @@ public abstract class AbstractVSpringMvcController {
 		// group.id.project.feature.controllers and we look in feature/...
 		// or group.id.project.controllers and we look in project/
 		Assertion.checkState(path.contains(".controllers"), "Default naming only works if your package contains .controllers, it's not the case for the controller {0}", controller.getClass());
-		path = path.substring(path.lastIndexOf('.', path.indexOf(".controllers") - 1));
-		path = path.replaceAll("\\.controllers?", "");
+		path = path.substring(path.lastIndexOf('.', path.indexOf(".controllers") - 1) + 1);
+		path = path.replaceAll("\\.controllers", "");
 		path = path.replaceAll("\\.", SLASH);
 		String simpleName = StringUtil.first2LowerCase(controller.getClass().getSimpleName());
 		simpleName = simpleName.replaceAll("Controller", "");
@@ -271,7 +279,7 @@ public abstract class AbstractVSpringMvcController {
 	}
 
 	protected boolean isNewContext() {
-		return createdContext;
+		return UiRequestUtil.getRequestScopedAttribute("createdContext", Boolean.class).orElse(true);
 	}
 
 }

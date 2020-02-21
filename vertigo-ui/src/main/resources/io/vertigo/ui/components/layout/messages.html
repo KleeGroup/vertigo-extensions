@@ -8,49 +8,49 @@ th:assert="${withFields} == null"> <!-- withFields unsupported yet -->
 	<!-- isNotify unsupported yet -->
 </th:block>
 <th:block th:if="isBlock">
-	<div th:if="${!uiMessageStack.getGlobalErrors().isEmpty()}" class="q-card bg-negative text-white col">
+	<div v-if="uiMessageStack.globalErrors.length > 0" class="q-card bg-negative text-white col">
 		<div class="q-card-main">
 			<div class="q-list">
-				<div class="q-item" th:each="message : ${uiMessageStack.getGlobalErrors()}">
+				<div v-for="message in uiMessageStack.globalErrors" class="q-item">
 					<div class="q-item-main">
-						<div class="q-item-label" th:text="${message}"></div>
+						<div class="q-item-label" >{{message}}</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div th:if="${!uiMessageStack.getGlobalWarnings().isEmpty()}" class="q-card bg-warning text-white col">
+	<div v-if="uiMessageStack.globalWarnings.length > 0" class="q-card bg-warning text-white col">
 		<div class="q-card-main">
 			<div class="q-list">
-				<div class="q-item" th:each="message : ${uiMessageStack.getGlobalWarnings()}">
+				<div v-for="message in uiMessageStack.globalWarnings" class="q-item">
 					<div class="q-item-main">
-						<div class="q-item-label" th:text="${message}"></div>
+						<div class="q-item-label" >{{message}}</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div th:if="${!uiMessageStack.getGlobalInfos().isEmpty()}" class="q-card bg-info text-white col">
+	<div v-if="uiMessageStack.globalInfos.length > 0" class="q-card bg-info text-white col">
 		<div class="q-card-main">
 			<div class="q-list">
-				<div class="q-item" th:each="message : ${uiMessageStack.getGlobalInfos()}">
+				<div v-for="message in uiMessageStack.globalInfos" class="q-item">
 					<div class="q-item-main">
-						<div class="q-item-label" th:text="${message}"></div>
+						<div class="q-item-label" >{{message}}</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div th:if="${!uiMessageStack.getGlobalSuccess().isEmpty()}" class="q-card bg-positive text-white col">
+	<div v-if="uiMessageStack.globalSuccess.length > 0" class="q-card bg-positive text-white col">
 		<div class="q-card-main">
 			<div class="q-list">
-				<div class="q-item" th:each="message : ${uiMessageStack.getGlobalSuccess()}">
+				<div v-for="message in uiMessageStack.globalSuccess" class="q-item">
 					<div class="q-item-main">
-						<div class="q-item-label" th:text="${message}"></div>
+						<div class="q-item-label" >{{message}}</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	</th:block>
+</th:block>
 </th:block>

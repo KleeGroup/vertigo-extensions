@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+  xmlns:vu="http://www.morphbit.com/thymeleaf/component"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{templates/mmcLayout}"
+>
+
+<head>
+	<title>Movie Detail</title>
+</head>
+
+<body>
+	<div layout:fragment="content">
+		<vu:message />
+			<vu:form>
+				<vu:block id="movie" title="Movie Information">
+					<vu:grid cols="3">
+						<vu:text-field object="movie" field="movId"/>
+						<vu:text-field object="movie" field="title"/>
+						<vu:text-field object="movie" field="year"  debounce="500" hint="Debouncing 500ms" />
+						<vu:slider object="movie" field="year"  />
+						<vu:knob object="movie" field="year"/>
+						<vu:select object="movie" field="movId" list="movies" />
+						<vu:grid-cell>
+							<vu:text-area object="movie" field="title"/>
+						</vu:grid-cell>
+						<vu:date object="movie" field="released"  />
+						<vu:datetime object="movie" field="lastModified" />
+						<vu:autocomplete object="movie" field="movId" list="movies" />
+						<vu:radio object="movie" field="movId" list="movies" layout="horizontal" labelField="movId"/>
+						<vu:radio object="movie" field="movId" list="movies" />
+						<vu:text-field object="movie" field="movId"/>
+						<vu:text-field object="movie" field="title" />
+						<vu:chips-autocomplete object="movie" field="tags" list="movies" staticData="false"/>
+						<vu:modal componentId="myModal" closeLabel="Close"/>
+						<vu:grid-cell>
+							<vu:button-submit th:if="${!model.modeReadOnly}" label="Read" action="@{_read}" color="primary"/>
+							<vu:button-submit th:if="${model.modeReadOnly}" label="Edit" action="@{_edit}" color="primary"/>
+							<vu:button-submit th:if="${!model.modeReadOnly}"  id="saveAction" label="Save" action="@{_save}" color="primary" />
+							<vu:button-link th:if="${model.modeEdit}"  label="Movies" url="@{/movies/}" color="primary" />
+							<q-btn  th:label="OpenModal" th:@click="|openModal('myModal', '@{/movies/}')|"></q-btn>
+						</vu:grid-cell>
+					</vu:grid>
+				</vu:block>				
+			</vu:form>
+			
+			<vu:cards list="movies" componentId="movieCards" cardClass="col-lg-3 col-md-6 col-xs-12" sortUrl="@{/movies/_sort}" rowsPerPage="8" showMore="true" showMoreLabel="Show more" >
+				<div class="nav" th:@click="|goTo('@{/basemanagement/base/information/}'+item.baseId)|">
+					<a th::href="|'@{/movie/}'+item.movId|" >{{item.movId}}</a>
+				</div>
+			</vu:cards>
+			
+			<vu:table list="movies" componentId="movieTable" selectable="true" sortUrl="@{/movies/_sort}"
+				tr_@click.native="|goTo('@{/movie/}'+props.row.movId)|" tr_class="nav">
+				<vu:slot name="actions_slot"><q-btn label="View detail" th:@click="|openModal('movieDetailModal', '@{/movie/}'+props.row.movId, {  })|"></q-btn></vu:slot>
+				<vu:include-data object="movies" field="movId" />
+				<vu:column field="movId" >
+					<a th::href="|'@{/movie/}'+props.row.movId|" >{{props.row.movId}}</a>
+				</vu:column>
+				<vu:column field="title" sortable="true" />
+				<vu:column name="tata" label="Tata">
+					another column  : {{props.row.movId}} : {{props.row.title}}
+				</vu:column>
+			</vu:table>
+	</div>
+</body>
+</html>

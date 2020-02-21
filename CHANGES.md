@@ -1,10 +1,33 @@
 Version history
 ===============
 
-Running 2.1.0-SNAPSHOT
+Running 3.0.0-SNAPSHOT
 ----------------------
 
 more to come :)
+
+#Release 2.1.0 - 2019/11/12
+
+
+* [all] remove all junit 4 (test suites + Plateform)
+* [quarto] removed K
+* [ui] fix autocomplete
+* [struts2] Fix : Cleaning memory when republishing in context
+* [struts2] Renamed AppServletContextListener2 to AppServletContextList
+* __[ui] quasar update from 0.17 to 1.4.1__ 
+* [ui] Changed NamedComponent to support mono boolean attribute (like 'flat') in placeholders
+* [ui] fix DefaultViewName can be disabled (if needed)
+* [ui] Merge pull request #25 from nothingismagick/patch-1
+* [ui] Added support of vu:content override attribute, and class concat
+* [ui] Added support of contentItem getAttribute
+* [ui] Added buttons-group component
+* [ui] i18n in vue components 
+* [ui] Added required support on text-field
+* [ui] ajax improvments
+* [ui] fix internalization
+* [ui] block has action slot
+* [ui] add text-field-read-reactive
+* [social] Fixed #27 Splitted SendMailPlugin and MailSessionConnector.
 
 Release 2.0.0 - 2019/03/22
 ----------------------

@@ -10,6 +10,7 @@
 		    type="radio"
 		   	th:v-model="|vueData.${object}.${field}|" 
 			th::options="|transformListForSelection('${list}', '${myValueField}', '${myLabelField}')|"
+			dense
 			th:attr="__${input_attrs}__"
 		 ></q-option-group>
 	</vu:label-edit>

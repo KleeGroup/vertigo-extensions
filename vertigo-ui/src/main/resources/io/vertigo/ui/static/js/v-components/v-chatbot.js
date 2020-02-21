@@ -13,15 +13,15 @@ Vue.component('v-chatbot', {
 + '				<div class="sys-chat">'
 + '					<q-chat-message v-if="error" class="animate-fade" bg-color="orange-4" text-color="black" size="12" >'
 + '						<div class="q-pb-sm">'
-+ '							Une erreur est survenue lors de l\'envoi du message'
++ '							{{$q.lang.vui.chatbot.errorMessage}}'
 + '						</div>'
-+ '						<q-btn class="full-width" @click="askBot(lastPayload)" label="Essayez de nouveau" color="white" text-color="black" ></q-btn>'
++ '						<q-btn class="full-width" @click="askBot(lastPayload)" :label="$q.lang.vui.chatbot.tryAgain" color="white" text-color="black" ></q-btn>'
 + '					</q-chat-message>'
 + '				</div>'
 + '				<div class="sys-chat non-selectable">'
 + '					<q-chat-message v-if="inputConfig.buttons.length > 0" class="animate-fade" bg-color="primary" size="12">'
 + '						<div class="text-blue-2 q-caption">'
-+ '							Réponses suggérées'
++ '							{{$q.lang.vui.suggestedAnswers}}'
 + '						</div>'
 + '						<div class="row docs-btn">'
 + '							<q-btn v-for="(btn, index) in inputConfig.buttons" class="full-width" :key="\'repChatBtn-\'+index" @click="postAnswerBtn(btn)" :label="btn.title" color="white" text-color="black" ></q-btn>'
@@ -47,7 +47,7 @@ Vue.component('v-chatbot', {
 + '					 :max-height="100"'
 + '					 class="col-grow"'
 + '					 v-model="inputConfig.responseText"'
-+ '					 placeholder="Ecrire un message"'
++ '					 :placeholder="$q.lang.vui.chatbot.inputPlaceholder"'
 + '					 :disable="processing || error"'
 + '					 :loading="processing"></q-input>'
 + '		'
@@ -209,7 +209,7 @@ Vue.component('v-chatbot', {
 			},
 			restart: function () {
 				this.messages.push({
-					text: ["Redémarrage de la conversation."],
+					text: [this.$q.lang.vui.chatbot.restartMessage],
 					bgColor: "orange"
 				});
 				this._scrollToBottom();

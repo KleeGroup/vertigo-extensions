@@ -1,37 +1,51 @@
-<th:block th:fragment="chips-autocomplete-edit(object, field, label, list, valueField, staticData,label_attrs, input_attrs)" vu:alias="chips-autocomplete" vu:selector="${viewMode=='edit'}"
+<th:block th:fragment="chips-autocomplete-edit(object, field, label, list, valueField, componentId, staticData,label_attrs, input_attrs)" vu:alias="chips-autocomplete" vu:selector="${viewMode=='edit'}"
 	  th:assert="${object} != null and ${field} != null and ${list} != null"
-	  th:with="myValueField=${valueField != null ? valueField : model.util.getDisplayField(list)}, value=${model.vContext[__${object}__][__${field}__]}, myStaticData=${staticData?:true}">
+	  th:with="myValueField=${valueField != null ? valueField : model.util.getDisplayField(list)}, value=${model.vContext[__${object}__][__${field}__]}, myStaticData=${staticData?:true},myComponentId=${componentId != null ? componentId : list + '_' + object + '_' + field}, myLabel=${label?:model.util.label(object + '.' + field)}"
+	  th:attr="objectKey=${model.vContext['componentStates'].addComponentState(myComponentId).addList('options')}" >
 	<vu:include-data object="${object}" field="${field}"/>
 	<vu:include-data th:if="${staticData}" object="${list}" field="${myValueField}"/>
-	<vu:label-edit object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
-		<q-chips-input th:v-model="|vueData.${object}.${field}|">
-		  <q-autocomplete th:if="${!myStaticData}"
-		  	th:@search="|function (terms, done) { searchAutocomplete('${list}', '${myValueField}', '${myValueField}', '@{/autocomplete/_searchFullText}' , terms, done)}|"
-		    :min-characters="3"
-		    value-field="value"
-		    th:attr="__${input_attrs}__"
-		  ></q-autocomplete>
-		  <q-autocomplete th:if="${myStaticData}"
-		  	th::static-data="|transformListForStaticSelection('${list}', '${myValueField}', '${myValueField}')|"
-		    :min-characters="3"
-		    value-field="value"
-		    th:attr="__${input_attrs}__"
-		  ></q-autocomplete>
-		</q-chips-input>
-	</vu:label-edit>
+	<q-select th:if="${!myStaticData}"
+       	th:v-model="|vueData.${object}.${field}|"
+		th:label="${myLabel}"
+		th::error="|hasFieldsError('${object}', '${field}')|"
+		th::error-message="|getErrorMessage('${object}', '${field}')|"
+		orientation="vertical"
+		multiple
+		hide-dropdown-icon
+		stack-label
+        use-input 
+        use-chips
+        fill-input
+        new-value-mode="add-unique"
+        input-debounce="300"
+        th::options="|componentStates.${myComponentId}.options|"
+        th:@filter="|function (val, update, abort) { searchAutocomplete('${list}', '${myValueField}', '${myValueField}', '${myComponentId}', '@{/autocomplete/_searchFullText}', val, update, abort)}|"
+        th:attr="__${input_attrs}__"
+     ></q-select>
+     <q-select th:if="${myStaticData}"
+       	th:v-model="|vueData.${object}.${field}|"
+		th:label="${myLabel}"
+		th::error="|hasFieldsError('${object}', '${field}')|"
+		th::error-message="|getErrorMessage('${object}', '${field}')|"
+		orientation="vertical"
+		multiple
+		hide-dropdown-icon
+		stack-label
+        use-input 
+        use-chips
+        new-value-mode="add-unique"
+        input-debounce="0"
+        th::options="|transformListForSelection('${list}', '${myValueField}', '${myValueField}')|"
+        th:attr="__${input_attrs}__"
+     ></q-select>
 	<input th:v-for="|id in vueData.${object}.${field}|" type="hidden" th:name="|vContext[${object}][${field}]|" th:v-bind:value="id" />
 	<input th::v-if="|vueData.${object}.${field}.length == 0|" type="hidden" th:name="|vContext[${object}][${field}]|" value="" />
 </th:block> 
 
-<th:block th:fragment="chips-autocomplete-read(object, field, label, list, valueField, staticData, label_attrs, input_attrs)" vu:alias="chips-autocomplete" vu:selector="${viewMode=='read'}" >
+<th:block th:fragment="chips-autocomplete-read(object, field, label, list, valueField, staticData, label_attrs, input_attrs)" vu:alias="chips-autocomplete" vu:selector="${viewMode=='read'}"
+	th:with="myLabel=${label?:model.util.label(object + '.' + field)}" >
 	<vu:include-data object="${object}" field="${field}"/>
-	<vu:label-read object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
-		<q-chips-input 
-			th:v-model="|vueData.${object}.${field}|" 
-			:readonly="true" 
-			:hide-underline="true"
-			th:attr="__${input_attrs}__"
-		>
-		</q-chips-input>
+	<vu:label-read label=${label} th:attr="__${label_attrs}__" >
+		<q-chip th:v-for="|value in vueData.${object}.${field}|" dense>{{value}}</q-chip>
 	</vu:label-read>
 </th:block>

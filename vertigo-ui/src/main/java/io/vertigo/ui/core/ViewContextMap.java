@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -345,15 +346,15 @@ public final class ViewContextMap extends HashMap<String, Serializable> {
 	}
 
 	public ViewContextMap getFilteredViewContext() {
-		return getFilteredViewContext(Collections.emptySet());
+		return getFilteredViewContext(Optional.empty());
 	}
 
-	ViewContextMap getFilteredViewContext(final Set<String> subFilter) {
+	ViewContextMap getFilteredViewContext(final Optional<Set<String>> subFilterOpt) {
 		final ViewContextMap viewContextMapForClient = new ViewContextMap();
 		viewContextMapForClient.put(CTX, get(CTX));
 		for (final Map.Entry<String, Serializable> entry : entrySet()) {
 			final String key = entry.getKey();
-			if (keysForClient.containsKey(key) && (subFilter.isEmpty() || subFilter.contains(key))) {
+			if (keysForClient.containsKey(key) && (!subFilterOpt.isPresent() || subFilterOpt.get().contains(key))) {
 				if (entry.getValue() instanceof MapUiObject) {
 					viewContextMapForClient.put(entry.getKey(), ((MapUiObject) entry.getValue()).mapForClient(keysForClient.get(key), createTransformers(key)));
 				} else if (entry.getValue() instanceof AbstractUiListUnmodifiable) {

@@ -1,0 +1,21 @@
+<th:block th:fragment="buttons-group(moreLabel, xs, sm, md, lg, xl, contentTags, other_attrs)"
+	  th:assert="${moreLabel} != null"
+	  th:with="buttonsCount=${contentTags.size()},xl=${xl?:99},lg=${lg?:xl},md=${md?:lg},sm=${sm?:md},xs=${xs?:sm}">
+	
+	<th:block th:each="contentItem,iter:${contentTags}">
+		<vu:content-item th:if="${iter.index<=xl}"
+		th:class="${iter.index>=xl?'gt-xl':iter.index>=lg?'gt-lg':iter.index>=md?'gt-md':iter.index>=sm?'gt-sm':iter.index>=xs?'gt-xs':''}"/>		
+	</th:block>
+	<th:block>
+		<q-btn round size="lg" color="primary" icon="more_horiz" direction="down" aria-label="More actions" title="More actions" class="on-left"
+		th:classappend="${buttonsCount>=lg?'lt-xl':buttonsCount>=md?'lt-lg':buttonsCount>=sm?'lt-md':buttonsCount>=xs?'lt-sm':buttonsCount>0?'lt-xs':''}">
+			<q-menu>
+				<q-list class="column items-center" th:each="contentItem,iter:${contentTags}">
+					<q-item th:class="${iter.index>=xl?'':iter.index>=lg?'lt-xl':iter.index>=md?'lt-lg':iter.index>=sm?'lt-md':iter.index>=xs?'lt-sm':'lt-xs'}">
+					<vu:content-item size="md" :round="false" label="${contentItem.getAttribute('ariaLabel')}" />
+					</q-item>
+				</q-list>
+			</q-menu>
+		</q-btn>
+	</th:block>
+</th:block> 

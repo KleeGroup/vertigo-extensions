@@ -1,18 +1,18 @@
 Vue.component('v-extensions-store', {
 	template : 
-'<q-list class="row col-12 gutter-md">'
-+'	<div v-for="extension in extensions" class="col-xs-12 col-lg-6 col-xl-4">'
+'<div class="row q-col-gutter-md">'
++'	<div v-for="extension in extensions" class="col-xs-12 col-lg-6 col-xl-4"><q-card>'
 +'		<q-item  class="bg-white" style="height: 100px;" >'
-+'			<q-item-side>'
++'			<q-item-section avatar>'
 +'				<q-icon :name="extension.icon" size="40px" :style="getIconStyle(extension.color)"></q-icon>'
-+'			</q-item-side>'
-+'			<q-item-main>'
-+'				<div class="row"><div class="q-subheading text-bold">{{extension.label}}</div><div class="col" /><div><q-toggle disabled readonly color="positive" v-model="extension.enabled"></q-toggle></div></div>'
-+'				<div class="row q-body-2 q-mt-sm text-justify">{{extension.description}}</div>'
-+'			</q-item-main>'
++'			</q-item-section>'
++'			<q-item-section>'
++'				<div class="row col items-center"><div class="q-subheading text-bold">{{extension.label}}</div><div class="col"></div><div><q-toggle disable readonly color="positive" v-model="extension.enabled"></q-toggle></div></div>'
++'				<div class="row col q-body-2 text-justify">{{extension.description}}</div>'
++'			</q-item-section>'
 +'		</q-item>'
-+'	</div>'
-+'</q-list>'
++'	</q-card></div>'
++'</div>'
 	,
 	props : {
 		activeSkills : { type: Array, required : true }

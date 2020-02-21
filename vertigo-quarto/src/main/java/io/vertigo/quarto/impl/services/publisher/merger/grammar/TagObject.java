@@ -27,7 +27,7 @@ import io.vertigo.quarto.impl.services.publisher.merger.script.ScriptTagContent;
  * @author pchretien, npiedeloup
  */
 //public car instancié dynamiquement
-public final class TagObject extends AbstractKScriptTag implements ScriptTag {
+public final class TagObject extends AbstractScriptTag implements ScriptTag {
 	private static final String OBJECT_CALL = "\\{ {1} {2} = ({1}) {0}; ";
 	private static final String OBJECT_ATTRIBUTE = "^([0-9a-zA-Z_]+) *= *([0-9a-zA-Z_]+(\\.[0-9a-zA-Z_]+)*)";
 

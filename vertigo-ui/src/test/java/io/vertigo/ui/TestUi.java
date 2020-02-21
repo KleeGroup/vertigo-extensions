@@ -18,7 +18,7 @@
  */
 package io.vertigo.ui;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +33,13 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppClassLoader;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.web.SpringServletContainerInitializer;
 
 import com.machinepublishers.jbrowserdriver.JBrowserDriver;
@@ -75,7 +79,7 @@ public class TestUi {
 		server = new Server(port);
 		final WebAppContext context = new WebAppContext(TestUi.class.getClassLoader().getResource("testWebApp/").getFile(), "/test");
 		System.setProperty("org.apache.jasper.compiler.disablejsr199", "false");
-		//context.setAttribute("jacoco.exclClassLoaders", "*");
+		context.setAttribute("jacoco.exclClassLoaders", "*");
 
 		context.setAttribute("javax.servlet.context.tempdir", getScratchDir());
 		context.setAttribute("org.eclipse.jetty.containerInitializers", springInitializers());
@@ -89,7 +93,7 @@ public class TestUi {
 
 	private static File getScratchDir() throws IOException {
 		final File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		final File scratchDir = new File(tempDir.toString(), "embedded-jetty-jsp");
+		final File scratchDir = new File(tempDir.toString(), "embedded-jetty-html");
 
 		if (!scratchDir.exists()) {
 			if (!scratchDir.mkdirs()) {
@@ -114,17 +118,84 @@ public class TestUi {
 	@Test
 	public void testLoadLoginPage() {
 		driver.get(baseUrl + "/test/");
-		assertEquals(baseUrl + "/test/", driver.getCurrentUrl());
+		Assertions.assertEquals(baseUrl + "/test/", driver.getCurrentUrl());
 	}
 
 	@Test
-	public void testMovies() {
+	public void testMovies() throws InterruptedException {
 		driver.get(baseUrl + "/test/movies/");
+		Thread.sleep(5000);
 	}
 
 	@Test
-	public void testMovieDetail() {
+	public void testMovieDetail() throws InterruptedException {
 		driver.get(baseUrl + "/test/movie/1000");
+		Thread.sleep(5000);
 	}
 
+	@Test
+	public void testDemo() throws InterruptedException {
+		driver.get(baseUrl + "/test/componentsDemo/");
+		Thread.sleep(5000);
+	}
+
+	@Test
+	public void testPostSimpleForm() throws InterruptedException {
+		driver.get(baseUrl + "/test/componentsDemo/");
+
+		assertEquals("Movie Information", waitElement(By.className("text-h6")).getText());
+		findElement(By.name("vContext[movie][title]")).clear();
+		findElement(By.name("vContext[movie][title]")).sendKeys("Test 1");
+		findElement(By.name("vContext[movie][year]")).clear();
+		findElement(By.name("vContext[movie][year]")).sendKeys("2020");
+		findElement(By.id("saveAction")).click();
+
+		assertEquals("Test 1", findElement(By.name("vContext[movie][title]")).getAttribute("value"));
+		assertEquals("2020", findElement(By.name("vContext[movie][year]")).getAttribute("value"));
+	}
+
+	/* May be use in nexts tests
+	private String getWebElementsAsString(final List<WebElement> webElements) {
+		return webElements.stream()
+				.map(WebElement::getText)
+				.collect(Collectors.joining(", "));
+	}
+	*/
+	private WebElement waitElement(final By byElement) throws InterruptedException {
+		return waitElement(byElement, 1000);
+	}
+
+	private WebElement waitElement(final By byElement, final long timeout) throws InterruptedException {
+		final long start = System.currentTimeMillis();
+		do {
+			try {
+				if (isElementPresent(byElement)) {
+					return driver.findElement(byElement);
+				}
+			} catch (final Exception e) {
+				//do nothing
+			}
+			Thread.sleep(100);
+		} while (System.currentTimeMillis() - start < timeout);
+		System.out.println(driver.getPageSource());
+		throw new AssertionError("Element non trouvé en " + timeout + "ms : " + byElement.toString());
+	}
+
+	private static boolean isElementPresent(final By by) {
+		try {
+			driver.findElement(by);
+			return true;
+		} catch (final org.openqa.selenium.NoSuchElementException e) {
+			return false;
+		}
+	}
+
+	private static WebElement findElement(final By by) {
+		try {
+			return driver.findElement(by);
+		} catch (final org.openqa.selenium.NoSuchElementException e) {
+			System.out.println(driver.getPageSource());
+			throw new NoSuchElementException(by.toString(), e);
+		}
+	}
 }

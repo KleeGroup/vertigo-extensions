@@ -4,6 +4,7 @@
 	<vu:label-edit object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
 		<q-checkbox 
 			th:v-model="|vueData.${object}.${field}|" 
+			dense
 			th:attr="__${input_attrs}__"
 			 >
 		</q-checkbox>
@@ -15,8 +16,9 @@
 	<vu:include-data object="${object}" field="${field}"/>
 	<vu:label-read object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
 		<q-checkbox 
-			:readonly="true"
+			disable
 			th:v-model="|vueData.${object}.${field}|"
+			dense
 			th:attr="__${input_attrs}__"  
 			>
 		</q-checkbox>

@@ -7,12 +7,13 @@
 	    loadingBar: { 'skip-hijack' : true } // disable quasar's ajaxbar
 	  }
 	</script>
-	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar-framework@0.17.19/dist/umd/quasar.mat.umd.min.js}"></script>
-	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar-framework@0.17.19/dist/umd/i18n.fr.umd.min.js}"></script>
+	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.4.1/dist/quasar.umd.min.js}"></script>
+	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.4.1/dist/lang/__${model.util.getCurrentLocalePrefixForQuasar()}__.umd.min.js}"></script>
 	<vu:vue-data/>
 	<script th:src="@{/vertigo-ui/static/js/vertigo-ui.js}"></script>
+	<script th:src="@{/vertigo-ui/static/js/vertigo-ui-lang-__${model.util.getCurrentLocalePrefixForQuasar()}__.js}"></script>
 	<script>
-		Quasar.i18n.set(Quasar.i18n.fr)
+		Quasar.lang.set(Quasar.lang.[[${model.util.getCurrentLocaleForQuasar()}]])
 		var data = {
 				  vueData : vueData,
 				  componentStates : componentStates,

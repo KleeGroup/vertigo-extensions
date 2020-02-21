@@ -168,8 +168,8 @@ public class ExecutionTest extends AbstractOrchestraTestCase {
 		orchestraServices.getScheduler()
 				.scheduleAt(processDefinition, Instant.now(), Collections.emptyMap());
 
-		// After 5 secondes at most there is 1 process in error
-		testWithTimeout(() -> checkExecutions(proId, 0, 0, 0, 1), 6);
+		// After 10 secondes at most there is 1 process in error
+		testWithTimeout(() -> checkExecutions(proId, 0, 0, 0, 1), 10);
 	}
 
 	/**

@@ -139,13 +139,10 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	/** {@inheritDoc} */
 	@Override
 	public final UiObject<O> get(final int index) {
-		UiObject<O> element = uiObjectByIndex.get(index);
-		if (element == null) {
-			element = new MapUiObject<>(obtainDtList().get(index));
-			uiObjectByIndex.put(index, element);
+		return uiObjectByIndex.computeIfAbsent(index, i -> {
 			Assertion.checkState(uiObjectByIndex.size() < 1000, "Trop d'élément dans le buffer uiObjectByIndex de la liste de {0}", getDtDefinition().getName());
-		}
-		return element;
+			return new MapUiObject<>(obtainDtList().get(i));
+		});
 	}
 
 	/** {@inheritDoc} */
@@ -194,6 +191,8 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @throws FormatterException Format error
 	 */
 	public UiObject<O> getById(final String keyFieldName, final Serializable keyValue) {
+		Assertion.checkNotNull(keyValue);
+		//-----
 		final Map<Serializable, UiObject<O>> uiObjectById = obtainUiObjectByIdMap(keyFieldName);
 		UiObject<O> uiObject = uiObjectById.get(keyValue);
 		if (uiObject == null) {
@@ -231,12 +230,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @return Index des UiObjects par Id
 	 */
 	protected final Map<Serializable, UiObject<O>> obtainUiObjectByIdMap(final String keyFieldName) {
-		Map<Serializable, UiObject<O>> uiObjectById = uiObjectByFieldValue.get(keyFieldName);
-		if (uiObjectById == null) {
-			uiObjectById = new HashMap<>();
-			uiObjectByFieldValue.put(keyFieldName, uiObjectById);
-		}
-		return uiObjectById;
+		return uiObjectByFieldValue.computeIfAbsent(keyFieldName, fieldName -> new HashMap<>());
 	}
 
 	/**
@@ -253,6 +247,12 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 		uiObjectByIndex.clear();
 	}
 
+	/**
+	 * Return a Serializable List for client.
+	 * @param fieldsForClient List of fields
+	 * @param valueTransformers Map of transformers
+	 * @return ArrayList of HashMap (needed for Serializable)
+	 */
 	public ArrayList<HashMap<String, Serializable>> listForClient(final Set<String> fieldsForClient, final Map<String, Function<Serializable, String>> valueTransformers) {
 		final ArrayList<HashMap<String, Serializable>> listForClient = new ArrayList<>();
 		for (final UiObject uiObject : this) {
