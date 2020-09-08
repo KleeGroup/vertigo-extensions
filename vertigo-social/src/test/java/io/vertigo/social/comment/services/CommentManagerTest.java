@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +26,17 @@ import org.junit.jupiter.api.Test;
 
 import io.vertigo.account.account.Account;
 import io.vertigo.account.account.AccountGroup;
-import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.dynamo.domain.metamodel.DtDefinition;
-import io.vertigo.dynamo.domain.model.KeyConcept;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.util.InjectorUtil;
+import io.vertigo.datamodel.structure.definitions.DtDefinition;
+import io.vertigo.datamodel.structure.model.KeyConcept;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 import io.vertigo.social.MyNodeConfig;
+import io.vertigo.social.comment.Comment;
+import io.vertigo.social.comment.CommentManager;
 import io.vertigo.social.data.MockIdentities;
-import io.vertigo.social.services.comment.Comment;
-import io.vertigo.social.services.comment.CommentServices;
-import io.vertigo.util.InjectorUtil;
 import redis.clients.jedis.Jedis;
 
 public class CommentManagerTest {
@@ -45,20 +44,20 @@ public class CommentManagerTest {
 	@Inject
 	private MockIdentities mockIdentities;
 	@Inject
-	private CommentServices commentServices;
+	private CommentManager commentServices;
 	@Inject
 	private RedisConnector redisConnector;
 
-	private AutoCloseableApp app;
+	private AutoCloseableNode node;
 	private UID<KeyConcept> keyConcept1Uri;
 
 	private UID<Account> accountURI1;
 
 	@BeforeEach
 	public void setUp() {
-		app = new AutoCloseableApp(MyNodeConfig.vegaConfig());
+		node = new AutoCloseableNode(MyNodeConfig.vegaConfig());
 		InjectorUtil.injectMembers(this);
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			jedis.flushAll();
 		}
 		accountURI1 = MockIdentities.createAccountURI("1");
@@ -72,8 +71,8 @@ public class CommentManagerTest {
 
 	@AfterEach
 	public void tearDown() {
-		if (app != null) {
-			app.close();
+		if (node != null) {
+			node.close();
 		}
 	}
 

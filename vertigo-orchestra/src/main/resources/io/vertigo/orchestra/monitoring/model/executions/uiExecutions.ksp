@@ -1,31 +1,31 @@
 package io.vertigo.orchestra.monitoring.domain.uiexecutions
 
 create DtDefinition DtOProcessExecutionUi {
-	field preId   				{domain : DoOIdentifiant, label :"Id de l'activité", required:"true",},
-	field beginTime   			{domain : DoOTimestamp, label :"Démarrage", required:"true",},
-	field endTime   			{domain : DoOTimestamp, label :"Fin", required:"true",},
-	field executionTime   		{domain : DoONombre, label :"Durée", required:"false",},
-	field status   				{domain : DoOCodeIdentifiant, label :"Statut", required:"false",},
-	field checked				{domain : DoOBooleen, label :"Pris en charge", required:"false",},
-	field checkingDate			{domain : DoOTimestamp, label :"Date de prise en charge", required:"false",},
-	field checkingComment		{domain : DoOText, label :"Commentaire", required:"false",},
-	field hasAttachment			{domain : DoOBooleen, label :"Fichier de log", required:"false",},
+	field preId   				{domain : DoOIdentifiant, label :"Id de l'activité", cardinality: "1",},
+	field beginTime   			{domain : DoOTimestamp, label :"Démarrage", cardinality: "1",},
+	field endTime   			{domain : DoOTimestamp, label :"Fin", cardinality: "1",},
+	field executionTime   		{domain : DoONombre, label :"Durée", cardinality: "?",},
+	field status   				{domain : DoOCodeIdentifiant, label :"Statut", cardinality: "?",},
+	field checked				{domain : DoOBooleen, label :"Pris en charge", cardinality: "?",},
+	field checkingDate			{domain : DoOTimestamp, label :"Date de prise en charge", cardinality: "?",},
+	field checkingComment		{domain : DoOText, label :"Commentaire", cardinality: "?",},
+	field hasAttachment			{domain : DoOBooleen, label :"Fichier de log", cardinality: "?",},
   	
-},
+}
 
 create DtDefinition DtOActivityExecutionUi {
-	field aceId   					{domain : DoOIdentifiant, label :"Id de l'activité", required:"true",},
-	field label   				{domain : DoOLibelle, label :"Libellé", required:"false",},
-	field beginTime   			{domain : DoOTimestamp, label :"Démarrage", required:"true",},
-	field endTime   			{domain : DoOTimestamp, label :"Fin", required:"true",},
-	field executionTime   		{domain : DoONombre, label :"Durée", required:"false",},
-	field status   				{domain : DoOCodeIdentifiant, label :"Statut", required:"false",},
-	field workspaceIn 			{domain : DoOJsonText, label :"Paramètres entrants", required:"false",},
-	field workspaceOut 			{domain : DoOJsonText, label :"Paramètres sortants", required:"false",},
-	field hasAttachment			{domain : DoOBooleen, label :"Fichier de log", required:"false",},
-	field hasTechnicalLog 		{domain : DoOBooleen, label :"Log technique", required:"false",},
+	field aceId   					{domain : DoOIdentifiant, label :"Id de l'activité", cardinality: "1",},
+	field label   				{domain : DoOLibelle, label :"Libellé", cardinality: "?",},
+	field beginTime   			{domain : DoOTimestamp, label :"Démarrage", cardinality: "1",},
+	field endTime   			{domain : DoOTimestamp, label :"Fin", cardinality: "1",},
+	field executionTime   		{domain : DoONombre, label :"Durée", cardinality: "?",},
+	field status   				{domain : DoOCodeIdentifiant, label :"Statut", cardinality: "?",},
+	field workspaceIn 			{domain : DoOJsonText, label :"Paramètres entrants", cardinality: "?",},
+	field workspaceOut 			{domain : DoOJsonText, label :"Paramètres sortants", cardinality: "?",},
+	field hasAttachment			{domain : DoOBooleen, label :"Fichier de log", cardinality: "?",},
+	field hasTechnicalLog 		{domain : DoOBooleen, label :"Log technique", cardinality: "?",},
   
-},
+}
 
 
 

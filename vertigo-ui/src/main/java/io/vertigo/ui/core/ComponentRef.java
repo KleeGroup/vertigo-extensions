@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +19,8 @@ package io.vertigo.ui.core;
 
 import java.io.Serializable;
 
-import io.vertigo.app.Home;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.Node;
 
 /**
  * Référence vers un composant.
@@ -43,7 +42,7 @@ public final class ComponentRef<T> implements Serializable {
 	 * @param lazy Si référencement à la première demande
 	 */
 	private ComponentRef(final Class<T> componentClazz, final boolean lazy) {
-		Assertion.checkNotNull(componentClazz);
+		Assertion.check().isNotNull(componentClazz);
 		//-----
 		componentId = null;
 		this.componentClazz = componentClazz;
@@ -76,9 +75,9 @@ public final class ComponentRef<T> implements Serializable {
 	public synchronized T get() {
 		if (instance == null) {
 			if (componentId != null) {
-				instance = Home.getApp().getComponentSpace().resolve(componentId, componentClazz);
+				instance = Node.getNode().getComponentSpace().resolve(componentId, componentClazz);
 			} else {
-				instance = Home.getApp().getComponentSpace().resolve(componentClazz);
+				instance = Node.getNode().getComponentSpace().resolve(componentClazz);
 			}
 		}
 		return instance;

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +30,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
-import io.vertigo.dynamo.kvstore.KVStoreManager;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.util.StringUtil;
+import io.vertigo.datastore.kvstore.KVStoreManager;
 import io.vertigo.ui.core.ComponentStates;
 import io.vertigo.ui.core.FormMode;
 import io.vertigo.ui.core.ViewContext;
@@ -41,7 +41,7 @@ import io.vertigo.ui.core.ViewContextMap;
 import io.vertigo.ui.exception.ExpiredViewContextException;
 import io.vertigo.ui.impl.springmvc.util.UiRequestUtil;
 import io.vertigo.ui.impl.springmvc.util.UiUtil;
-import io.vertigo.util.StringUtil;
+import io.vertigo.vega.engines.webservice.json.JsonEngine;
 import io.vertigo.vega.webservice.validation.UiMessageStack;
 
 /**
@@ -85,6 +85,8 @@ public abstract class AbstractVSpringMvcController {
 	private KVStoreManager kvStoreManager;
 	@Inject
 	private VTransactionManager transactionManager;
+	@Inject
+	private JsonEngine jsonEngine;
 
 	public void prepareContext(final HttpServletRequest request) throws ExpiredViewContextException {
 		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
@@ -102,18 +104,19 @@ public abstract class AbstractVSpringMvcController {
 				if (viewContextMap == null) {
 					contextMiss(ctxId);
 				}
-				viewContext = new ViewContext(viewContextMap);
+				viewContext = new ViewContext(viewContextMap, jsonEngine);
 				viewContext.makeModifiable();
+				viewContext.setInputCtxId(ctxId);
+				attributes.setAttribute("viewContext", viewContext, RequestAttributes.SCOPE_REQUEST);
 			}
-			viewContext.setInputCtxId(ctxId);
-			attributes.setAttribute("viewContext", viewContext, RequestAttributes.SCOPE_REQUEST);
+
 		} else {
-			viewContext = new ViewContext(new ViewContextMap());
+			viewContext = new ViewContext(new ViewContextMap(), jsonEngine);
 			attributes.setAttribute("viewContext", viewContext, RequestAttributes.SCOPE_REQUEST);
 			//initContextUrlParameters(request, viewContext);
 			//TODO vérifier que l'action demandée n'attendait pas de context : il va etre recrée vide ce qui n'est pas bon dans certains cas.
 			preInitContext(viewContext);
-			Assertion.checkState(viewContext.containsKey(UTIL_CONTEXT_KEY), "Pour surcharger preInitContext vous devez rappeler les parents super.preInitContext(). Action: {0}",
+			Assertion.check().isTrue(viewContext.containsKey(UTIL_CONTEXT_KEY), "Pour surcharger preInitContext vous devez rappeler les parents super.preInitContext(). Action: {0}",
 					getClass().getSimpleName());
 			//initContext();
 		}
@@ -137,7 +140,7 @@ public abstract class AbstractVSpringMvcController {
 		//package is
 		// group.id.project.feature.controllers and we look in feature/...
 		// or group.id.project.controllers and we look in project/
-		Assertion.checkState(path.contains(".controllers"), "Default naming only works if your package contains .controllers, it's not the case for the controller {0}", controller.getClass());
+		Assertion.check().isTrue(path.contains(".controllers"), "Default naming only works if your package contains .controllers, it's not the case for the controller {0}", controller.getClass());
 		path = path.substring(path.lastIndexOf('.', path.indexOf(".controllers") - 1) + 1);
 		path = path.replaceAll("\\.controllers", "");
 		path = path.replaceAll("\\.", SLASH);
@@ -199,10 +202,10 @@ public abstract class AbstractVSpringMvcController {
 	}
 
 	/** {@inheritDoc} */
-	private static final ViewContext getViewContext() {
+	private static ViewContext getViewContext() {
 		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
 		final ViewContext viewContext = (ViewContext) attributes.getAttribute("viewContext", RequestAttributes.SCOPE_REQUEST);
-		Assertion.checkNotNull(viewContext);
+		Assertion.check().isNotNull(viewContext);
 		//---
 		return viewContext;
 	}

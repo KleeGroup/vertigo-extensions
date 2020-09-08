@@ -1,9 +1,9 @@
 <th:block th:fragment="column(list, field, name, label, align, sortable, class, td_attrs)"
 	th:assert="${(field != null) or (name != null and label != null)}"
-	th:with="columnName=${field != null ? field : name }, columnLabel=${label != null ? label : model.util.label('__${list + '.' + field}__')}, columnAlign=${model.util.domainAlign(list, field, align)}, columnClass=${model.util.domainCss(list, field, class, 'col_'+name)}, columnSortable=${sortable != null ? sortable : true } "
-	th:attr="objectKey=${model.vContext['componentStates']['__${componentId}__'].addObjectToList('columns', {name: '__${columnName}__', field: '__${field}__', label: '__${columnLabel}__', align: '__${columnAlign}__', 'sortable': __${columnSortable}__, 'classes':'__${class?:myAutoColClass?columnClass:''}__'})}" >
+	th:with="columnName=${field != null ? field : name }, columnLabel=${label != null ? label : model.util.label('__${list + '.' + field}__')}, columnAlign=${model.util.smartTypeAlign(list, field, align)}, columnClass=${model.util.smartTypeCss(list, field, class, 'col_'+name)}, columnSortable=${sortable != null ? sortable : true } "
+	th:attr="objectKey=${model.vContext['componentStates']['__${componentId}__'].addObjectToList('columns', {name: '__${columnName}__', field: '__${field}__', label: '__${columnLabel}__', align: '__${columnAlign}__', 'sortable': __${columnSortable}__, 'classes':'__${class?:columnClass}__'})}" >
 	<vu:include-data th:if="${field != null}" object="${list}" field="${field}"/>
-	<q-td th:key="${columnName}" :props="props" th:class="${class?:myAutoColClass?columnClass:''}"  th:attr="__${td_attrs}__" >
+	<q-td th:key="${columnName}" :props="props" th:class="${class?:columnClass}"  th:attr="__${td_attrs}__" >
 		<vu:content>{{ props.row.[[${field}]] }}</vu:content><!--/* Default content */-->
 	</q-td>
 </th:block> 

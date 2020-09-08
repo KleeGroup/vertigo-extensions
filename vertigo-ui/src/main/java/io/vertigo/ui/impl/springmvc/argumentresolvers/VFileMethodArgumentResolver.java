@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +27,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import io.vertigo.dynamo.file.model.VFile;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.datastore.filestore.model.VFile;
 import io.vertigo.vega.webservice.stereotype.QueryParam;
 
 public class VFileMethodArgumentResolver implements HandlerMethodArgumentResolver {
@@ -47,7 +46,7 @@ public class VFileMethodArgumentResolver implements HandlerMethodArgumentResolve
 			final WebDataBinderFactory binderFactory) throws Exception {
 		final HttpServletRequest request = getRequest(webRequest);
 		final QueryParam requestParam = parameter.getParameterAnnotation(QueryParam.class);
-		Assertion.checkNotNull(requestParam, "File name wasn't found. Use @QueryParam('myFileRequestParam') in your controller.");
+		Assertion.check().isNotNull(requestParam, "File name wasn't found. Use @QueryParam('myFileRequestParam') in your controller.");
 		return VFileUtil.readQueryFile(request, requestParam.value());
 	}
 

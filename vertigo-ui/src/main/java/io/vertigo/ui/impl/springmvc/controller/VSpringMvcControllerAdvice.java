@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +17,8 @@
  */
 package io.vertigo.ui.impl.springmvc.controller;
 
+import java.util.function.Supplier;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import io.vertigo.account.authorization.VSecurityException;
-import io.vertigo.lang.VUserException;
+import io.vertigo.core.lang.VUserException;
 import io.vertigo.ui.core.ViewContext;
 import io.vertigo.ui.core.ViewContextMap;
 import io.vertigo.ui.impl.springmvc.util.UiRequestUtil;
@@ -48,6 +49,12 @@ public final class VSpringMvcControllerAdvice {
 		final UiMessageStack uiMessageStack = UiRequestUtil.obtainCurrentUiMessageStack();
 		//---
 		model.addAttribute("model", viewContext.asMap());
+		model.addAttribute("viewContextAsJson", new Supplier<String>() {
+			@Override
+			public String get() {
+				return viewContext.getFilteredViewContextAsJson();
+			}
+		});
 		model.addAttribute("uiMessageStack", uiMessageStack);
 		// here we can retrieve anything and put it into the model or in our context
 		// we can also use argument resolvers to retrieve attributes in our context for convenience (a DtObject or an UiObject can be retrieved as parameters
@@ -78,7 +85,7 @@ public final class VSpringMvcControllerAdvice {
 	@ExceptionHandler(Throwable.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public static Object handleThrowable(final Throwable th, final HttpServletRequest request) throws Throwable {
-		if (isJsonRequest(request)) {
+		if (UiRequestUtil.isJsonRequest(request)) {
 			final UiMessageStack uiMessageStack = UiRequestUtil.obtainCurrentUiMessageStack();
 			final String exceptionMessage = th.getMessage() != null ? th.getMessage() : th.getClass().getSimpleName();
 			uiMessageStack.addGlobalMessage(Level.ERROR, exceptionMessage);
@@ -111,20 +118,21 @@ public final class VSpringMvcControllerAdvice {
 		//---
 		final ViewContext viewContext = UiRequestUtil.getCurrentViewContext();
 		//---
-		if (isJsonRequest(request)) {
+		if (UiRequestUtil.isJsonRequest(request)) {
 			return uiMessageStack;
 		}
 		//---
 		final ModelAndView modelAndView = new ModelAndView();
 		viewContext.markDirty();
 		modelAndView.addObject("model", viewContext.asMap());
+		modelAndView.addObject("viewContextAsJson", new Supplier<String>() {
+			@Override
+			public String get() {
+				return viewContext.getFilteredViewContextAsJson();
+			}
+		});
 		modelAndView.addObject("uiMessageStack", uiMessageStack);
 		return modelAndView;
-	}
-
-	private static boolean isJsonRequest(final HttpServletRequest request) {
-		final String acceptHeader = request.getHeader("Accept");
-		return acceptHeader != null && acceptHeader.contains("application/json");
 	}
 
 }

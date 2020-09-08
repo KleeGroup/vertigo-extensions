@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.vertigo.app.Home;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.locale.MessageText;
-import io.vertigo.dynamo.collections.ListFilter;
-import io.vertigo.dynamo.collections.metamodel.FacetDefinition;
-import io.vertigo.dynamo.collections.model.FacetValue;
-import io.vertigo.dynamo.collections.model.SelectedFacetValues;
-import io.vertigo.dynamo.collections.model.SelectedFacetValues.SelectedFacetValuesBuilder;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.node.Node;
+import io.vertigo.datafactory.collections.ListFilter;
+import io.vertigo.datafactory.collections.definitions.FacetDefinition;
+import io.vertigo.datafactory.collections.model.FacetValue;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues.SelectedFacetValuesBuilder;
 
 /**
  * Selection de Facette.
@@ -46,7 +45,7 @@ public final class UiSelectedFacetValues extends HashMap<String, List<String>> {
 	}
 
 	public UiSelectedFacetValues(final SelectedFacetValues selectedFacetValues, final Collection<String> facetNames) {
-		Assertion.checkNotNull(selectedFacetValues);
+		Assertion.check().isNotNull(selectedFacetValues);
 		//---
 		facetNames
 				.forEach(facetName -> put(facetName, selectedFacetValues
@@ -61,7 +60,7 @@ public final class UiSelectedFacetValues extends HashMap<String, List<String>> {
 		final SelectedFacetValuesBuilder selectedFacetValuesBuilder = SelectedFacetValues.empty();
 
 		for (final Map.Entry<String, List<String>> entry : entrySet()) {
-			final FacetDefinition facetDefinition = Home.getApp().getDefinitionSpace().resolve(entry.getKey(), FacetDefinition.class);
+			final FacetDefinition facetDefinition = Node.getNode().getDefinitionSpace().resolve(entry.getKey(), FacetDefinition.class);
 			if (facetDefinition.isRangeFacet()) {
 				appendRangeFacetValues(entry.getValue(), facetDefinition, selectedFacetValuesBuilder);
 			} else {

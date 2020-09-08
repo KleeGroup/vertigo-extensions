@@ -14,25 +14,44 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-vega-impl</artifactId>
-			<version>${vertigo.version}</version>
+			<artifactId>vertigo-vega</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
-			<version>2.3.29</version>
+			<version>2.3.30</version>
 		</dependency>
 		<dependency>
-			<groupId>org.influxdb</groupId>
-			<artifactId>influxdb-java</artifactId>
-			<version>2.16</version>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-influxdb-connector</artifactId>
+			<version>${vertigo.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-redis-connector</artifactId>
+			<version>${vertigo.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-elasticsearch-connector</artifactId>
+			<version>${vertigo.version}</version>
+			<optional>true</optional>
+		</dependency> 
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		
 		<!-- -->
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.5.4</version>
+			<version>0.9.5.5</version>
 			<scope>test</scope>
 		</dependency>
 			<dependency>
@@ -42,66 +61,64 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.31.v20200723</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
+			<version>9.4.31.v20200723</version>
+			<scope>test</scope>
+		</dependency>
 		
 		<!-- CollectionsManager/LuceneIndexPlugin -->
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>8.2.0</version> <!-- 8.2.0 compatible with ElasticSearch 7.4.1 -->
+			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-analyzers-common</artifactId>
-			<version>8.2.0</version> <!-- 8.2.0 compatible with ElasticSearch 7.4.1 -->
+			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
 			<scope>test</scope>
 		</dependency>
 
 		<!-- Search -->
 		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<version>7.4.1</version>
-			<scope>test</scope><!-- EsTransportSearchServicesPlugin -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>
-				</exclusion>
-			</exclusions>
+		    <groupId>org.elasticsearch.client</groupId>
+		    <artifactId>elasticsearch-rest-high-level-client</artifactId>
+		    <version>7.9.0</version>
+		    <scope>test</scope> <!-- REstHighLevelElasticSearchConnector -->
 		</dependency>
 		<dependency>
 		    <groupId>org.elasticsearch.client</groupId>
 		    <artifactId>transport</artifactId>
-		    <version>7.4.1</version>
+		    <version>7.9.0</version>
 		    <scope>test</scope><!-- EsTransportSearchServicesPlugin -->
 		</dependency>
 		<dependency>
 	        <groupId>org.codelibs.elasticsearch.module</groupId>
 	        <artifactId>analysis-common</artifactId> 
-	        <version>7.4.1</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
+	        <version>7.9.0</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
 	        <scope>test</scope>
 	    </dependency>
 	   	<dependency>
 		    <groupId>org.codelibs.elasticsearch.module</groupId>
 		    <artifactId>mapper-extras</artifactId>
-		    <version>7.4.1</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
+		    <version>7.9.0</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
 	        <scope>test</scope>
 		</dependency>
 		<!-- For Rest Webservice testing -->
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>4.1.2</version>
+			<version>4.3.1</version>
 			<scope>test</scope>
 		</dependency>
-		
-		<dependency>
-			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-core</artifactId>
-			<version>${vertigo.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>		
 	</dependencies>
 </project>

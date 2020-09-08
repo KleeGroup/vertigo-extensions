@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +26,18 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collections;
 
 import javax.inject.Inject;
 
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
-import io.vertigo.core.component.ComponentInitializer;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.node.component.ComponentInitializer;
 import io.vertigo.core.resource.ResourceManager;
-import io.vertigo.database.sql.SqlDataBaseManager;
+import io.vertigo.database.sql.SqlManager;
 import io.vertigo.database.sql.connection.SqlConnection;
 import io.vertigo.database.sql.statement.SqlStatement;
-import io.vertigo.lang.WrappedException;
 import io.vertigo.ui.data.dao.movies.MovieDAO;
 import io.vertigo.ui.data.domain.movies.Movie;
 
@@ -52,7 +52,7 @@ public class DataBaseInitializer implements ComponentInitializer {
 	@Inject
 	private VTransactionManager transactionManager;
 	@Inject
-	private SqlDataBaseManager sqlDataBaseManager;
+	private SqlManager sqlManager;
 	@Inject
 	private MovieDAO movieDao;
 
@@ -65,7 +65,7 @@ public class DataBaseInitializer implements ComponentInitializer {
 	}
 
 	private void createDataBase() {
-		final SqlConnection connection = sqlDataBaseManager.getConnectionProvider(SqlDataBaseManager.MAIN_CONNECTION_PROVIDER_NAME).obtainConnection();
+		final SqlConnection connection = sqlManager.getConnectionProvider(SqlManager.MAIN_CONNECTION_PROVIDER_NAME).obtainConnection();
 		execSqlScript(connection, "sqlgen/crebas.sql");
 	}
 
@@ -79,21 +79,17 @@ public class DataBaseInitializer implements ComponentInitializer {
 					crebaseSql.append(adaptedInputLine).append('\n');
 				}
 				if (inputLine.trim().endsWith(";")) {
-					execCallableStatement(connection, sqlDataBaseManager, crebaseSql.toString());
+					execCallableStatement(connection, sqlManager, crebaseSql.toString());
 					crebaseSql.setLength(0);
 				}
 			}
-		} catch (final IOException e) {
+		} catch (final IOException | SQLException e) {
 			throw WrappedException.wrap(e, "Can't exec script {0}", scriptPath);
 		}
 	}
 
-	private static void execCallableStatement(final SqlConnection connection, final SqlDataBaseManager sqlDataBaseManager, final String sql) {
-		try {
-			sqlDataBaseManager.executeUpdate(SqlStatement.builder(sql).build(), connection);
-		} catch (final SQLException e) {
-			throw WrappedException.wrap(e, "Can't exec command {0}", sql);
-		}
+	private static void execCallableStatement(final SqlConnection connection, final SqlManager sqlManager, final String sql) throws SQLException {
+		sqlManager.executeUpdate(SqlStatement.builder(sql).build(), Collections.emptyMap(), connection);
 	}
 
 	private static void createInitialMovies(final MovieDAO movieDao, final VTransactionManager transactionManager) {

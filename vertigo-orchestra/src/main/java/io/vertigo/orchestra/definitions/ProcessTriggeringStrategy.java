@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +20,7 @@ package io.vertigo.orchestra.definitions;
 import java.util.Map;
 import java.util.Optional;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 /**
  * Strategy for trigerring the process.
@@ -46,8 +45,9 @@ public final class ProcessTriggeringStrategy {
 			final Map<String, String> initialParams,
 			final boolean multiExecution,
 			final int rescuePeriodInSeconds) {
-		Assertion.checkNotNull(cronExpression);
-		Assertion.checkNotNull(initialParams);
+		Assertion.check()
+				.isNotNull(cronExpression)
+				.isNotNull(initialParams);
 		// --
 		this.cronExpression = cronExpression;
 		this.initialParams = initialParams;

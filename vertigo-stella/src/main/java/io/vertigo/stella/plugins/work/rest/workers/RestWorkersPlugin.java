@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +20,8 @@ package io.vertigo.stella.plugins.work.rest.workers;
 import javax.inject.Inject;
 
 import io.vertigo.commons.codec.CodecManager;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.lang.Assertion;
 import io.vertigo.stella.impl.work.WorkItem;
 import io.vertigo.stella.impl.workers.WorkersPlugin;
 
@@ -49,8 +48,9 @@ public final class RestWorkersPlugin implements WorkersPlugin {
 			@ParamValue("serverUrl") final String serverUrl,
 			@ParamValue("timeoutSeconds") final int timeoutSeconds,
 			final CodecManager codecManager) {
-		Assertion.checkArgNotEmpty(serverUrl);
-		Assertion.checkArgument(timeoutSeconds < 10000, "Le timeout s'exprime en seconde.");
+		Assertion.check()
+				.isNotBlank(serverUrl)
+				.isTrue(timeoutSeconds < 10000, "Le timeout s'exprime en seconde.");
 		//-----
 		restQueueClient = new RestQueueClient(serverUrl + "/backend/workQueue", timeoutSeconds, codecManager);
 	}

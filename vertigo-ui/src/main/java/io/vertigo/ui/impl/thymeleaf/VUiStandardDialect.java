@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +23,7 @@ import java.util.Set;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.processor.IProcessor;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.ui.impl.thymeleaf.components.ContentItemComponentProcessor;
 import io.vertigo.ui.impl.thymeleaf.components.ContentSlotComponentProcessor;
 import io.vertigo.ui.impl.thymeleaf.components.NamedComponentDefinition;
@@ -44,7 +43,7 @@ public final class VUiStandardDialect extends AbstractProcessorDialect {
 
 	public VUiStandardDialect(final Set<NamedComponentDefinition> components) {
 		super(NAME, PREFIX, PROCESSOR_PRECEDENCE);
-		Assertion.checkNotNull(components);
+		Assertion.check().isNotNull(components);
 		//---
 		this.components = components;
 	}

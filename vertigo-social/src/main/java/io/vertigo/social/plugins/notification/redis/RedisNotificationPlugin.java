@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +21,21 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
 
 import io.vertigo.account.account.Account;
-import io.vertigo.commons.daemon.DaemonManager;
-import io.vertigo.commons.daemon.DaemonScheduled;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.lang.Assertion;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.daemon.DaemonScheduled;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.param.ParamValue;
+import io.vertigo.core.util.MapBuilder;
+import io.vertigo.datamodel.structure.model.UID;
 import io.vertigo.social.impl.notification.NotificationEvent;
 import io.vertigo.social.impl.notification.NotificationPlugin;
-import io.vertigo.social.services.notification.Notification;
-import io.vertigo.util.MapBuilder;
+import io.vertigo.social.notification.Notification;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
@@ -53,17 +53,23 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 	 * @param daemonManager Daemon Manager
 	 */
 	@Inject
-	public RedisNotificationPlugin(final RedisConnector redisConnector, final DaemonManager daemonManager) {
-		Assertion.checkNotNull(redisConnector);
-		Assertion.checkNotNull(daemonManager);
+	public RedisNotificationPlugin(
+			@ParamValue("connectorName") final Optional<String> connectorNameOpt,
+			final List<RedisConnector> redisConnectors) {
+		Assertion.check()
+				.isNotNull(connectorNameOpt)
+				.isNotNull(redisConnectors);
 		//-----
-		this.redisConnector = redisConnector;
+		final String connectorName = connectorNameOpt.orElse("main");
+		redisConnector = redisConnectors.stream()
+				.filter(connector -> connectorName.equals(connector.getName()))
+				.findFirst().get();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void send(final NotificationEvent notificationEvent) {
-		Assertion.checkNotNull(notificationEvent);
+		Assertion.check().isNotNull(notificationEvent);
 		//-----
 		//1 notif is store 5 times :
 		// - data in map with key= notif:$uuid (with expiration)
@@ -73,7 +79,7 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 		// - notifs:$accountId in queue with key= accounts:$uuid
 		// - userContent value per accountId:$accountId in map with key= userContent:$uuid
 
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final Notification notification = notificationEvent.getNotification();
 			final String uuid = notification.getUuid().toString();
 			final String typedTarget = "type:" + notification.getType() + ";target:" + notification.getTargetUrl() + ";uuid";
@@ -135,11 +141,11 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public List<Notification> getCurrentNotifications(final UID<Account> accountURI) {
-		Assertion.checkNotNull(accountURI);
+		Assertion.check().isNotNull(accountURI);
 		//-----
 		final List<Response<Map<String, String>>> responses = new ArrayList<>();
 		final List<Response<String>> responsesUserContent = new ArrayList<>();
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final List<String> uuids = jedis.lrange("notifs:" + accountURI.getId(), 0, -1);
 			final Transaction tx = jedis.multi();
 			for (final String uuid : uuids) {
@@ -165,10 +171,11 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void updateUserContent(final UID<Account> accountURI, final UUID notificationUUID, final String userContent) {
-		Assertion.checkNotNull(accountURI);
-		Assertion.checkNotNull(notificationUUID);
+		Assertion.check()
+				.isNotNull(accountURI)
+				.isNotNull(notificationUUID);
 		//-----
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final String uuid = notificationUUID.toString();
 			final String updatedAccount = "accountURI:" + accountURI.getId();
 
@@ -183,10 +190,11 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void remove(final UID<Account> accountURI, final UUID notificationUUID) {
-		Assertion.checkNotNull(accountURI);
-		Assertion.checkNotNull(notificationUUID);
+		Assertion.check()
+				.isNotNull(accountURI)
+				.isNotNull(notificationUUID);
 		//-----
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final String notifiedAccount = "notifs:" + accountURI.getId();
 			final String uuid = notificationUUID.toString();
 			//we remove notif from account stack and account from notif stack
@@ -221,7 +229,7 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void removeAll(final String type, final String targetUrl) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final List<String> uuids = jedis.lrange("type:" + type + ";target:" + targetUrl + ";uuid", 0, -1);
 			for (final String uuid : uuids) {
 				//we search accounts for this notif
@@ -253,7 +261,7 @@ public final class RedisNotificationPlugin implements NotificationPlugin {
 		long startIndex = -1L;
 		final long startTime = System.currentTimeMillis();
 		while (System.currentTimeMillis() - startTime < 10 * 1000) {
-			try (final Jedis jedis = redisConnector.getResource()) {
+			try (final Jedis jedis = redisConnector.getClient()) {
 				final List<String> uuids = jedis.lrange("notifs:all", startIndex - REMOVE_PACKET_SIZE, startIndex); //return last (older) 100 uuid (but not sorted)
 				if (uuids.isEmpty()) {
 					break;// no more notifs we do nothing and stop now

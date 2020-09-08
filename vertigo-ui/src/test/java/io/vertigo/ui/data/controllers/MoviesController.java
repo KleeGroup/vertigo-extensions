@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +25,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import io.vertigo.dynamo.collections.CollectionsManager;
-import io.vertigo.dynamo.collections.model.FacetedQueryResult;
-import io.vertigo.dynamo.collections.model.SelectedFacetValues;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtListState;
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.util.VCollectors;
-import io.vertigo.dynamo.search.model.SearchQuery;
+import io.vertigo.datafactory.collections.model.FacetedQueryResult;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues;
+import io.vertigo.datafactory.search.model.SearchQuery;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtListState;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.util.VCollectors;
+import io.vertigo.datastore.entitystore.EntityStoreManager;
 import io.vertigo.ui.core.ViewContext;
 import io.vertigo.ui.core.ViewContextKey;
 import io.vertigo.ui.data.domain.DtDefinitions.MovieDisplayFields;
@@ -56,7 +55,7 @@ public final class MoviesController extends AbstractVSpringMvcController {
 	@Autowired
 	private MovieServices movieServices;
 	@Autowired
-	private CollectionsManager collectionsManager;
+	private EntityStoreManager entityStoreManager;
 
 	@GetMapping("/")
 	public void initContext(final ViewContext viewContext) {
@@ -89,7 +88,7 @@ public final class MoviesController extends AbstractVSpringMvcController {
 	private <D extends DtObject> DtList<D> applySortAndPagination(final DtList<D> unFilteredList, final DtListState dtListState) {
 		final DtList<D> sortedList;
 		if (dtListState.getSortFieldName().isPresent()) {
-			sortedList = collectionsManager.sort(unFilteredList, dtListState.getSortFieldName().get(), dtListState.isSortDesc().get());
+			sortedList = entityStoreManager.sort(unFilteredList, dtListState.getSortFieldName().get(), dtListState.isSortDesc().get());
 		} else {
 			sortedList = unFilteredList;
 		}

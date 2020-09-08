@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +26,15 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import io.vertigo.commons.transaction.Transactional;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VSystemException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VSystemException;
+import io.vertigo.core.util.ClassUtil;
+import io.vertigo.core.util.StringUtil;
+import io.vertigo.datamodel.structure.model.DtList;
 import io.vertigo.orchestra.dao.definition.DefinitionPAO;
 import io.vertigo.orchestra.dao.definition.OActivityDAO;
 import io.vertigo.orchestra.dao.definition.OProcessDAO;
@@ -47,8 +48,6 @@ import io.vertigo.orchestra.domain.definition.OProcess;
 import io.vertigo.orchestra.impl.definitions.ProcessDefinitionStorePlugin;
 import io.vertigo.orchestra.plugins.services.MapCodec;
 import io.vertigo.orchestra.services.execution.ActivityEngine;
-import io.vertigo.util.ClassUtil;
-import io.vertigo.util.StringUtil;
 
 /**
  * Plugin de gestion des définitions en base de données.
@@ -70,7 +69,7 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	private final MapCodec mapCodec = new MapCodec();
 
 	private void createDefinition(final ProcessDefinition processDefinition) {
-		Assertion.checkNotNull(processDefinition);
+		Assertion.check().isNotNull(processDefinition);
 		//-----
 		final OProcess process = new OProcess();
 
@@ -116,7 +115,7 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	/** {@inheritDoc} */
 	@Override
 	public ProcessDefinition getProcessDefinition(final String processName) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		// ---
 		final OProcess process = getOProcessByName(processName);
 		final DtList<OActivity> activities = activityDAO.getActivitiesByProId(process.getProId());
@@ -147,23 +146,24 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	}
 
 	private ProcessDefinition decodeProcessDefinition(final OProcess process, final List<OActivity> oActivities) {
-		Assertion.checkNotNull(process);
-		Assertion.checkNotNull(oActivities);
+		Assertion.check()
+				.isNotNull(process)
+				.isNotNull(oActivities);
 		// ---
 		final ProcessDefinitionBuilder processDefinitionBuilder = ProcessDefinition.builder(process.getName(), process.getLabel());
 		processDefinitionBuilder.withRescuePeriod(process.getRescuePeriod());
-		if (!StringUtil.isEmpty(process.getCronExpression())) {
+		if (!StringUtil.isBlank(process.getCronExpression())) {
 			processDefinitionBuilder.withCronExpression(process.getCronExpression());
 		}
 		processDefinitionBuilder.addInitialParams(mapCodec.decode(process.getInitialParams()));
 		if (process.getNeedUpdate() != null && process.getNeedUpdate()) {
 			processDefinitionBuilder.withNeedUpdate();
 		}
-		if (!StringUtil.isEmpty(process.getMetadatas())) {
+		if (!StringUtil.isBlank(process.getMetadatas())) {
 			// voir si on fait mieux
 			processDefinitionBuilder.withMetadatas(new GsonBuilder().create().fromJson(process.getMetadatas(),
 					new TypeToken<Map<String, String>>() {
-						private static final long serialVersionUID = 1L;/*rien*/
+						/*rien*/
 					}.getType()));
 		}
 		if (process.getMultiexecution()) {
@@ -196,7 +196,7 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	/** {@inheritDoc} */
 	@Override
 	public void createOrUpdateDefinition(final ProcessDefinition processDefinition) {
-		Assertion.checkNotNull(processDefinition);
+		Assertion.check().isNotNull(processDefinition);
 		// ---
 		final String processName = processDefinition.getName();
 
@@ -214,7 +214,7 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	}
 
 	private void updateDefinition(final ProcessDefinition processDefinition) {
-		Assertion.checkNotNull(processDefinition);
+		Assertion.check().isNotNull(processDefinition);
 		// ---
 		final String processName = processDefinition.getName();
 		definitionPAO.disableOldProcessDefinitions(processName);
@@ -226,19 +226,20 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 
 	/** {@inheritDoc} */
 	@Override
-	public void updateProcessDefinitionProperties(final ProcessDefinition processDefinition, final Optional<String> cronExpression, final boolean multiExecution, final int rescuePeriod,
+	public void updateProcessDefinitionProperties(final ProcessDefinition processDefinition, final Optional<String> cronExpressionOpt, final boolean multiExecution, final int rescuePeriod,
 			final boolean active) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(cronExpression);
-		Assertion.checkNotNull(rescuePeriod);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(cronExpressionOpt)
+				.isNotNull(rescuePeriod);
 		// ---
 		final OProcess process = getOProcessByName(processDefinition.getName());
-		if (cronExpression.isPresent()) {
+		if (cronExpressionOpt.isPresent()) {
 			process.setTrtCd("SCHEDULED");
 		} else {
 			process.setTrtCd("MANUAL");
 		}
-		process.setCronExpression(cronExpression.orElse(null));
+		process.setCronExpression(cronExpressionOpt.orElse(null));
 		process.setMultiexecution(multiExecution);
 		process.setRescuePeriod(rescuePeriod);
 		process.setActive(active);
@@ -250,8 +251,9 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	/** {@inheritDoc} */
 	@Override
 	public void updateProcessDefinitionInitialParams(final ProcessDefinition processDefinition, final Map<String, String> initialParams) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(initialParams);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(initialParams);
 		// ---
 		final OProcess process = getOProcessByName(processDefinition.getName());
 		process.setInitialParams(mapCodec.encode(initialParams));
@@ -260,7 +262,7 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 	}
 
 	private OProcess getOProcessByName(final String processName) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		// ---
 		return processDao.getActiveProcessByName(processName)
 				.orElseThrow(() -> new VSystemException("Cannot find process with name {0}", processName));
@@ -268,7 +270,7 @@ public class DbProcessDefinitionStorePlugin implements ProcessDefinitionStorePlu
 
 	@Override
 	public boolean processDefinitionExists(final String processName) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		// ---
 		return processDao.getActiveProcessByName(processName).isPresent();
 	}

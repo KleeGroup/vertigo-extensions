@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +27,7 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.standard.expression.Fragment;
 import org.thymeleaf.templatemode.TemplateMode;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 public class SlotAttributeTagProcessor extends AbstractAttributeTagProcessor {
 	protected static final String VARIABLE_PLACEHOLDER_SEPARATOR = "_";
@@ -53,7 +52,7 @@ public class SlotAttributeTagProcessor extends AbstractAttributeTagProcessor {
 			final ITemplateContext context, final IProcessableElementTag tag,
 			final AttributeName attributeName, final String attributeValue,
 			final IElementTagStructureHandler structureHandler) {
-		Assertion.checkArgument(
+		Assertion.check().isTrue(
 				attributeValue.endsWith(VARIABLE_PLACEHOLDER_SEPARATOR + SLOTS_SUFFIX),
 				"{0} isn't a slot. Attribute vu:slot supports only slots, names must ends with '_slot'", attributeValue);
 		//-----

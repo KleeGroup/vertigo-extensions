@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -33,12 +32,11 @@ import javax.servlet.http.Part;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.vertigo.app.Home;
-import io.vertigo.dynamo.file.FileManager;
-import io.vertigo.dynamo.file.model.InputStreamBuilder;
-import io.vertigo.dynamo.file.model.VFile;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.datastore.filestore.model.InputStreamBuilder;
+import io.vertigo.datastore.filestore.model.VFile;
+import io.vertigo.datastore.impl.filestore.model.StreamFile;
 
 /**
  * @author npiedeloup
@@ -71,11 +69,11 @@ final class VFileUtil {
 
 	static VFile readQueryFile(final HttpServletRequest request, final String requestParamName) {
 		try {
-			Assertion.checkArgument(
-					request.getContentType().contains("multipart/form-data"), "File {0} not found. Request contentType isn't \"multipart/form-data\"", requestParamName);
-			Assertion.checkArgument(!request.getParts().isEmpty(),
-					"File {0} not found. Request is multipart but there is no Parts. : Check you have defined MultipartConfig (example for Tomcat set allowCasualMultipartParsing=\"true\" on context tag in your context definition, for Jetty use JettyMultipartConfig)",
-					requestParamName);
+			Assertion.check()
+					.isTrue(request.getContentType().contains("multipart/form-data"), "File {0} not found. Request contentType isn't \"multipart/form-data\"", requestParamName)
+					.isFalse(request.getParts().isEmpty(),
+							"File {0} not found. Request is multipart but there is no Parts. : Check you have defined MultipartConfig (example for Tomcat set allowCasualMultipartParsing=\"true\" on context tag in your context definition, for Jetty use JettyMultipartConfig)",
+							requestParamName);
 			final Part file = request.getPart(requestParamName);
 			if (file == null) {
 				final String sentParts = request.getParts()
@@ -93,7 +91,7 @@ final class VFileUtil {
 	private static void send(final VFile vFile, final boolean isAttachment, final HttpServletResponse response)
 			throws IOException {
 		final Long length = vFile.getLength();
-		Assertion.checkArgument(length < Integer.MAX_VALUE, "Too big file to be send. It's "
+		Assertion.check().isTrue(length < Integer.MAX_VALUE, "Too big file to be send. It's "
 				+ length / 1024 + " Ko long, but maximum was " + Integer.MAX_VALUE / 1024
 				+ " Ko.");
 		response.setContentLength(length.intValue());
@@ -142,7 +140,7 @@ final class VFileUtil {
 					sb.append((char) c);
 				} else {
 					sb.append('%');
-					sb.append(Integer.toHexString(c & 0xff)); // we want byte as a char on one byte
+					sb.append(String.format("%02X", c)); // we want byte as a char on one byte
 				}
 			}
 		} catch (final UnsupportedEncodingException e) {
@@ -178,8 +176,7 @@ final class VFileUtil {
 		if (mimeType == null) {
 			mimeType = "application/octet-stream";
 		}
-		final FileManager fileManager = Home.getApp().getComponentSpace().resolve(FileManager.class);
-		return fileManager.createFile(fileName, mimeType, new Date(), file.getSize(), new FileInputStreamBuilder(file));
+		return StreamFile.of(fileName, mimeType, Instant.now(), file.getSize(), new FileInputStreamBuilder(file));
 	}
 
 	private static String getSubmittedFileName(final Part filePart) {

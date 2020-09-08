@@ -2,7 +2,7 @@ package io.vertigo.orchestra.dao.execution
 
 create Task TkGetActiveProcessExecutionByProId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		pre.*
@@ -10,13 +10,13 @@ create Task TkGetActiveProcessExecutionByProId {
         	where pre.PRO_ID = #proId#
         	and (pre.EST_CD = 'WAITING' or pre.EST_CD = 'RESERVED' or pre.EST_CD = 'SUBMITTED' or pre.EST_CD = 'RUNNING' or pre.EST_CD = 'PENDING')     	
 			"
-		attribute proId					{domain : DoOIdentifiant 						required:"true" 	inOut :"in"}
-		attribute dtcProcessExecution	 	{domain : DoDtOProcessExecutionDtc 		required:"true" 	inOut :"out"}
-},
+		in proId					{domain : DoOIdentifiant 						cardinality: "1" 	}
+		out dtcProcessExecution	 	{domain : DoDtOProcessExecution 		cardinality: "*" 	}
+}
 
 create Task TkGetLogByPreId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         	acl.*
@@ -25,13 +25,13 @@ create Task TkGetLogByPreId {
 			where ace.PRE_ID = #preId#
 			order by ace.end_time desc limit 1         	
 			"
-		attribute preId					{domain : DoOIdentifiant 				required:"true" 		inOut :"in" }
-		attribute dtActivityLog	 		{domain : DoDtOActivityLogDto 		required:"false" 	inOut :"out"}
-},
+		in preId					{domain : DoOIdentifiant 				cardinality: "1" 		 }
+		out dtActivityLog	 		{domain : DoDtOActivityLog 		cardinality: "?" 	}
+}
 
 create Task TkUpdateProcessExecutionTreatment {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update o_process_execution
         	set CHECKED = #checked# ,
@@ -40,10 +40,10 @@ create Task TkUpdateProcessExecutionTreatment {
         		where PRE_ID = #preId#
          	
 			"
-		attribute preId					{domain : DoOIdentifiant 			required:"true" 		inOut :"in" }
-		attribute checked					{domain : DoOBooleen 				required:"true" 		inOut :"in" }
-		attribute checkingDate				{domain : DoOTimestamp 			required:"true" 		inOut :"in" }
-		attribute checkingComment			{domain : DoOText 				required:"true" 		inOut :"in" }
-},
+		in preId					{domain : DoOIdentifiant 			cardinality: "1" 		 }
+		in checked					{domain : DoOBooleen 			cardinality: "1" 		 }
+		in checkingDate				{domain : DoOTimestamp 			cardinality: "1" 		 }
+		in checkingComment			{domain : DoOText 				cardinality: "1" 		 }
+}
 
 

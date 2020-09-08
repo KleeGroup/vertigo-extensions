@@ -1,15 +1,32 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.dao.planification;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.dynamo.task.TaskManager;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
-import io.vertigo.dynamo.task.model.Task;
-import io.vertigo.dynamo.task.model.TaskBuilder;
-import io.vertigo.dynamo.store.StoreServices;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.task.TaskManager;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
+import io.vertigo.datamodel.task.model.Task;
+import io.vertigo.datamodel.task.model.TaskBuilder;
+import io.vertigo.datastore.impl.dao.StoreServices;
 
 /**
  * This class is automatically generated.
@@ -25,7 +42,7 @@ public final class PlanificationPAO implements StoreServices {
 	 */
 	@Inject
 	public PlanificationPAO(final TaskManager taskManager) {
-		Assertion.checkNotNull(taskManager);
+		Assertion.check().isNotNull(taskManager);
 		//-----
 		this.taskManager = taskManager;
 	}
@@ -36,43 +53,72 @@ public final class PlanificationPAO implements StoreServices {
 	 * @return the builder 
 	 */
 	private static TaskBuilder createTaskBuilder(final String name) {
-		final TaskDefinition taskDefinition = Home.getApp().getDefinitionSpace().resolve(name, TaskDefinition.class);
+		final TaskDefinition taskDefinition = Node.getNode().getDefinitionSpace().resolve(name, TaskDefinition.class);
 		return Task.builder(taskDefinition);
 	}
 
 	/**
 	 * Execute la tache TkCleanFuturePlanifications.
-	 * @param processName String 
+	 * @param processName String
 	*/
-	public void cleanFuturePlanifications(final String processName) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkCleanFuturePlanifications",
+			request = "delete from o_process_planification prp" + 
+ "        	where prp.PRO_ID in (select pro.PRO_ID from o_process pro where pro.NAME = #processName#) and prp.SST_CD = 'WAITING' and prp.expected_time > current_timestamp",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineProc.class)
+	public void cleanFuturePlanifications(@io.vertigo.datamodel.task.proxy.TaskInput(name = "processName", smartType = "STyOLibelle") final String processName) {
 		final Task task = createTaskBuilder("TkCleanFuturePlanifications")
 				.addValue("processName", processName)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		getTaskManager().execute(task);
 	}
 
 	/**
 	 * Execute la tache TkCleanPlanificationsOnBoot.
-	 * @param currentDate Instant 
+	 * @param currentDate Instant
 	*/
-	public void cleanPlanificationsOnBoot(final java.time.Instant currentDate) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkCleanPlanificationsOnBoot",
+			request = "update o_process_planification set " + 
+ "			SST_CD = 'MISFIRED'" + 
+ "			where SST_CD = 'WAITING' and expected_time < #currentDate# and prp_id not in (select prp.PRP_ID from  o_process_planification prp" + 
+ "        	inner join (" + 
+ "				    select pro_id, max(expected_time) as MaxDate" + 
+ "				    from o_process_planification" + 
+ "				    group by pro_id" + 
+ "				) pp on pp.pro_id = prp.pro_id and pp.MaxDate = prp.expected_time)",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineProc.class)
+	public void cleanPlanificationsOnBoot(@io.vertigo.datamodel.task.proxy.TaskInput(name = "currentDate", smartType = "STyOTimestamp") final java.time.Instant currentDate) {
 		final Task task = createTaskBuilder("TkCleanPlanificationsOnBoot")
 				.addValue("currentDate", currentDate)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		getTaskManager().execute(task);
 	}
 
 	/**
 	 * Execute la tache TkReserveProcessToExecute.
-	 * @param lowerLimit Instant 
-	 * @param upperLimit Instant 
-	 * @param nodId Long 
+	 * @param lowerLimit Instant
+	 * @param upperLimit Instant
+	 * @param nodId Long
 	*/
-	public void reserveProcessToExecute(final java.time.Instant lowerLimit, final java.time.Instant upperLimit, final Long nodId) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkReserveProcessToExecute",
+			request = "update o_process_planification" + 
+ "        	set SST_CD = 'RESERVED', NOD_ID = #nodId#" + 
+ "        	where (SST_CD = 'WAITING' and expected_time >= #lowerLimit# and expected_time <= #upperLimit#) " + 
+ "        			or (SST_CD = 'RESCUED')",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineProc.class)
+	public void reserveProcessToExecute(@io.vertigo.datamodel.task.proxy.TaskInput(name = "lowerLimit", smartType = "STyOTimestamp") final java.time.Instant lowerLimit, @io.vertigo.datamodel.task.proxy.TaskInput(name = "upperLimit", smartType = "STyOTimestamp") final java.time.Instant upperLimit, @io.vertigo.datamodel.task.proxy.TaskInput(name = "nodId", smartType = "STyOIdentifiant") final Long nodId) {
 		final Task task = createTaskBuilder("TkReserveProcessToExecute")
 				.addValue("lowerLimit", lowerLimit)
 				.addValue("upperLimit", upperLimit)
 				.addValue("nodId", nodId)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		getTaskManager().execute(task);
 	}

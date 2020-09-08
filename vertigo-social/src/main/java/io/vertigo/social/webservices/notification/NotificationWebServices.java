@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +28,10 @@ import io.vertigo.account.account.Account;
 import io.vertigo.account.authentication.AuthenticationManager;
 import io.vertigo.account.authorization.VSecurityException;
 import io.vertigo.core.locale.MessageText;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.social.services.notification.Notification;
-import io.vertigo.social.services.notification.NotificationServices;
-import io.vertigo.util.MapBuilder;
+import io.vertigo.core.util.MapBuilder;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.notification.Notification;
+import io.vertigo.social.notification.NotificationManager;
 import io.vertigo.vega.webservice.WebServices;
 import io.vertigo.vega.webservice.stereotype.AnonymousAccessAllowed;
 import io.vertigo.vega.webservice.stereotype.DELETE;
@@ -52,7 +51,7 @@ public final class NotificationWebServices implements WebServices {
 	private static final String IMPL_VERSION = "0.9.4";
 
 	@Inject
-	private NotificationServices notificationServices;
+	private NotificationManager NotificationManager;
 	@Inject
 	private AuthenticationManager authenticationManager;
 
@@ -63,7 +62,7 @@ public final class NotificationWebServices implements WebServices {
 	@GET("/api/messages")
 	public List<Notification> getMessages() {
 		final UID<Account> loggedAccountURI = getLoggedAccountURI();
-		return notificationServices.getCurrentNotifications(loggedAccountURI);
+		return NotificationManager.getCurrentNotifications(loggedAccountURI);
 	}
 
 	/**
@@ -73,7 +72,7 @@ public final class NotificationWebServices implements WebServices {
 	@DELETE("/api/messages/{uuid}")
 	public void removeMessage(@PathParam("uuid") final String messageUuid) {
 		final UID<Account> loggedAccountURI = getLoggedAccountURI();
-		notificationServices.remove(loggedAccountURI, UUID.fromString(messageUuid));
+		NotificationManager.remove(loggedAccountURI, UUID.fromString(messageUuid));
 	}
 
 	/**
@@ -84,7 +83,7 @@ public final class NotificationWebServices implements WebServices {
 	public void removeMessage(final List<String> messageUuids) {
 		final UID<Account> loggedAccountURI = getLoggedAccountURI();
 		for (final String messageUuid : messageUuids) {
-			notificationServices.remove(loggedAccountURI, UUID.fromString(messageUuid));
+			NotificationManager.remove(loggedAccountURI, UUID.fromString(messageUuid));
 		}
 	}
 

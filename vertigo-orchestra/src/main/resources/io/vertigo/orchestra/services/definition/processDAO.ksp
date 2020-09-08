@@ -2,7 +2,7 @@ package io.vertigo.orchestra.dao.definition
 
 create Task TkGetActiveProcessByName {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		pro.*
@@ -11,13 +11,13 @@ create Task TkGetActiveProcessByName {
 	        	and pro.ACTIVE_VERSION is true
         	
 			"
-	attribute name			 	{domain : DoOLibelle 				required:"true" 		inOut :"in"}
-	attribute dtProcess	 	{domain : DoDtOProcessDto 		required:"false" 	inOut :"out"}
+	in name			 	{domain : DoOLibelle 				cardinality: "1"		}
+	out dtProcess	 	{domain : DoDtOProcess 		cardinality: "?" 	}
 }
 
 create Task TkGetProcessesByName {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		count(*)
@@ -25,14 +25,14 @@ create Task TkGetProcessesByName {
         	where pro.NAME = #name#
         	
 			"
-	attribute name			 	{domain : DoOLibelle 				required:"true" 		inOut :"in"}
-	attribute nombre			 	{domain : DoONombre				required:"true" 		inOut :"out"}
+	in name			 	{domain : DoOLibelle 				cardinality: "1" 		}
+	out nombre			 	{domain : DoONombre				cardinality: "1" 		}
 }
 
 
 create Task TkGetAllActiveProcesses {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		pro.*
@@ -40,13 +40,13 @@ create Task TkGetAllActiveProcesses {
         	where pro.ACTIVE_VERSION is true
         	
 			"
-	attribute dtcProcesses	 	{domain : DoDtOProcessDtc 		required:"true" 	inOut :"out"}
+	out dtcProcesses	 	{domain : DoDtOProcess 		cardinality: "*" 	}
 }
 
 
 create Task TkDisableOldProcessDefinitions {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update o_process 
         	set ACTIVE_VERSION = false,
@@ -54,5 +54,5 @@ create Task TkDisableOldProcessDefinitions {
         	where NAME = #name#
         	
 			"
-	attribute name			 	{domain : DoOLibelle 				required:"true" 		inOut :"in"}
+	in name			 	{domain : DoOLibelle 				cardinality: "1" 		}
 }

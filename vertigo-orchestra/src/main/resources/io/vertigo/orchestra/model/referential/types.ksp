@@ -3,12 +3,12 @@ package io.vertigo.orchestra.domain.referential
 create DtDefinition DtTriggerType {
 	storeName : "orchestra"
 	id trtCd	{domain : DoOCodeIdentifiant, label :"Code", }
-	field label   	{domain : DoOLibelle, label :"Libellé", required:"false",}
+	field label   	{domain : DoOLibelle, label :"Libellé", cardinality: "?",}
   
 }
 
 create DtDefinition DtOProcessType {
 	storeName : "orchestra"
 	id prtCd	{domain : DoOCodeIdentifiant, label :"Code", }
-	field label   	{domain : DoOLibelle, label :"Libellé", required:"false",}
+	field label   	{domain : DoOLibelle, label :"Libellé", cardinality: "?",}
 }

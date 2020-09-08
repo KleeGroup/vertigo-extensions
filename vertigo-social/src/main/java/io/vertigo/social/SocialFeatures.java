@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +17,24 @@
  */
 package io.vertigo.social;
 
-import io.vertigo.app.config.Feature;
-import io.vertigo.app.config.Features;
+import io.vertigo.core.node.config.Feature;
+import io.vertigo.core.node.config.Features;
 import io.vertigo.core.param.Param;
-import io.vertigo.social.impl.comment.CommentServicesImpl;
-import io.vertigo.social.impl.handle.HandleServicesImpl;
+import io.vertigo.social.comment.CommentManager;
+import io.vertigo.social.handle.HandleManager;
+import io.vertigo.social.impl.comment.CommentManagerImpl;
+import io.vertigo.social.impl.handle.HandleManagerImpl;
 import io.vertigo.social.impl.mail.MailManagerImpl;
-import io.vertigo.social.impl.notification.NotificationServicesImpl;
+import io.vertigo.social.impl.notification.NotificationManagerImpl;
+import io.vertigo.social.mail.MailManager;
+import io.vertigo.social.notification.NotificationManager;
 import io.vertigo.social.plugins.comment.memory.MemoryCommentPlugin;
 import io.vertigo.social.plugins.comment.redis.RedisCommentPlugin;
 import io.vertigo.social.plugins.handle.memory.MemoryHandlePlugin;
 import io.vertigo.social.plugins.handle.redis.RedisHandlePlugin;
 import io.vertigo.social.plugins.mail.javax.JavaxSendMailPlugin;
-import io.vertigo.social.plugins.mail.javax.JndiMailSessionConnector;
-import io.vertigo.social.plugins.mail.javax.NativeMailSessionConnector;
 import io.vertigo.social.plugins.notification.memory.MemoryNotificationPlugin;
 import io.vertigo.social.plugins.notification.redis.RedisNotificationPlugin;
-import io.vertigo.social.services.comment.CommentServices;
-import io.vertigo.social.services.handle.HandleServices;
-import io.vertigo.social.services.mail.MailManager;
-import io.vertigo.social.services.notification.NotificationServices;
 import io.vertigo.social.webservices.account.AccountWebServices;
 import io.vertigo.social.webservices.comment.CommentWebServices;
 import io.vertigo.social.webservices.handle.HandleWebServices;
@@ -73,8 +70,8 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 	}
 
 	@Feature("notifications.redis")
-	public SocialFeatures withRedisNotifications() {
-		getModuleConfigBuilder().addPlugin(RedisNotificationPlugin.class);
+	public SocialFeatures withRedisNotifications(final Param... params) {
+		getModuleConfigBuilder().addPlugin(RedisNotificationPlugin.class, params);
 		return this;
 	}
 
@@ -95,8 +92,8 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 	}
 
 	@Feature("comments.redis")
-	public SocialFeatures withRedisComments() {
-		getModuleConfigBuilder().addPlugin(RedisCommentPlugin.class);
+	public SocialFeatures withRedisComments(final Param... params) {
+		getModuleConfigBuilder().addPlugin(RedisCommentPlugin.class, params);
 		return this;
 	}
 
@@ -125,22 +122,6 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 
 	}
 
-	@Feature("mail.javax.native")
-	public SocialFeatures withNativeMailConnector(final Param... params) {
-		getModuleConfigBuilder()
-				.addPlugin(NativeMailSessionConnector.class, params);
-
-		return this;
-	}
-
-	@Feature("mail.javax.jndi")
-	public SocialFeatures withJndiMailConnector(final Param... params) {
-		getModuleConfigBuilder()
-				.addPlugin(JndiMailSessionConnector.class, params);
-
-		return this;
-	}
-
 	/**
 	 * Activates handles
 	 * @return the features
@@ -152,8 +133,8 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 	}
 
 	@Feature("handles.redis")
-	public SocialFeatures withRedisHandles() {
-		getModuleConfigBuilder().addPlugin(RedisHandlePlugin.class);
+	public SocialFeatures withRedisHandles(final Param... params) {
+		getModuleConfigBuilder().addPlugin(RedisHandlePlugin.class, params);
 		return this;
 	}
 
@@ -177,7 +158,7 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 	protected void buildFeatures() {
 		if (notificationsEnabled) {
 			getModuleConfigBuilder()
-					.addComponent(NotificationServices.class, NotificationServicesImpl.class);
+					.addComponent(NotificationManager.class, NotificationManagerImpl.class);
 			if (webapiEnabled) {
 				getModuleConfigBuilder()
 						.addComponent(AccountWebServices.class)
@@ -186,7 +167,7 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 		}
 		if (commentsEnabled) {
 			getModuleConfigBuilder()
-					.addComponent(CommentServices.class, CommentServicesImpl.class);
+					.addComponent(CommentManager.class, CommentManagerImpl.class);
 			if (webapiEnabled) {
 				getModuleConfigBuilder()
 						.addComponent(CommentWebServices.class);
@@ -194,7 +175,7 @@ public final class SocialFeatures extends Features<SocialFeatures> {
 		}
 		if (handlesEnabled) {
 			getModuleConfigBuilder()
-					.addComponent(HandleServices.class, HandleServicesImpl.class);
+					.addComponent(HandleManager.class, HandleManagerImpl.class);
 			if (webapiEnabled) {
 				getModuleConfigBuilder()
 						.addComponent(HandleWebServices.class);

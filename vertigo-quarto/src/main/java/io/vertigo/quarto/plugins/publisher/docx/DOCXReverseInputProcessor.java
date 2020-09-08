@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +30,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
-import io.vertigo.quarto.impl.services.publisher.merger.processor.MergerProcessor;
-import io.vertigo.quarto.services.publisher.model.PublisherData;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.quarto.impl.publisher.merger.processor.MergerProcessor;
+import io.vertigo.quarto.publisher.model.PublisherData;
 
 /**
  * Mise en forme des tags et suppression des champs inutiles dans le document DOCX.
@@ -200,8 +199,9 @@ final class DOCXReverseInputProcessor implements MergerProcessor {
 	}
 
 	private static boolean isDOCXNode(final Node node, final DOCXUtil.DOCXNode nodeType) {
-		Assertion.checkNotNull(node);
-		Assertion.checkNotNull(nodeType);
+		Assertion.check()
+				.isNotNull(node)
+				.isNotNull(nodeType);
 		//-----
 		if (!node.hasChildNodes()) {
 			return false;
@@ -213,10 +213,7 @@ final class DOCXReverseInputProcessor implements MergerProcessor {
 			return false;
 		}
 		final Node namedNode = node.getLastChild().getAttributes().getNamedItem(W_FLD_CHAR_TYPE);
-		if (namedNode != null && nodeType.getNs().equals(namedNode.getTextContent())) {
-			return true;
-		}
-		return false;
+		return namedNode != null && nodeType.getNs().equals(namedNode.getTextContent());
 	}
 
 	/**

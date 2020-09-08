@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +30,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.standard.expression.Fragment;
 import org.thymeleaf.templatemode.TemplateMode;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 public class ContentSlotComponentProcessor extends AbstractElementModelProcessor {
 
@@ -58,7 +57,7 @@ public class ContentSlotComponentProcessor extends AbstractElementModelProcessor
 	protected void doProcess(final ITemplateContext context, final IModel model, final IElementModelStructureHandler structureHandler) {
 		final Map<String, String> attributes = processAttribute(model);
 		final String attributeValue = attributes.get("name");
-		Assertion.checkArgument(
+		Assertion.check().isTrue(
 				attributeValue.endsWith(SlotAttributeTagProcessor.VARIABLE_PLACEHOLDER_SEPARATOR + SlotAttributeTagProcessor.SLOTS_SUFFIX),
 				"{0} isn't a slot. Tag vu:content-slot supports only slots, names must ends with '_slot'", attributeValue);
 		//-----

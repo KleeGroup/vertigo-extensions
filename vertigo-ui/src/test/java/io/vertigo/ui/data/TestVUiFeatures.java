@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +17,12 @@
  */
 package io.vertigo.ui.data;
 
-import io.vertigo.app.config.DefinitionProviderConfig;
-import io.vertigo.app.config.discovery.ModuleDiscoveryFeatures;
-import io.vertigo.dynamo.plugins.environment.DynamoDefinitionProvider;
+import io.vertigo.core.node.config.DefinitionProviderConfig;
+import io.vertigo.core.node.config.discovery.ModuleDiscoveryFeatures;
+import io.vertigo.datamodel.impl.smarttype.ModelDefinitionProvider;
 import io.vertigo.ui.data.boot.initializer.TestVertigoUiMasterDataDefinitionProvider;
+import io.vertigo.vega.engines.webservice.json.GoogleJsonEngine;
+import io.vertigo.vega.engines.webservice.json.JsonEngine;
 
 public class TestVUiFeatures extends ModuleDiscoveryFeatures<TestVUiFeatures> {
 
@@ -39,9 +40,11 @@ public class TestVUiFeatures extends ModuleDiscoveryFeatures<TestVUiFeatures> {
 		super.buildFeatures();
 		//---
 		getModuleConfigBuilder()
-				.addDefinitionProvider(DefinitionProviderConfig.builder(DynamoDefinitionProvider.class)
-						.addDefinitionResource("classes", "io.vertigo.ui.data.domain.DtDefinitions")
-						.addDefinitionResource("kpr", "/META-INF/io/vertigo/ui/execution.kpr")
+				.addComponent(JsonEngine.class, GoogleJsonEngine.class);
+		getModuleConfigBuilder()
+				.addDefinitionProvider(DefinitionProviderConfig.builder(ModelDefinitionProvider.class)
+						.addDefinitionResource("smarttypes", VuiTestSmartTypes.class.getName())
+						.addDefinitionResource("dtobjects", "io.vertigo.ui.data.domain.DtDefinitions")
 						.build())
 				.addDefinitionProvider(TestVertigoUiMasterDataDefinitionProvider.class)
 				.build();

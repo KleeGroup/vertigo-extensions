@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +20,9 @@ package io.vertigo.stella.plugins.work.rest.master;
 import javax.inject.Inject;
 
 import io.vertigo.commons.codec.CodecManager;
-import io.vertigo.commons.daemon.DaemonScheduled;
+import io.vertigo.core.daemon.DaemonScheduled;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.lang.Assertion;
 import io.vertigo.stella.impl.master.MasterPlugin;
 import io.vertigo.stella.impl.master.WorkResult;
 import io.vertigo.stella.impl.work.WorkItem;
@@ -49,7 +48,7 @@ public final class RestMasterPlugin implements MasterPlugin, WebServices {
 	public RestMasterPlugin(
 			@ParamValue("timeoutSeconds") final int timeoutSeconds,
 			final CodecManager codecManager) {
-		Assertion.checkArgument(timeoutSeconds < 10000, "Le timeout s'exprime en seconde.");
+		Assertion.check().isTrue(timeoutSeconds < 10000, "Le timeout s'exprime en seconde.");
 		//-----
 		restQueueServer = new RestQueueServer(20, codecManager, 5);
 	}

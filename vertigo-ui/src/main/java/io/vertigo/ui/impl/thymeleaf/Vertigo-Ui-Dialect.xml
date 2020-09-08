@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialect xmlns="http://www.thymeleaf.org/extras/dialect"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	prefix="vu"
+	namespace-uri="https://vertigo.io/thymeleaf/vertigo-ui"
+	class="io.vertigo.ui.impl.thymeleaf.VUiStandardDialect">
+
+	<!-- buttons -->
+	<element-processor name="button-link"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="button-submit, buttons-group"
+			reference="Adds a button that behaves like a link, with a 'a' tag"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="button-submit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="button-link, buttons-group"
+			reference="Adds a submit button"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="buttons-group"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="button-link, button-submit"
+			reference="Adds a group of button, with a display strategy"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	
+	<!-- collections -->
+	<element-processor name="cards"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="table, collection, list"
+			reference="Displays a collection as cards"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="collection"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="table, cards, list"
+			reference="Iterate over a collection, with support of pagination and showMore"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="list"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="table, cards, collection"
+			reference="Displays a collection as a list of items"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="list"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="table, cards, collection"
+			reference="Displays a collection as a list of items"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="field-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="search"
+			reference="Used for Fk Fields to render. Works for single object and inside collections"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	<!-- search -->
+	<element-processor name="search"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="facets, table, cards, collection, list"
+			reference="Technical component to enable complex search pattern with several ui elements inside it : criteria, facets and collections with the desired render (table, cards, list, etc...)"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="facets"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="search"
+			reference="Works in combination with vu:search. Displays Facets and Facets Values, handles selection and unselection of facets and triggers the search"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	
+	<!-- input  -->
+		<!-- autocomplete -->
+	<element-processor name="autocomplete-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="autocomplete, autocomplete-read"
+			reference="Autocomplete input field, works with any List in the ViewContext.
+			Only use this component if you need to force the render in edit mode, otherwise prefer autocomplete"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="autocomplete-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="autocomplete, autocomplete-edit"
+			reference="Field in read-only. Only value in a 'span' tag will be in html output.
+			Only use this component if you need to force the render in read mode, otherwise prefer autocomplete"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="autocomplete"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="autocomplete-edit, autocomplete-read"
+			reference="Autocomplete input field, works with any List in the ViewContext.
+			Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- checkbox -->
+	<element-processor name="checkbox-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="checkbox, checkbox-read"
+			reference="Checkbox input field.
+			Only use this component if you need to force the render in edit mode, otherwise prefer checkbox"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="checkbox-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="checkbox, checkbox-edit"
+			reference="Checkbox in read-only.
+			 Only use this component if you need to force the render in read mode, otherwise prefer checkbox"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="checkbox"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="checkbox-edit, checkbox-read"
+			reference="Checkbox input field. 
+			Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	
+		<!-- chips-autocomplete -->
+	<element-processor name="chips-autocomplete-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="chips-autocomplete, chips-autocomplete-read"
+			reference="Multiple chips input that also allows autocompletion. Use it for tags for example.
+			Only use this component if you need to force the render in edit mode, otherwise prefer chips-autocomplete"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="chips-autocomplete-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="chips-autocomplete, chips-autocomplete-edit"
+			reference="Multiple chips in read-only.
+			 Only use this component if you need to force the render in read mode, otherwise prefer chips-autocomplete"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="chips-autocomplete"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="chips-autocomplete-edit, chips-autocomplete-read"
+			reference="Multiple chips input that also allows autocompletion. Use it for tags for example.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- date -->
+	<element-processor name="date-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="date, date-read"
+			reference="Input a date directly from user typing or via a selection widget. Use it when precion of Date is day with a Java LocalDate field.
+			Only use this component if you need to force the render in edit mode, otherwise prefer date"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="date-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="date, date-edit"
+			reference="Formatted Date as a String inside a 'span' tag.
+			 Only use this component if you need to force the render in read mode, otherwise prefer date"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="date"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="date-edit, date-read"
+			reference="Input a date directly from user typing or via a selection widget. Use it when precion of Date is day with a Java LocalDate field.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+		
+		<!-- datetime -->
+	<element-processor name="datetime-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="datetime, datetime-read"
+			reference="Input a datetime directly from user typing or via a selection widget. Use it when precion is at second or lower with a Java Instant field.
+			Only use this component if you need to force the render in edit mode, otherwise prefer datetime"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="datetime-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="datetime, datetime-edit"
+			reference="Formatted datetime as a String inside a 'span' tag.
+			 Only use this component if you need to force the render in read mode, otherwise prefer datetime"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="datetime"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="datetime-edit, datetime-read"
+			reference="Input a datetime directly from user typing or via a selection widget. Use it when precion is at second or lower with a Java Instant field.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- fileupload -->
+	<element-processor name="fileupload"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			reference="File Input, Allows drag-n-drop, previews and communication with the server"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- geolocation -->
+	<element-processor name="geolocation-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="geolocation, geolocation-read"
+			reference="Input a geolocation directly from user typing latitude and longitude
+			Only use this component if you need to force the render in edit mode, otherwise prefer geolocation"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="geolocation-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="geolocation, geolocation-edit"
+			reference="Geolocation displayed as a mini-map.
+			 Only use this component if you need to force the render in read mode, otherwise prefer geolocation"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="geolocation"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="geolocation-edit, geolocation-read"
+			reference="Geolocation displayed as a mini-map in read and lat/lon input in edit
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	
+		<!-- knob -->
+	<element-processor name="knob-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="knob, knob-read"
+			reference="Input a numeric value using a knob.
+			Only use this component if you need to force the render in edit mode, otherwise prefer knob"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="knob-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="knob, knob-edit"
+			reference="Displays formatted numeric value in a 'span' tag
+			 Only use this component if you need to force the render in read mode, otherwise prefer knob"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="knob"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="knob-edit, knob-read"
+			reference="Input a numeric value using a knob in edit mode and show the numeric value in read.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- label -->
+	<element-processor name="label-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="label, label-read, grid"
+			reference="Wrap the content inside a field to add a label and show errors, warning and infos. Works perfectly to wrap non standard component insie the grid mechanism.
+			Do not use this component with provided vu:inputs components because the already has this behaviour
+			Only use this component if you need to force the render in edit mode, otherwise prefer label"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="label-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="label, label-edit, grid"
+			reference="Same as label-read but without messages.
+			 Only use this component if you need to force the render in read mode, otherwise prefer label"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="label"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="label-edit, label-read, grid"
+			reference="Wrap the content inside a field to add a label and show errors, warning and infos. Works perfectly to wrap non standard component insie the grid mechanism.
+			Do not use this component with provided vu:inputs components because the already has this behaviour
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>	
+	
+		<!-- radio -->
+	<element-processor name="radio-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="radio, radio-read"
+			reference="Choose between different options in a list using a radio component.
+			Only use this component if you need to force the render in edit mode, otherwise prefer radio"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="radio-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="radio, radio-edit"
+			reference="Displays the select value inside a 'span' tag.
+			 Only use this component if you need to force the render in read mode, otherwise prefer radio"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="radio"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="radio-edit, radio-read"
+			reference="Choose between different options in a list using a radio component.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>	
+	
+		<!-- select -->
+	<element-processor name="select-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="select, select-read"
+			reference="Choose between different options in a list using a select component.
+			Only use this component if you need to force the render in edit mode, otherwise prefer select"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="select-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="select, select-edit"
+			reference="Displays the select value inside a 'span' tag.
+			 Only use this component if you need to force the render in read mode, otherwise prefer select"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="select"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="select-edit, select-read"
+			reference="Choose between different options in a list using a select component.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>	
+	
+		<!-- slider -->
+	<element-processor name="slider-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="slider, slider-read"
+			reference="Input a numeric value using a slider.
+			Only use this component if you need to force the render in edit mode, otherwise prefer slider"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="slider-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="slider, slider-edit"
+			reference="Displays formatted numeric value in a 'span' tag
+			 Only use this component if you need to force the render in read mode, otherwise prefer slider"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="slider"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="slider-edit, slider-read"
+			reference="Input a numeric value using a slider in edit mode and show the numeric value in read.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- text-area -->
+	<element-processor name="text-area-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="text-area, text-area-read"
+			reference="Multiline input for typing text.
+			Only use this component if you need to force the render in edit mode, otherwise prefer text-area"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="text-area-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="text-area, text-area-edit"
+			reference="Displays a multiline text.
+			 Only use this component if you need to force the render in read mode, otherwise prefer text-area"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="text-area"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="text-area-edit, text-area-read"
+			reference="Multiline input for typing text.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+		<!-- text-field -->
+	<element-processor name="text-field-edit"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="text-field, text-field-read"
+			reference="Single line input for typing text.
+			Only use this component if you need to force the render in edit mode, otherwise prefer text-field"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="text-field-read"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="text-field, text-field-edit"
+			reference="Displays a single line text.
+			 Only use this component if you need to force the render in read mode, otherwise prefer text-field"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="text-field"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="text-field-edit, text-field-read"
+			reference="Single line for typing text.
+			 Switch between edit and read-only based on ViewContext mode set in the controller "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	<!-- layout -->
+	<element-processor name="block"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			reference="Wrap content inside a block with a title and custom slots "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="form"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			reference="Technical component that must contains all your input elements. Puts in the DOM, the 'form' tag and also puts in the DOM the ViewContext id"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="grid"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="grid-cell"
+			reference="Technical component to align sub-elements with a flex grid mechanism"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="grid-cell"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="grid"
+			reference="Technical component to put all subelements inside a same cell in the grid container"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="head"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="head-meta"
+			reference="Technical component to contruct the head section of the page. It's optional but helps fast developement in early stage of the project"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="head-meta"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="head"
+			reference="Technical component to include all javascript and css dependencies required for vertigo-ui"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="messages"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			reference="Displays all messages for the end-user categorized by severity in a single place. Message associated to fields are placed next to the associated input"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="modal"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			reference="Technical component to help putting a modal block that displays an iframe and handles navigation workflow: open and close"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="page"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			reference="Technical component to construct the Vue Instance of the page (Called VUiPage). It must wrap all the content that needs Vue.js to render (more or less the body of your page but it's your choice). "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	<!-- utils -->
+	<element-processor name="include-data"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="include-data-primitive, include-data-map, include-data-protected"
+			reference="All inputs and high level components already call this compomenent. Only use it when you know what you are doing.
+			Technical component to tell the server to include in the client side data the value of the specified object and field. Field can be the wilcard '*' "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="include-data-primitive"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="include-data, include-data-map, include-data-protected"
+			reference="All inputs and high level components already call this compomenent. Only use it when you know what you are doing.
+			Technical component to tell the server to include data in the client side"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="include-data-map"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="include-data, include-data-primitive, include-data-protected"
+			reference="All inputs and high level components already call this compomenent. Only use it when you know what you are doing.
+			Technical component to tell the server to include data in the client side. The sent data will be the display field of the target foreign key"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="include-data-protected"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="include-data, include-data-primitive, include-data-protected"
+			reference="Technical component to tell the server to include data in the client side.
+			 The data will be protected : the real data stays on the server but the server provides a new value and keep track of the real value behind it.
+			 Use it to protect sensitive information"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="vue-data"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="page"
+			reference="
+			Allready called in the vu:page component. Only use it when you know what you are doing.
+			Technical component to serialize all client-data that will be available in the Vue.JS page instance "><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+
+	<!-- slot -->
+	<element-processor name="content-slot"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="slot"
+			reference="Declares a element to be a named slot inside a custom component."><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="slot"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="content-slot"
+			reference="Declares a element to be placed inside a named slot in the parent componenent. Must be the first elements of the body of the parent element."><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+
+	<!-- table -->
+	<element-processor name="table"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="column, cards, collection, list"
+			reference="Displays a collection as a table"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	<element-processor name="column"
+		class="io.vertigo.ui.impl.thymeleaf.components.NamedComponentElementProcessor">
+		<documentation
+			see-also="table, field-read"
+			reference="Adds a column in a table"><![CDATA[
+			<a href="https://vertigo-io.github.io/vertigo-docs/#/extensions/ui">https://vertigo-io.github.io/vertigo-docs/#/extensions/ui</a>
+		]]></documentation>
+	</element-processor>
+	
+	
+
+
+
+</dialect>

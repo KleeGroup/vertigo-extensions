@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +19,8 @@ package io.vertigo.ui.data.boot.initializer;
 
 import javax.inject.Inject;
 
-import io.vertigo.core.component.ComponentInitializer;
 import io.vertigo.core.locale.LocaleManager;
+import io.vertigo.core.node.component.ComponentInitializer;
 
 /**
  * Initializer de LocaleManager.
@@ -36,8 +35,8 @@ public final class LocaleManagerInitializer implements ComponentInitializer {
 	/** {@inheritDoc} */
 	@Override
 	public void init() {
-		localeManager.add("io.vertigo.dynamox.domain.constraint.Constraint", io.vertigo.dynamox.domain.constraint.Resources.values());
-		localeManager.add("io.vertigo.dynamox.domain.formatter.Formatter", io.vertigo.dynamox.domain.formatter.Resources.values());
+		localeManager.add("io.vertigo.basics.constraint.Constraint", io.vertigo.basics.constraint.Resources.values());
+		localeManager.add("io.vertigo.basics.formatter.Formatter", io.vertigo.basics.formatter.Resources.values());
 
 		// Messages Demo
 		//localeManager.add(io.vertigo.struts2.ui.util.Resources.class.getName(), io.vertigo.struts2.ui.util.Resources.values());

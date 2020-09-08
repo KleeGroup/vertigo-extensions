@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +17,8 @@
  */
 package io.vertigo.stella;
 
-import io.vertigo.app.config.Feature;
-import io.vertigo.app.config.Features;
+import io.vertigo.core.node.config.Feature;
+import io.vertigo.core.node.config.Features;
 import io.vertigo.core.param.Param;
 import io.vertigo.stella.impl.master.MasterManagerImpl;
 import io.vertigo.stella.impl.workers.WorkersManagerImpl;
@@ -52,8 +51,8 @@ public final class StellaFeatures extends Features<StellaFeatures> {
 	}
 
 	@Feature("master.redis")
-	public StellaFeatures withRedisMasterPlugin() {
-		getModuleConfigBuilder().addPlugin(RedisMasterPlugin.class);
+	public StellaFeatures withRedisMasterPlugin(final Param... params) {
+		getModuleConfigBuilder().addPlugin(RedisMasterPlugin.class, params);
 		return this;
 	}
 
@@ -72,8 +71,8 @@ public final class StellaFeatures extends Features<StellaFeatures> {
 	}
 
 	@Feature("worker.redis")
-	public StellaFeatures withRedisWorkerPlugin() {
-		getModuleConfigBuilder().addPlugin(RedisWorkersPlugin.class);
+	public StellaFeatures withRedisWorkerPlugin(final Param... params) {
+		getModuleConfigBuilder().addPlugin(RedisWorkersPlugin.class, params);
 		return this;
 	}
 

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +20,8 @@ package io.vertigo.dashboard.ui.commons.model;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.vertigo.commons.eventbus.EventBusSubscriptionDefinition;
-import io.vertigo.lang.Assertion;
+import io.vertigo.commons.eventbus.definitions.EventBusSubscriptionDefinition;
+import io.vertigo.core.lang.Assertion;
 
 public final class EventBusModel {
 	private final Class eventType;
@@ -31,8 +30,9 @@ public final class EventBusModel {
 	public EventBusModel(
 			final Class eventType,
 			final List<EventBusSubscriptionDefinition> subscriptions) {
-		Assertion.checkNotNull(eventType);
-		Assertion.checkNotNull(subscriptions);
+		Assertion.check()
+				.isNotNull(eventType)
+				.isNotNull(subscriptions);
 		//---
 		this.eventType = eventType;
 		this.subscriptions = subscriptions;

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.vertigo</groupId>
+		<artifactId>vertigo-extensions</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>vertigo-account</artifactId>
+	<packaging>jar</packaging>
+	<name>vertigo-account</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-core</artifactId>
+			<version>${vertigo.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-datastore</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-redis-connector</artifactId>
+			<version>${vertigo.version}</version>
+			<optional>true</optional> <!-- pour RedisAccountCache -->
+		</dependency>
+		
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-ldap-connector</artifactId>
+			<version>${vertigo.version}</version>
+			<optional>true</optional> <!-- pour LdapAuthenticationPlugin -->
+		</dependency>
+
+		<!-- Tests -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.200</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Connections Pool -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5.5</version>
+			<optional>true</optional><!-- C3p0DataSourceProviderPlugin -->
+		</dependency>
+	</dependencies>
+
+</project>

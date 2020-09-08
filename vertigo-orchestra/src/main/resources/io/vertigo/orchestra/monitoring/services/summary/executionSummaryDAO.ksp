@@ -2,7 +2,7 @@ package io.vertigo.orchestra.monitoring.dao.summary
 
 create Task TkGetExecutionSummariesByDate {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 	* from (select 
         		from_exec.PRO_ID,
@@ -78,15 +78,15 @@ create Task TkGetExecutionSummariesByDate {
 			;
         	
 			"
-	attribute dtcExecutionSummary	 	{domain : DoDtOExecutionSummaryDtc 		required:"true" 	inOut :"out"}
-	attribute dateMin	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-	attribute dateMax	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-	attribute status	 	{domain : DoOCodeIdentifiant		required:"true" 	inOut :"in"}
-},
+	in dateMin	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+	in dateMax	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+	in status	 	{domain : DoOCodeIdentifiant		cardinality: "1" 	}
+	out dtcExecutionSummary	 	{domain : DoDtOExecutionSummary 		cardinality: "*" }
+}
 
 create Task TkGetExecutionSummaryByDateAndName {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		from_process.PRO_ID,
@@ -106,7 +106,8 @@ create Task TkGetExecutionSummaryByDateAndName {
 						pro.name as PROCESS_NAME,
 						pro.label as PROCESS_LABEL
 						from o_process pro 
-						where pro.NAME = #name#) as from_process
+						where pro.NAME = #name#
+						  and pro.ACTIVE_VERSION) as from_process
 				left join lateral (
 					select 
 						sum(exec.SI_SUCCESS) as SUCCESSFUL_COUNT,
@@ -155,8 +156,8 @@ create Task TkGetExecutionSummaryByDateAndName {
 					) lat_planif on true;
         	
 			"
-	attribute dtExecutionSummary	 	{domain : DoDtOExecutionSummaryDto 		required:"true" 	inOut :"out"}
-	attribute dateMin	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-	attribute dateMax	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-	attribute name	 		{domain : DoOLibelle 		required:"true" 	inOut :"in"}
-},
+	in dateMin	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+	in dateMax	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+	in name	 		{domain : DoOLibelle 		cardinality: "1" 	}
+	out dtExecutionSummary	 	{domain : DoDtOExecutionSummary 		cardinality: "1" 	}
+}

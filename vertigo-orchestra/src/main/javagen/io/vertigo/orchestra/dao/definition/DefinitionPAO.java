@@ -1,15 +1,32 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.dao.definition;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.dynamo.task.TaskManager;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
-import io.vertigo.dynamo.task.model.Task;
-import io.vertigo.dynamo.task.model.TaskBuilder;
-import io.vertigo.dynamo.store.StoreServices;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.task.TaskManager;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
+import io.vertigo.datamodel.task.model.Task;
+import io.vertigo.datamodel.task.model.TaskBuilder;
+import io.vertigo.datastore.impl.dao.StoreServices;
 
 /**
  * This class is automatically generated.
@@ -25,7 +42,7 @@ public final class DefinitionPAO implements StoreServices {
 	 */
 	@Inject
 	public DefinitionPAO(final TaskManager taskManager) {
-		Assertion.checkNotNull(taskManager);
+		Assertion.check().isNotNull(taskManager);
 		//-----
 		this.taskManager = taskManager;
 	}
@@ -36,29 +53,48 @@ public final class DefinitionPAO implements StoreServices {
 	 * @return the builder 
 	 */
 	private static TaskBuilder createTaskBuilder(final String name) {
-		final TaskDefinition taskDefinition = Home.getApp().getDefinitionSpace().resolve(name, TaskDefinition.class);
+		final TaskDefinition taskDefinition = Node.getNode().getDefinitionSpace().resolve(name, TaskDefinition.class);
 		return Task.builder(taskDefinition);
 	}
 
 	/**
 	 * Execute la tache TkDisableOldProcessDefinitions.
-	 * @param name String 
+	 * @param name String
 	*/
-	public void disableOldProcessDefinitions(final String name) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkDisableOldProcessDefinitions",
+			request = "update o_process " + 
+ "        	set ACTIVE_VERSION = false," + 
+ "        		NEED_UPDATE = false" + 
+ "        	where NAME = #name#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineProc.class)
+	public void disableOldProcessDefinitions(@io.vertigo.datamodel.task.proxy.TaskInput(name = "name", smartType = "STyOLibelle") final String name) {
 		final Task task = createTaskBuilder("TkDisableOldProcessDefinitions")
 				.addValue("name", name)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		getTaskManager().execute(task);
 	}
 
 	/**
 	 * Execute la tache TkGetProcessesByName.
-	 * @param name String 
+	 * @param name String
 	 * @return Integer nombre
 	*/
-	public Integer getProcessesByName(final String name) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetProcessesByName",
+			request = "select " + 
+ "        		count(*)" + 
+ "        	from o_process pro" + 
+ "        	where pro.NAME = #name#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyONombre")
+	public Integer getProcessesByName(@io.vertigo.datamodel.task.proxy.TaskInput(name = "name", smartType = "STyOLibelle") final String name) {
 		final Task task = createTaskBuilder("TkGetProcessesByName")
 				.addValue("name", name)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)

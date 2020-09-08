@@ -1,9 +1,26 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.monitoring.domain.uidefinitions;
 
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.stereotype.Field;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.stereotype.Field;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 
 /**
  * This class is automatically generated.
@@ -28,7 +45,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Id du processus'.
 	 * @return Long proId <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOIdentifiant", required = true, label = "Id du processus")
+	@Field(smartType = "STyOIdentifiant", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Id du processus")
 	public Long getProId() {
 		return proId;
 	}
@@ -47,7 +64,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Nom du processus'.
 	 * @return String name
 	 */
-	@Field(domain = "DoOLibelle", label = "Nom du processus")
+	@Field(smartType = "STyOLibelle", label = "Nom du processus")
 	public String getName() {
 		return name;
 	}
@@ -66,7 +83,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Libellé du processus'.
 	 * @return String label
 	 */
-	@Field(domain = "DoOLibelle", label = "Libellé du processus")
+	@Field(smartType = "STyOLibelle", label = "Libellé du processus")
 	public String getLabel() {
 		return label;
 	}
@@ -85,7 +102,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Expression récurrence du processus'.
 	 * @return String cronExpression
 	 */
-	@Field(domain = "DoOLibelle", label = "Expression récurrence du processus")
+	@Field(smartType = "STyOLibelle", label = "Expression récurrence du processus")
 	public String getCronExpression() {
 		return cronExpression;
 	}
@@ -104,7 +121,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Paramètres initiaux sous forme de JSON'.
 	 * @return String initialParams
 	 */
-	@Field(domain = "DoOJsonText", label = "Paramètres initiaux sous forme de JSON")
+	@Field(smartType = "STyOJsonText", label = "Paramètres initiaux sous forme de JSON")
 	public String getInitialParams() {
 		return initialParams;
 	}
@@ -123,7 +140,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Accepte la multi-execution'.
 	 * @return Boolean multiexecution
 	 */
-	@Field(domain = "DoOBooleen", label = "Accepte la multi-execution")
+	@Field(smartType = "STyOBooleen", label = "Accepte la multi-execution")
 	public Boolean getMultiexecution() {
 		return multiexecution;
 	}
@@ -142,7 +159,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Processus actif'.
 	 * @return Boolean active <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOBooleen", required = true, label = "Processus actif")
+	@Field(smartType = "STyOBooleen", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Processus actif")
 	public Boolean getActive() {
 		return active;
 	}
@@ -161,7 +178,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Temps de validité d'une planification'.
 	 * @return Integer rescuePeriod <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoONombre", required = true, label = "Temps de validité d'une planification")
+	@Field(smartType = "STyONombre", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Temps de validité d'une planification")
 	public Integer getRescuePeriod() {
 		return rescuePeriod;
 	}
@@ -180,7 +197,7 @@ public final class OProcessUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Métadonnées du processus'.
 	 * @return String metadatas
 	 */
-	@Field(domain = "DoOMetadatas", label = "Métadonnées du processus")
+	@Field(smartType = "STyOMetadatas", label = "Métadonnées du processus")
 	public String getMetadatas() {
 		return metadatas;
 	}

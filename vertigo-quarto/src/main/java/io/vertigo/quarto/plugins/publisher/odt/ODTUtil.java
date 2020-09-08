@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +28,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import io.vertigo.dynamo.file.model.VFile;
-import io.vertigo.quarto.impl.services.publisher.merger.processor.ZipUtil;
-import io.vertigo.util.TempFile;
+import io.vertigo.core.util.TempFile;
+import io.vertigo.datastore.filestore.model.VFile;
+import io.vertigo.quarto.impl.publisher.merger.processor.ZipUtil;
 
 /**
  * Classe d'utilitaires pour les fichiers de type ODT.

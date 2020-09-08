@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +22,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
-import io.vertigo.app.Home;
+import io.vertigo.basics.formatter.Resources;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.BasicType;
 import io.vertigo.core.locale.LocaleManager;
-import io.vertigo.dynamo.domain.metamodel.DataType;
-import io.vertigo.dynamo.domain.metamodel.FormatterException;
-import io.vertigo.dynamox.domain.formatter.Resources;
-import io.vertigo.lang.Assertion;
-import io.vertigo.util.StringUtil;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.util.StringUtil;
+import io.vertigo.datamodel.structure.definitions.FormatterException;
 
 /**
  * Encoder de date et de date time
@@ -46,8 +45,8 @@ public final class EncoderDate {
 	private EncoderDate() {
 	}
 
-	public static String valueToString(final Object objValue, final DataType dataType) {
-		Assertion.checkArgument(dataType.isAboutDate(), "this formatter only applies on date formats");
+	public static String valueToString(final Object objValue, final BasicType dataType) {
+		Assertion.check().isTrue(dataType.isAboutDate(), "this formatter only applies on date formats");
 		//-----
 		if (objValue == null) {
 			return ""; //Affichage d'une date non renseignée;
@@ -62,10 +61,10 @@ public final class EncoderDate {
 		}
 	}
 
-	public static Object stringToValue(final String strValue, final DataType dataType) throws FormatterException {
-		Assertion.checkArgument(dataType.isAboutDate(), "Formatter ne s'applique qu'aux dates");
+	public static Object stringToValue(final String strValue, final BasicType dataType) throws FormatterException {
+		Assertion.check().isTrue(dataType.isAboutDate(), "Formatter ne s'applique qu'aux dates");
 		//-----
-		if (StringUtil.isEmpty(strValue)) {
+		if (StringUtil.isBlank(strValue)) {
 			return null;
 		}
 		final String sValue = strValue.trim();
@@ -84,7 +83,7 @@ public final class EncoderDate {
 	 */
 	private static <T> T applyStringToObject(final String dateString, final Function<String, T> fun) throws FormatterException {
 		//StringToDate renvoit null si elle n'a pas réussi à convertir la date
-		T dateValue = null;
+		T dateValue ;
 		try {
 			dateValue = fun.apply(dateString);
 		} catch (final Exception e) {
@@ -126,6 +125,6 @@ public final class EncoderDate {
 	}
 
 	private static LocaleManager getLocaleManager() {
-		return Home.getApp().getComponentSpace().resolve(LocaleManager.class);
+		return Node.getNode().getComponentSpace().resolve(LocaleManager.class);
 	}
 }

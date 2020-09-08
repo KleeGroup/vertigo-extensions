@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,51 +24,50 @@ import java.util.Optional;
 
 import org.thymeleaf.standard.expression.VariableExpression;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 public final class NamedComponentDefinition {
 
 	private String name;
 	private String fragmentTemplate;
-	private final Optional<VariableExpression> selectionExpression;
+	private final Optional<VariableExpression> selectionExpressionOpt;
 	private final List<String> parameters;
 	private final String frag;
 
 	public NamedComponentDefinition(final String name, final String fragmentTemplate, final String selectionExpression, final Optional<String> parameters, final String frag) {
-		Assertion.checkArgNotEmpty(name);
-		Assertion.checkArgNotEmpty(fragmentTemplate);
-		Assertion.checkArgNotEmpty(selectionExpression);
-		Assertion.checkArgument(
-				selectionExpression.startsWith("${") && selectionExpression.endsWith("}"),
-				"Component {0} selector expression must starts with $\\{ and ends with \\} ({1})", name, selectionExpression);
-		Assertion.checkArgNotEmpty(frag);
+		Assertion.check()
+				.isNotBlank(name)
+				.isNotBlank(fragmentTemplate)
+				.isNotBlank(selectionExpression)
+				.isTrue(
+						selectionExpression.startsWith("${") && selectionExpression.endsWith("}"),
+						"Component {0} selector expression must starts with $\\{ and ends with \\} ({1})", name, selectionExpression);
+		Assertion.check().isNotBlank(frag);
 		//-----
 		this.name = name;
 		this.fragmentTemplate = fragmentTemplate;
 		final String trimmedSelectionExpression = selectionExpression.substring(2, selectionExpression.length() - 1);
-		this.selectionExpression = Optional.of(new VariableExpression(trimmedSelectionExpression));
+		this.selectionExpressionOpt = Optional.of(new VariableExpression(trimmedSelectionExpression));
 		this.parameters = splitAsSet(parameters);
 		this.frag = frag;
 	}
 
 	public NamedComponentDefinition(final String name, final String fragmentTemplate, final Optional<String> parameters, final String frag) {
-		Assertion.checkArgNotEmpty(name);
-		Assertion.checkArgNotEmpty(fragmentTemplate);
-		Assertion.checkArgNotEmpty(frag);
+		Assertion.check()
+				.isNotBlank(name)
+				.isNotBlank(fragmentTemplate)
+				.isNotBlank(frag);
 		//-----
 		this.name = name;
 		this.fragmentTemplate = fragmentTemplate;
-		selectionExpression = Optional.empty();
+		selectionExpressionOpt = Optional.empty();
 		this.parameters = splitAsSet(parameters);
 		this.frag = frag;
 	}
 
 	private static List<String> splitAsSet(final Optional<String> parameters) {
-		if (parameters.isPresent()) {
-			return Arrays.asList(parameters.get().split("\\s*,\\s*"));
-		}
-		return Collections.emptyList();
-	}
+        return parameters.map(s -> Arrays.asList(s.split("\\s*,\\s*"))).orElse(Collections.emptyList());
+    }
 
 	/**
 	 * Returns the name of the component (e.g. panel)
@@ -101,7 +99,7 @@ public final class NamedComponentDefinition {
 	}
 
 	public Optional<VariableExpression> getSelectionExpression() {
-		return selectionExpression;
+		return selectionExpressionOpt;
 	}
 
 	public List<String> getParameters() {

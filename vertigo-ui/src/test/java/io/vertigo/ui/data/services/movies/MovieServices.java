@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +20,12 @@ package io.vertigo.ui.data.services.movies;
 import java.util.List;
 import java.util.Optional;
 
-import io.vertigo.core.component.Component;
-import io.vertigo.dynamo.collections.model.FacetedQueryResult;
-import io.vertigo.dynamo.collections.model.SelectedFacetValues;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtListState;
-import io.vertigo.dynamo.search.model.SearchQuery;
+import io.vertigo.core.node.component.Component;
+import io.vertigo.datafactory.collections.model.FacetedQueryResult;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues;
+import io.vertigo.datafactory.search.model.SearchQuery;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtListState;
 import io.vertigo.ui.data.domain.movies.Movie;
 import io.vertigo.ui.data.domain.movies.MovieDisplay;
 import io.vertigo.ui.data.domain.movies.MovieIndex;

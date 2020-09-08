@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +17,18 @@
  */
 package io.vertigo.orchestra.webservices;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.definitions.OrchestraDefinitionManager;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.services.OrchestraServices;
 import io.vertigo.orchestra.services.execution.ExecutionState;
-import io.vertigo.util.DateUtil;
 import io.vertigo.vega.webservice.WebServices;
 import io.vertigo.vega.webservice.stereotype.AnonymousAccessAllowed;
 import io.vertigo.vega.webservice.stereotype.InnerBodyParam;
@@ -60,8 +59,9 @@ public class WsExecutionControl implements WebServices {
 	@SessionLess
 	@AnonymousAccessAllowed
 	public void endExecution(@InnerBodyParam("aceId") final Long activityExecutionId, @InnerBodyParam("token") final String token) {
-		Assertion.checkNotNull(activityExecutionId);
-		Assertion.checkArgNotEmpty(token);
+		Assertion.check()
+				.isNotNull(activityExecutionId)
+				.isNotBlank(token);
 		// ---
 		orchestraServices.getExecutor()
 				.endPendingActivityExecution(activityExecutionId, token, ExecutionState.DONE, Optional.empty());
@@ -77,9 +77,10 @@ public class WsExecutionControl implements WebServices {
 	@SessionLess
 	@AnonymousAccessAllowed
 	public void onError(@InnerBodyParam("aceId") final Long activityExecutionId, @InnerBodyParam("token") final String token, @InnerBodyParam("errorMessage") final String errorMessage) {
-		Assertion.checkNotNull(activityExecutionId);
-		Assertion.checkArgNotEmpty(token);
-		Assertion.checkArgNotEmpty(errorMessage);
+		Assertion.check()
+				.isNotNull(activityExecutionId)
+				.isNotBlank(token)
+				.isNotBlank(errorMessage);
 		// ---
 		orchestraServices.getExecutor()
 				.endPendingActivityExecution(activityExecutionId, token, ExecutionState.ERROR, Optional.of(errorMessage));
@@ -94,11 +95,11 @@ public class WsExecutionControl implements WebServices {
 	@SessionLess
 	@AnonymousAccessAllowed
 	public void executeNow(@InnerBodyParam("processName") final String processName, @InnerBodyParam("initialParams") final Map<String, String> initialParams) {
-		Assertion.checkNotNull(processName);
+		Assertion.check().isNotNull(processName);
 		// ---
 		final ProcessDefinition processDefinition = orchestraDefinitionManager.getProcessDefinition(processName);
 		orchestraServices.getScheduler()
-				.scheduleAt(processDefinition, DateUtil.newInstant(), initialParams);
+				.scheduleAt(processDefinition, Instant.now(), initialParams);
 	}
 
 	/**
@@ -107,11 +108,11 @@ public class WsExecutionControl implements WebServices {
 	 */
 	@POST("/executeNow")
 	public void executeNowIhm(@InnerBodyParam("processName") final String processName) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		// ---
 		final ProcessDefinition processDefinition = orchestraDefinitionManager.getProcessDefinition(processName);
 		orchestraServices.getScheduler()
-				.scheduleAt(processDefinition, DateUtil.newInstant(), Collections.emptyMap());
+				.scheduleAt(processDefinition, Instant.now(), Collections.emptyMap());
 	}
 
 }

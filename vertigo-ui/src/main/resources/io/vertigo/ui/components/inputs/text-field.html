@@ -6,8 +6,8 @@
 	<q-input 
 		th:v-model="${'vueData.' + object + '.' + field}" 
 		th:name="${'vContext['+object+']['+ field +']'}"
-		th:suffix="${model.util.domainUnit(object, field, suffix)}"
-		th:maxlength="${model.util.domainMaxLength(object, field)}"
+		th:suffix="${model.util.smartTypeUnit(object, field, suffix)}"
+		th:maxlength="${model.util.smartTypeMaxLength(object, field)}"
 		th::label-width="${overridedLabelWidth?:3}"
 		th:label="${myLabel}"
 		th:classappend="${required}?'v-field__required'"
@@ -18,19 +18,18 @@
 		th:attr="__${input_attrs}__"
 	>
 	</q-input>
-	</vu:label-edit>
 </th:block>
 <th:block th:fragment="text-field-read(object, field, label, suffix, label_attrs, input_attrs)" 
 	vu:alias="text-field" vu:selector="${viewMode=='read'}"
 	th:assert="${object} != null and ${field} != null" 
-	th:with="mySuffix=${model.util.domainUnit(object, field, suffix)}, useSuffix=${model.vContext[__${object}__][__${field}__]!='' && mySuffix!=''}">
+	th:with="mySuffix=${model.util.smartTypeUnit(object, field, suffix)}, useSuffix=${model.vContext[__${object}__][__${field}__]!='' && mySuffix!=''}">
 	<vu:label-read label=${label} th:attr="__${label_attrs}__" >
 		<span th:text="${model.vContext[__${object}__][__${field}__]}" th:attr="__${input_attrs}__"></span><span th:if="${useSuffix}" th:text="${mySuffix}"></span>
 	</vu:label-read>
 </th:block>
 <th:block th:fragment="text-field-read-reactive(object, field, label, suffix, label_attrs, input_attrs)" 
 		th:assert="${object} != null and ${field} != null" 
-		th:with="mySuffix=${model.util.domainUnit(object, field, suffix)}, useSuffix=${model.vContext[__${object}__][__${field}__]!='' && mySuffix!=''}">
+		th:with="mySuffix=${model.util.smartTypeUnit(object, field, suffix)}, useSuffix=${model.vContext[__${object}__][__${field}__]!='' && mySuffix!=''}">
 	<vu:include-data object="${object}" field="${field}"/>
 	<vu:label-read label=${label} th:attr="__${label_attrs}__" >
 		<span th:attr="__${input_attrs}__" >{{vueData.[[${object}]].[[${field}]]}}</span><span th:if="${useSuffix}" th:text="${mySuffix}"></span>

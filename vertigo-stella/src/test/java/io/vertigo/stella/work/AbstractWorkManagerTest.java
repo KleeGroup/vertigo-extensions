@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +21,14 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.vertigo.AbstractTestCaseJU5;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.node.component.di.DIInjector;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.stella.master.MasterManager;
 import io.vertigo.stella.master.WorkResultHandler;
 import io.vertigo.stella.work.mock.DivideWork;
@@ -38,12 +41,46 @@ import io.vertigo.stella.work.mock.ThreadLocalWorkEngine;
 /**
  * @author pchretien
  */
-public abstract class AbstractWorkManagerTest extends AbstractTestCaseJU5 {
-	private final long warmupTime = 5000; //en fonction du mode de distribution la prise en compte d'une tache est plus ou moins longue. Pour les TU on estime à 2s
+public abstract class AbstractWorkManagerTest {
+	private final long warmupTime = 10000; //en fonction du mode de distribution la prise en compte d'une tache est plus ou moins longue. Pour les TU on estime à 2s
 	private static final int WORKER_COUNT = 5; //Doit correspondre au workerCount déclaré dans managers.xlm
 
 	@Inject
 	private MasterManager workManager;
+	private AutoCloseableNode node;
+
+	@BeforeEach
+	public final void setUp() throws Exception {
+		node = new AutoCloseableNode(buildNodeConfig());
+		DIInjector.injectMembers(this, node.getComponentSpace());
+		//---
+		doSetUp();
+	}
+
+	protected void doSetUp() throws Exception {
+		//
+	}
+
+	@AfterEach
+	public final void tearDown() throws Exception {
+		if (node != null) {
+			try {
+				doTearDown();
+			} finally {
+				node.close();
+			}
+		}
+	}
+
+	protected void doTearDown() throws Exception {
+		//
+	}
+
+	protected abstract NodeConfig buildNodeConfig();
+
+	protected final void nop(final Object o) {
+		//nada
+	}
 
 	//=========================================================================
 	//===========================PROCESS=======================================

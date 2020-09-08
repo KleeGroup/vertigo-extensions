@@ -1,17 +1,16 @@
 package io.vertigo.orchestra.monitoring.domain.uidefinitions
 
 create DtDefinition DtOProcessUi {
-	field proId   				{domain : DoOIdentifiant, label :"Id du processus", required:"true",},
-	field name   				{domain : DoOLibelle, label :"Nom du processus", required:"false",},
-	field label   				{domain : DoOLibelle, label :"Libellé du processus", required:"false",},
-	field cronExpression		{domain : DoOLibelle, label :"Expression récurrence du processus", required:"false",},
-	field initialParams			{domain : DoOJsonText, label :"Paramètres initiaux sous forme de JSON ", required:"false",},
-	field multiexecution   		{domain : DoOBooleen, label :"Accepte la multi-execution", required:"false",},
-	field active   				{domain : DoOBooleen, label :"Processus actif", required:"true",},
-	field rescuePeriod			{domain : DoONombre, label :"Temps de validité d'une planification", required:"true",},
-	field metadatas				{domain : DoOMetadatas, label :"Métadonnées du processus", required:"false",},
-  
-},
+	field proId   				{domain : DoOIdentifiant, label :"Id du processus", cardinality: "1",},
+	field name   				{domain : DoOLibelle, label :"Nom du processus", cardinality: "?",},
+	field label   				{domain : DoOLibelle, label :"Libellé du processus", cardinality: "?",},
+	field cronExpression		{domain : DoOLibelle, label :"Expression récurrence du processus", cardinality: "?",},
+	field initialParams			{domain : DoOJsonText, label :"Paramètres initiaux sous forme de JSON ", cardinality: "?",},
+	field multiexecution   		{domain : DoOBooleen, label :"Accepte la multi-execution", cardinality: "?",},
+	field active   				{domain : DoOBooleen, label :"Processus actif", cardinality: "1",},
+	field rescuePeriod			{domain : DoONombre, label :"Temps de validité d'une planification", cardinality: "1",},
+	field metadatas				{domain : DoOMetadatas, label :"Métadonnées du processus", cardinality: "?",},
+}
 
 
 

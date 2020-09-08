@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +20,7 @@ package io.vertigo.quarto.plugins.converter.openoffice;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -39,13 +39,14 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.XRefreshable;
 
-import io.vertigo.core.component.Activeable;
-import io.vertigo.dynamo.file.FileManager;
-import io.vertigo.dynamo.file.model.VFile;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
-import io.vertigo.quarto.impl.services.converter.ConverterPlugin;
-import io.vertigo.util.TempFile;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.node.component.Activeable;
+import io.vertigo.core.util.TempFile;
+import io.vertigo.datastore.filestore.model.VFile;
+import io.vertigo.datastore.filestore.util.FileUtil;
+import io.vertigo.datastore.impl.filestore.model.FSFile;
+import io.vertigo.quarto.impl.converter.ConverterPlugin;
 
 /**
  * Conversion des fichiers à partir de OpenOffice.
@@ -59,25 +60,22 @@ abstract class AbstractOpenOfficeConverterPlugin implements ConverterPlugin, Act
 
 	private final ExecutorService executors = Executors.newFixedThreadPool(1);
 
-	private final FileManager fileManager;
 	private final String unoHost;
 	private final int unoPort;
 	private final int convertTimeoutSeconds;
 
 	/**
 	 * Constructor.
-	 * @param fileManager Manager de gestion des fichiers
 	 * @param unoHost Hote du serveur OpenOffice
 	 * @param unoPort Port de connexion au serveur OpenOffice
 	 * @param convertTimeoutSeconds Convert timeout in seconds
 	 */
-	protected AbstractOpenOfficeConverterPlugin(final FileManager fileManager, final String unoHost, final String unoPort, final int convertTimeoutSeconds) {
+	protected AbstractOpenOfficeConverterPlugin(final String unoHost, final String unoPort, final int convertTimeoutSeconds) {
 		super();
-		Assertion.checkNotNull(fileManager);
-		Assertion.checkArgNotEmpty(unoHost);
-		Assertion.checkArgument(convertTimeoutSeconds >= 1 && convertTimeoutSeconds <= 900, "Le timeout de conversion est exprimé en seconde et doit-être compris entre 1s et 15min (900s)");
+		Assertion.check()
+				.isNotBlank(unoHost)
+				.isTrue(convertTimeoutSeconds >= 1 && convertTimeoutSeconds <= 900, "Le timeout de conversion est exprimé en seconde et doit-être compris entre 1s et 15min (900s)");
 		//-----
-		this.fileManager = fileManager;
 		this.unoHost = unoHost;
 		this.unoPort = Integer.parseInt(unoPort);
 		this.convertTimeoutSeconds = convertTimeoutSeconds;
@@ -98,32 +96,28 @@ abstract class AbstractOpenOfficeConverterPlugin implements ConverterPlugin, Act
 	/** {@inheritDoc} */
 	@Override
 	public final VFile convertToFormat(final VFile file, final String targetFormat) {
-		Assertion.checkArgNotEmpty(targetFormat);
+		Assertion.check().isNotBlank(targetFormat);
 		//-----
 		return convertToFormat(file, ConverterFormat.find(targetFormat));
 	}
 
 	private VFile convertToFormat(final VFile file, final ConverterFormat targetFormat) {
-		Assertion.checkNotNull(file);
-		Assertion.checkNotNull(targetFormat);
-		// si le format de sortie est celui d'entrée la convertion est inutile
-		Assertion.checkArgument(!targetFormat.getTypeMime().equals(file.getMimeType()), "Le format de sortie est identique à celui d'entrée ; la conversion est inutile");
+		Assertion.check()
+				.isNotNull(file)
+				.isNotNull(targetFormat)
+				// si le format de sortie est celui d'entrée la convertion est inutile
+				.isFalse(targetFormat.getTypeMime().equals(file.getMimeType()), "Le format de sortie est identique à celui d'entrée ; la conversion est inutile");
 		//-----
-		final File inputFile = fileManager.obtainReadOnlyFile(file);
-		final Callable<File> convertTask = new Callable<File>() {
-			@Override
-			public File call() throws Exception {
-				return doConvertToFormat(inputFile, targetFormat);
-			}
-		};
-		final File targetFile;
+		final Path inputFile = FileUtil.obtainReadOnlyPath(file);
+		final Callable<Path> convertTask = () -> doConvertToFormat(inputFile.toFile(), targetFormat).toPath();
+		final Path targetFile;
 		try {
-			final Future<File> targetFileFuture = executors.submit(convertTask);
+			final Future<Path> targetFileFuture = executors.submit(convertTask);
 			targetFile = targetFileFuture.get(convertTimeoutSeconds, TimeUnit.SECONDS);
 		} catch (final Exception e) {
 			throw WrappedException.wrap(e, "Erreur de conversion du document au format {0} ({1})", targetFormat.name(), e.getClass().getSimpleName());
 		}
-		return fileManager.createFile(targetFile);
+		return FSFile.of(targetFile);
 	}
 
 	// On synchronize sur le plugin car OpenOffice supporte mal les accès concurrents.
@@ -135,7 +129,7 @@ abstract class AbstractOpenOfficeConverterPlugin implements ConverterPlugin, Act
 	 */
 	synchronized File doConvertToFormat(final File inputFile, final ConverterFormat targetFormat) throws Exception {
 		try (final OpenOfficeConnection openOfficeConnection = connectOpenOffice()) {
-			Assertion.checkArgument(inputFile.exists(), "Le document à convertir n''existe pas : {0}", inputFile.getAbsolutePath());
+			Assertion.check().isTrue(inputFile.exists(), "Le document à convertir n''existe pas : {0}", inputFile.getAbsolutePath());
 			final XComponent xDoc = loadDocument(inputFile, openOfficeConnection);
 			try {
 				refreshDocument(xDoc);
@@ -202,8 +196,9 @@ abstract class AbstractOpenOfficeConverterPlugin implements ConverterPlugin, Act
 	}
 
 	private static PropertyValue[] getFileProperties(final ConverterFormat docType, final XOutputStream outputStream, final XInputStream inputStream) {
-		Assertion.checkNotNull(docType, "Le type du format de sortie est obligatoire");
-		Assertion.checkArgument(outputStream == null || inputStream == null, "Les properties pointent soit un fichier local, soit un flux d'entrée, soit un flux de sortie");
+		Assertion.check()
+				.isNotNull(docType, "Le type du format de sortie est obligatoire")
+				.isTrue(outputStream == null || inputStream == null, "Les properties pointent soit un fichier local, soit un flux d'entrée, soit un flux de sortie");
 		final List<PropertyValue> fileProps = new ArrayList<>(3);
 
 		PropertyValue fileProp = new PropertyValue();

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +28,11 @@ import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.vertigo.commons.analytics.AnalyticsManager;
-import io.vertigo.core.component.Activeable;
+import io.vertigo.core.analytics.AnalyticsManager;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.component.Activeable;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.util.InjectorUtil;
 import io.vertigo.orchestra.definitions.ActivityDefinition;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.definitions.ProcessType;
@@ -42,7 +42,6 @@ import io.vertigo.orchestra.plugins.services.MapCodec;
 import io.vertigo.orchestra.services.execution.ActivityEngine;
 import io.vertigo.orchestra.services.execution.ActivityExecutionWorkspace;
 import io.vertigo.orchestra.services.execution.ExecutionState;
-import io.vertigo.util.InjectorUtil;
 
 /**
  * Executeur de processus non supervisés.
@@ -65,7 +64,7 @@ public class MemoryProcessExecutorPlugin implements ProcessExecutorPlugin, Activ
 	 */
 	@Inject
 	public MemoryProcessExecutorPlugin(@ParamValue("workersCount") final Integer workersCount) {
-		Assertion.checkNotNull(workersCount);
+		Assertion.check().isNotNull(workersCount);
 		// ---
 		localExecutor = Executors.newFixedThreadPool(workersCount);
 	}
@@ -134,8 +133,9 @@ public class MemoryProcessExecutorPlugin implements ProcessExecutorPlugin, Activ
 				}
 				// We try the execution and we keep the result
 				resultWorkspace = activityEngine.execute(workspaceIn);
-				Assertion.checkNotNull(resultWorkspace);
-				Assertion.checkNotNull(resultWorkspace.getValue("status"), "Le status est obligatoire dans le résultat");
+				Assertion.check()
+						.isNotNull(resultWorkspace)
+						.isNotNull(resultWorkspace.getValue("status"), "Le status est obligatoire dans le résultat");
 				// we call the posttreament
 				resultWorkspace = activityEngine.successfulPostTreatment(resultWorkspace);
 

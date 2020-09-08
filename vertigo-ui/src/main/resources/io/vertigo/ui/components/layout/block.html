@@ -2,7 +2,7 @@
 	th:assert="${title} != null">
 	<div class="col-12">
 		<div th:class="${'q-card bg-white ' + ((withFab!=null && withFab)?'withFab':'')}" th:attr="__${card_attrs}__">
-			<div class="q-card__section no-padding" th:attr="__${header_attrs}__">
+			<div class="q-card__section" th:attr="__${header_attrs}__">
 				<q-item>
 					<q-item-section>
 						<div class="text-h6" th:text="${title?:''}" />
@@ -12,7 +12,7 @@
 				</q-item>
 			</div>
 			<div class="q-separator q-separator--horizontal"></div>
-			<div class="q-card__section" th:attr="__${content_attrs}__">
+			<div class="q-card__section q-pa-md" th:attr="__${content_attrs}__">
 				<vu:content/>
 			</div>
 		</div>

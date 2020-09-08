@@ -3,15 +3,15 @@ package io.vertigo.orchestra.domain.execution
 create DtDefinition DtOProcessExecution {
 	storeName : "orchestra"
 	id preId			{domain : DoOIdentifiant, label :"Id de l'execution d'un processus", }
-	field beginTime   	{domain : DoOTimestamp, label :"Date de début", required:"true",}
-	field endTime   	{domain : DoOTimestamp, label :"Date de fin", required:"false",}
-	field engine   	{domain : DoOClasse, label :"Implémentation effective de l'execution", required:"false",}
-	field checked				{domain : DoOBooleen, label :"Pris en charge", required:"false",}
-	field checkingDate			{domain : DoOTimestamp, label :"Date de prise en charge", required:"false",}
-	field checkingComment		{domain : DoOText, label :"Commentaire", required:"false",}
+	field beginTime   	{domain : DoOTimestamp, label :"Date de début", cardinality: "1",}
+	field endTime   	{domain : DoOTimestamp, label :"Date de fin", cardinality: "?",}
+	field engine   	{domain : DoOClasse, label :"Implémentation effective de l'execution", cardinality: "?",}
+	field checked				{domain : DoOBooleen, label :"Pris en charge", cardinality: "?",}
+	field checkingDate			{domain : DoOTimestamp, label :"Date de prise en charge", cardinality: "?",}
+	field checkingComment		{domain : DoOText, label :"Commentaire", cardinality: "?",}
 	
   
-},
+}
 
 
 create Association APrePro {

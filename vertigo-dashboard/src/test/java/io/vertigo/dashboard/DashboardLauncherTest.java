@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +19,7 @@ package io.vertigo.dashboard;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.h2.Driver;
@@ -30,11 +30,15 @@ import org.junit.jupiter.api.Test;
 
 import io.restassured.RestAssured;
 import io.restassured.specification.ResponseSpecification;
-import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.app.config.ModuleConfig;
-import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
-import io.vertigo.commons.plugins.analytics.log.SocketLoggerAnalyticsConnectorPlugin;
+import io.vertigo.connectors.elasticsearch.ElasticSearchFeatures;
+import io.vertigo.connectors.influxdb.InfluxDbFeatures;
+import io.vertigo.connectors.javalin.JavalinFeatures;
+import io.vertigo.connectors.redis.RedisFeatures;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.ModuleConfig;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin;
 import io.vertigo.database.DatabaseFeatures;
@@ -42,43 +46,61 @@ import io.vertigo.database.impl.sql.vendor.h2.H2DataBase;
 import io.vertigo.database.timeseries.ClusteredMeasure;
 import io.vertigo.database.timeseries.DataFilter;
 import io.vertigo.database.timeseries.TimeFilter;
-import io.vertigo.dynamo.DynamoFeatures;
-import io.vertigo.dynamox.metric.domain.DomainMetricsProvider;
+import io.vertigo.datafactory.DataFactoryFeatures;
+import io.vertigo.datamodel.DataModelFeatures;
+import io.vertigo.datastore.DataStoreFeatures;
+import io.vertigo.datastore.entitystore.metrics.EntityMetricsProvider;
 import io.vertigo.vega.VegaFeatures;
 
 public class DashboardLauncherTest {
 
-	private static AutoCloseableApp app;
+	private static AutoCloseableNode node;
 
 	static {
 		//RestAsssured init
-		RestAssured.port = 8080;
+		RestAssured.port = 8082;
 	}
 
 	@BeforeAll
 	public static void setUp() {
-		app = new AutoCloseableApp(buildNodeConfig());
+		node = new AutoCloseableNode(buildNodeConfig());
 	}
 
 	@AfterAll
 	public static void tearDown() {
-		if (app != null) {
-			app.close();
+		if (node != null) {
+			node.close();
 		}
 	}
 
 	private static NodeConfig buildNodeConfig() {
 		return NodeConfig.builder()
 				.withAppName("dashboardtest")
-				.beginBoot()
-				.addPlugin(ClassPathResourceResolverPlugin.class)
-				.withLocales("fr_FR")
-				.endBoot()
+				.withBoot(BootConfig.builder()
+						.addPlugin(ClassPathResourceResolverPlugin.class)
+						.withSocketLoggerAnalyticsConnector()
+						.withLocales("fr_FR")
+						.build())
+				.addModule(new RedisFeatures()
+						.withJedis(
+								Param.of("host", "redis-pic.part.klee.lan.net"),
+								Param.of("port", "6379"),
+								Param.of("database", "0"))
+						.build())
+				.addModule(new InfluxDbFeatures()
+						.withInfluxDb(
+								Param.of("host", "http://analytica.part.klee.lan.net:8086"),
+								Param.of("user", "analytica"),
+								Param.of("password", "kleeklee"))
+						.build())
+				.addModule(new JavalinFeatures()
+						.withEmbeddedServer(Param.of("port", 8082))
+						.build())
 				.addModule(new CommonsFeatures()
-						.withRedisConnector(Param.of("host", "redis-pic.part.klee.lan.net"), Param.of("port", "6379"), Param.of("database", "0"))
-						.addAnalyticsConnectorPlugin(SocketLoggerAnalyticsConnectorPlugin.class)
-						.withCache()
-						.withMemoryCache()
+						.build())
+				.addModule(new ElasticSearchFeatures()
+						.withEmbeddedServer(Param.of("home", "io/vertigo/dashboard/search/indexconfig"))
+						.withRestHL(Param.of("servers.names", "localhost:9200"))
 						.build())
 				.addModule(new DatabaseFeatures()
 						.withSqlDataBase()
@@ -87,38 +109,38 @@ public class DashboardLauncherTest {
 								Param.of("jdbcDriver", Driver.class.getCanonicalName()),
 								Param.of("jdbcUrl", "jdbc:h2:mem:database"))
 						.withTimeSeriesDataBase()
-						.withInfluxDb(
-								Param.of("host", "http://analytica.part.klee.lan.net:8086"),
-								Param.of("user", "analytica"),
-								Param.of("password", "kleeklee"))
+						.withInfluxDb()
 						.build())
-				.addModule(new DynamoFeatures()
-						.withStore()
-						.withSqlStore()
+				.addModule(new DataModelFeatures().build())
+				.addModule(new DataStoreFeatures()
+						.withCache()
+						.withMemoryCache()
+						.withEntityStore()
+						.withSqlEntityStore()
+						.build())
+				.addModule(new DataFactoryFeatures()
 						.withSearch()
-						.withESEmbedded(
-								Param.of("home", "io/vertigo/dashboard/search/indexconfig"),
+						.withESHL(
 								Param.of("config.file", "io/vertigo/dashboard/search/indexconfig/elasticsearch.yml"),
-								Param.of("envIndex", "TU_TEST_"),
+								Param.of("envIndexPrefix", "tuTest"),
 								Param.of("rowsPerQuery", "50"))
 						.build())
 				.addModule(new VegaFeatures()
 						.withWebServices()
-						.withWebServicesEmbeddedServer(Param.of("port", Integer.toString(8080)))
-						.withWebServicesApiPrefix(Param.of("apiPrefix", "/api"))
+						.withJavalinWebServerPlugin(Param.of("apiPrefix", "/api"))
 						.build())
 				.addModule(new DashboardFeatures()
 						.withAnalytics(Param.of("appName", "dashboardtest"))
 						.build())
 				.addModule(
 						ModuleConfig.builder("metrics")
-								.addComponent(DomainMetricsProvider.class)
+								.addComponent(EntityMetricsProvider.class)
 								.build())
 				.build();
 	}
 
 	@Test
-	@Disabled
+	@Disabled /* use it for local debuging */
 	public void server() {
 		while (!Thread.interrupted()) {
 			try {
@@ -134,7 +156,7 @@ public class DashboardLauncherTest {
 	public void testSimpleSeries() {
 		final Map<String, Object> params = new HashMap<>();
 
-		params.put("measures", Arrays.asList("duration:mean"));
+		params.put("measures", List.of("duration:mean"));
 		params.put("dataFilter", DataFilter.builder("webservices").addFilter("location", "*").build());
 		params.put("timeFilter", TimeFilter.builder("now() - 1w", "now() + 1w").withTimeDim("1h").build());
 
@@ -168,7 +190,7 @@ public class DashboardLauncherTest {
 	public void testTabularData() {
 		final Map<String, Object> params = new HashMap<>();
 
-		params.put("measures", Arrays.asList("duration:mean"));
+		params.put("measures", List.of("duration:mean"));
 		params.put("dataFilter", DataFilter.builder("webservices").addFilter("location", "*").build());
 		params.put("timeFilter", TimeFilter.builder("now() - 1w", "now() + 1w").withTimeDim("1h").build());
 		params.put("groupBy", "name");

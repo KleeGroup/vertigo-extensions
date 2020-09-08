@@ -19,17 +19,20 @@
 		</dependency>
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-dynamo-api</artifactId>
-			<version>${vertigo.version}</version>
+			<artifactId>vertigo-datamodel</artifactId>
+			<version>${project.version}</version>
 		</dependency>
-
-		<!-- tests -->
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-core</artifactId>
+			<artifactId>vertigo-elasticsearch-connector</artifactId>
 			<version>${vertigo.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+		    <groupId>org.elasticsearch.client</groupId>
+		    <artifactId>elasticsearch-rest-high-level-client</artifactId>
+		    <version>7.9.0</version>
+		    <optional>true</optional> <!-- RestHighLevelElasticSearchConnector -->
 		</dependency>
 	</dependencies>
 </project>

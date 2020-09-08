@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import io.vertigo.core.component.Activeable;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.component.Activeable;
 import io.vertigo.stella.impl.master.MasterPlugin;
 import io.vertigo.stella.impl.master.WorkResult;
 import io.vertigo.stella.impl.work.Coordinator;
@@ -40,7 +39,7 @@ public final class MasterCoordinator implements Coordinator, Activeable {
 	private final Map<String, WorkResultHandler> workResultHandlers = Collections.synchronizedMap(new HashMap<String, WorkResultHandler>());
 
 	public MasterCoordinator(final MasterPlugin masterPlugin) {
-		Assertion.checkNotNull(masterPlugin);
+		Assertion.check().isNotNull(masterPlugin);
 		//-----
 		this.masterPlugin = masterPlugin;
 		watcher = createWatcher();
@@ -73,8 +72,9 @@ public final class MasterCoordinator implements Coordinator, Activeable {
 	}
 
 	private <R> void setResult(final String workId, final R result, final Throwable error) {
-		Assertion.checkArgNotEmpty(workId);
-		Assertion.checkArgument(result == null ^ error == null, "result xor error is null");
+		Assertion.check()
+				.isNotBlank(workId)
+				.isTrue(result == null ^ error == null, "result xor error is null");
 		//-----
 		final WorkResultHandler workResultHandler = workResultHandlers.remove(workId);
 		if (workResultHandler != null) {

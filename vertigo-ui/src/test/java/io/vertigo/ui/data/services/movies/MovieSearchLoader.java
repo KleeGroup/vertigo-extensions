@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +23,14 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.vertigo.commons.transaction.VTransactionManager;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.dynamo.search.SearchManager;
-import io.vertigo.dynamo.search.metamodel.SearchChunk;
-import io.vertigo.dynamo.search.metamodel.SearchIndexDefinition;
-import io.vertigo.dynamo.search.model.SearchIndex;
-import io.vertigo.dynamo.task.TaskManager;
-import io.vertigo.dynamox.search.AbstractSqlSearchLoader;
+import io.vertigo.datafactory.impl.search.loader.AbstractSqlSearchLoader;
+import io.vertigo.datafactory.search.SearchManager;
+import io.vertigo.datafactory.search.definitions.SearchChunk;
+import io.vertigo.datafactory.search.definitions.SearchIndexDefinition;
+import io.vertigo.datafactory.search.model.SearchIndex;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.datamodel.task.TaskManager;
 import io.vertigo.ui.data.domain.movies.Movie;
 import io.vertigo.ui.data.domain.movies.MovieIndex;
 

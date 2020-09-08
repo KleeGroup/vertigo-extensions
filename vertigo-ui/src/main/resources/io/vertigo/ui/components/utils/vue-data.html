@@ -1,7 +1,7 @@
 <th:block th:fragment="vue-data">
     <script th:inline="javascript">
-       	var vueData = [[${model.vContext.filteredViewContext}]];
-       	var componentStates = [[${model['componentStates']}]];
-       	var uiMessageStack = [[${uiMessageStack}]];
+       	VertigoUi.vueData = [(${viewContextAsJson.get()})];
+       	VertigoUi.componentStates = [[${model['componentStates']}]];
+       	VertigoUi.uiMessageStack = [[${uiMessageStack}]];
 	</script>
 </th:block>

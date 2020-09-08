@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +21,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.vertigo.social.services.handle.Handle;
-import io.vertigo.social.services.handle.HandleServices;
+import io.vertigo.social.handle.Handle;
+import io.vertigo.social.handle.HandleManager;
 import io.vertigo.vega.webservice.WebServices;
 import io.vertigo.vega.webservice.stereotype.GET;
 import io.vertigo.vega.webservice.stereotype.InnerBodyParam;
@@ -39,7 +38,7 @@ import io.vertigo.vega.webservice.stereotype.PathPrefix;
 public final class HandleWebServices implements WebServices {
 
 	@Inject
-	private HandleServices handleServices;
+	private HandleManager handleServices;
 
 	@POST("/_search")
 	public List<Handle> search(@InnerBodyParam("prefix") final String prefix) {

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +23,12 @@ import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.util.InjectorUtil;
 import io.vertigo.stella.impl.work.WorkItem;
 import io.vertigo.stella.master.MasterManager;
 import io.vertigo.stella.master.WorkResultHandler;
-import io.vertigo.util.InjectorUtil;
 
 /**
  * Exécution d'un work.
@@ -66,15 +65,16 @@ final class Worker<R, W> implements Callable<R> {
 	 * @param workItem WorkItem à traiter
 	 */
 	Worker(final WorkItem<W, R> workItem, final WorkResultHandler<R> workResultHandler) {
-		Assertion.checkNotNull(workItem);
-		Assertion.checkNotNull(workResultHandler);
+		Assertion.check()
+				.isNotNull(workItem)
+				.isNotNull(workResultHandler);
 		//-----
 		this.workItem = workItem;
 		this.workResultHandler = workResultHandler;
 	}
 
 	private static <W, R> R executeNow(final WorkItem<W, R> workItem) {
-		Assertion.checkNotNull(workItem);
+		Assertion.check().isNotNull(workItem);
 		//-----
 		return InjectorUtil.newInstance(workItem.getWorkEngineClass())
 				.process(workItem.getWork());

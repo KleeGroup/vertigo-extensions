@@ -434,93 +434,93 @@ comment on column TRIGGER_TYPE.LABEL is
 
 
 alter table O_ACTIVITY_EXECUTION
-	add constraint FK_ACE_ACT_O_ACTIVITY foreign key (ACT_ID)
+	add constraint FK_A_ACE_ACT_O_ACTIVITY foreign key (ACT_ID)
 	references O_ACTIVITY (ACT_ID);
 
-create index ACE_ACT_O_ACTIVITY_FK on O_ACTIVITY_EXECUTION (ACT_ID asc);
+create index A_ACE_ACT_O_ACTIVITY_FK on O_ACTIVITY_EXECUTION (ACT_ID asc);
 
 alter table O_ACTIVITY_EXECUTION
-	add constraint FK_ACE_EST_O_EXECUTION_STATE foreign key (EST_CD)
+	add constraint FK_A_ACE_EST_O_EXECUTION_STATE foreign key (EST_CD)
 	references O_EXECUTION_STATE (EST_CD);
 
-create index ACE_EST_O_EXECUTION_STATE_FK on O_ACTIVITY_EXECUTION (EST_CD asc);
+create index A_ACE_EST_O_EXECUTION_STATE_FK on O_ACTIVITY_EXECUTION (EST_CD asc);
 
 alter table O_ACTIVITY_EXECUTION
-	add constraint FK_ACE_NOD_O_NODE foreign key (NOD_ID)
+	add constraint FK_A_ACE_NOD_O_NODE foreign key (NOD_ID)
 	references O_NODE (NOD_ID);
 
-create index ACE_NOD_O_NODE_FK on O_ACTIVITY_EXECUTION (NOD_ID asc);
+create index A_ACE_NOD_O_NODE_FK on O_ACTIVITY_EXECUTION (NOD_ID asc);
 
 alter table O_ACTIVITY_EXECUTION
-	add constraint FK_ACE_PRE_O_PROCESS_EXECUTION foreign key (PRE_ID)
+	add constraint FK_A_ACE_PRE_O_PROCESS_EXECUTION foreign key (PRE_ID)
 	references O_PROCESS_EXECUTION (PRE_ID);
 
-create index ACE_PRE_O_PROCESS_EXECUTION_FK on O_ACTIVITY_EXECUTION (PRE_ID asc);
+create index A_ACE_PRE_O_PROCESS_EXECUTION_FK on O_ACTIVITY_EXECUTION (PRE_ID asc);
 
 alter table O_ACTIVITY_LOG
-	add constraint FK_ACL_ACE_O_ACTIVITY_EXECUTION foreign key (ACE_ID)
+	add constraint FK_A_ACL_ACE_O_ACTIVITY_EXECUTION foreign key (ACE_ID)
 	references O_ACTIVITY_EXECUTION (ACE_ID);
 
-create index ACL_ACE_O_ACTIVITY_EXECUTION_FK on O_ACTIVITY_LOG (ACE_ID asc);
+create index A_ACL_ACE_O_ACTIVITY_EXECUTION_FK on O_ACTIVITY_LOG (ACE_ID asc);
 
 alter table O_ACTIVITY
-	add constraint FK_ACT_PRO_O_PROCESS foreign key (PRO_ID)
+	add constraint FK_A_ACT_PRO_O_PROCESS foreign key (PRO_ID)
 	references O_PROCESS (PRO_ID);
 
-create index ACT_PRO_O_PROCESS_FK on O_ACTIVITY (PRO_ID asc);
+create index A_ACT_PRO_O_PROCESS_FK on O_ACTIVITY (PRO_ID asc);
 
 alter table O_PROCESS_EXECUTION
-	add constraint FK_PRE_EST_O_EXECUTION_STATE foreign key (EST_CD)
+	add constraint FK_A_PRE_EST_O_EXECUTION_STATE foreign key (EST_CD)
 	references O_EXECUTION_STATE (EST_CD);
 
-create index PRE_EST_O_EXECUTION_STATE_FK on O_PROCESS_EXECUTION (EST_CD asc);
+create index A_PRE_EST_O_EXECUTION_STATE_FK on O_PROCESS_EXECUTION (EST_CD asc);
 
 alter table O_PROCESS_EXECUTION
-	add constraint FK_PRE_PRO_O_PROCESS foreign key (PRO_ID)
+	add constraint FK_A_PRE_PRO_O_PROCESS foreign key (PRO_ID)
 	references O_PROCESS (PRO_ID);
 
-create index PRE_PRO_O_PROCESS_FK on O_PROCESS_EXECUTION (PRO_ID asc);
+create index A_PRE_PRO_O_PROCESS_FK on O_PROCESS_EXECUTION (PRO_ID asc);
 
 alter table O_PROCESS_EXECUTION
-	add constraint FK_PRE_USR_O_USER foreign key (USR_ID)
+	add constraint FK_A_PRE_USR_O_USER foreign key (USR_ID)
 	references O_USER (USR_ID);
 
-create index PRE_USR_O_USER_FK on O_PROCESS_EXECUTION (USR_ID asc);
+create index A_PRE_USR_O_USER_FK on O_PROCESS_EXECUTION (USR_ID asc);
 
 alter table O_PROCESS
-	add constraint FK_PRO_PRT_O_PROCESS_TYPE foreign key (PRT_CD)
+	add constraint FK_A_PRO_PRT_O_PROCESS_TYPE foreign key (PRT_CD)
 	references O_PROCESS_TYPE (PRT_CD);
 
-create index PRO_PRT_O_PROCESS_TYPE_FK on O_PROCESS (PRT_CD asc);
+create index A_PRO_PRT_O_PROCESS_TYPE_FK on O_PROCESS (PRT_CD asc);
 
 alter table O_PROCESS
-	add constraint FK_PRO_TRT_TRIGGER_TYPE foreign key (TRT_CD)
+	add constraint FK_A_PRO_TRT_TRIGGER_TYPE foreign key (TRT_CD)
 	references TRIGGER_TYPE (TRT_CD);
 
-create index PRO_TRT_TRIGGER_TYPE_FK on O_PROCESS (TRT_CD asc);
+create index A_PRO_TRT_TRIGGER_TYPE_FK on O_PROCESS (TRT_CD asc);
 
 alter table O_PROCESS_PLANIFICATION
-	add constraint FK_PRP_NOD_O_NODE foreign key (NOD_ID)
+	add constraint FK_A_PRP_NOD_O_NODE foreign key (NOD_ID)
 	references O_NODE (NOD_ID);
 
-create index PRP_NOD_O_NODE_FK on O_PROCESS_PLANIFICATION (NOD_ID asc);
+create index A_PRP_NOD_O_NODE_FK on O_PROCESS_PLANIFICATION (NOD_ID asc);
 
 alter table O_PROCESS_PLANIFICATION
-	add constraint FK_PRP_PRO_O_PROCESS foreign key (PRO_ID)
+	add constraint FK_A_PRP_PRO_O_PROCESS foreign key (PRO_ID)
 	references O_PROCESS (PRO_ID);
 
-create index PRP_PRO_O_PROCESS_FK on O_PROCESS_PLANIFICATION (PRO_ID asc);
+create index A_PRP_PRO_O_PROCESS_FK on O_PROCESS_PLANIFICATION (PRO_ID asc);
 
 alter table O_PROCESS_PLANIFICATION
-	add constraint FK_PRP_PST_O_SCHEDULER_STATE foreign key (SST_CD)
+	add constraint FK_A_PRP_PST_O_SCHEDULER_STATE foreign key (SST_CD)
 	references O_SCHEDULER_STATE (SST_CD);
 
-create index PRP_PST_O_SCHEDULER_STATE_FK on O_PROCESS_PLANIFICATION (SST_CD asc);
+create index A_PRP_PST_O_SCHEDULER_STATE_FK on O_PROCESS_PLANIFICATION (SST_CD asc);
 
 alter table O_ACTIVITY_WORKSPACE
-	add constraint FK_TKW_TKE_O_ACTIVITY_EXECUTION foreign key (ACE_ID)
+	add constraint FK_A_TKW_TKE_O_ACTIVITY_EXECUTION foreign key (ACE_ID)
 	references O_ACTIVITY_EXECUTION (ACE_ID);
 
-create index TKW_TKE_O_ACTIVITY_EXECUTION_FK on O_ACTIVITY_WORKSPACE (ACE_ID asc);
+create index A_TKW_TKE_O_ACTIVITY_EXECUTION_FK on O_ACTIVITY_WORKSPACE (ACE_ID asc);
 
 

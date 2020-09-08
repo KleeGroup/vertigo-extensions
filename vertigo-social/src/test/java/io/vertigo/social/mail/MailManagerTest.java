@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +19,30 @@ package io.vertigo.social.mail;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.vertigo.AbstractTestCaseJU5;
-import io.vertigo.app.config.NodeConfig;
 import io.vertigo.commons.CommonsFeatures;
+import io.vertigo.connectors.mail.MailFeatures;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VUserException;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.node.component.di.DIInjector;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.core.param.Param;
-import io.vertigo.dynamo.DynamoFeatures;
-import io.vertigo.dynamo.file.FileManager;
-import io.vertigo.dynamo.file.model.VFile;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VUserException;
+import io.vertigo.datastore.DataStoreFeatures;
+import io.vertigo.datastore.filestore.model.VFile;
 import io.vertigo.social.SocialFeatures;
-import io.vertigo.social.services.mail.Mail;
-import io.vertigo.social.services.mail.MailManager;
 
 /**
  * Test de l'implémentation standard.
  *
  * @author npiedeloup
  */
-public final class MailManagerTest extends AbstractTestCaseJU5 {
+public final class MailManagerTest {
 	//private static final String DT_MAIL = "Direction Technique<direction.technique@kleegroup.com>";
 	//private static final String NPI_MAIL = "Nicolas Piedeloup<npiedeloup@kleegroup.com>";
 	private static final String DT_MAIL = "Direction Technique<direction.technique@yopmail.com>";
@@ -49,35 +50,52 @@ public final class MailManagerTest extends AbstractTestCaseJU5 {
 
 	@Inject
 	private MailManager mailManager;
-	@Inject
-	private FileManager fileManager;
 
-	@Override
-	protected NodeConfig buildNodeConfig() {
+	private AutoCloseableNode node;
+
+	@BeforeEach
+	public final void setUp() {
+		node = new AutoCloseableNode(buildNodeConfig());
+		DIInjector.injectMembers(this, node.getComponentSpace());
+	}
+
+	@AfterEach
+	public final void tearDown() {
+		if (node != null) {
+			node.close();
+		}
+	}
+
+	private NodeConfig buildNodeConfig() {
 		return NodeConfig.builder()
-				.beginBoot()
-				.withLocales("fr_FR")
-				.endBoot()
+				.withBoot(BootConfig.builder()
+						.withLocales("fr_FR")
+						.build())
+				.addModule(new MailFeatures()
+						.withNativeMailConnector(
+								Param.of("storeProtocol", "smtp"),
+								Param.of("host", "localdelivery.klee.lan.net"))
+						.build())
 				.addModule(new CommonsFeatures().build())
-				.addModule(new DynamoFeatures().build())
+				.addModule(new DataStoreFeatures().build())
 				.addModule(new SocialFeatures()
 						.withMails()
 						.withJavaxMail(
 								Param.of("developmentMode", "true"),
 								Param.of("developmentMailTo", "klee-DevTest@yopmail.com"))
-						.withNativeMailConnector(
-								Param.of("storeProtocol", "smtp"),
-								Param.of("host", "localdelivery.klee.lan.net"))
 						.build())
 				.build();
 	}
 
+	private void nop(final Object o) {
+		//nada
+	}
+
 	/**
-	 * @throws Exception manager null
 	 */
 	@Test
-	public void testNotNull() throws Exception {
-		Assertion.checkNotNull(mailManager);
+	public void testNotNull() {
+		Assertion.check().isNotNull(mailManager);
 	}
 
 	/**
@@ -477,7 +495,7 @@ public final class MailManagerTest extends AbstractTestCaseJU5 {
 	 */
 	@Test
 	public void testSendMailWithBadCc() {
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Assertions.assertThrows(IllegalStateException.class, () -> {
 			final Mail mail = Mail.builder()
 					.from(DT_MAIL)
 					.withSubject("-12-testWritableMailWithBadCc")
@@ -569,7 +587,7 @@ public final class MailManagerTest extends AbstractTestCaseJU5 {
 	 */
 	@Test
 	public void testSendMailWithPJ() {
-		final VFile image = TestUtil.createVFile(fileManager, "data/logo.jpg", getClass());
+		final VFile image = TestUtil.createVFile("data/logo.jpg", getClass());
 
 		final Mail mail = Mail.builder()
 				.from(DT_MAIL)
@@ -591,8 +609,8 @@ public final class MailManagerTest extends AbstractTestCaseJU5 {
 				.to(NPI_MAIL)
 				.withSubject("9-testSendMailWithOneContentTwoPJ")
 				.withTextContent("Mon test en <b>TEXT</b>")
-				.withAttachments(TestUtil.createVFile(fileManager, "data/logo.jpg", getClass()))
-				.withAttachments(TestUtil.createVFile(fileManager, "data/test.txt", getClass()))
+				.withAttachments(TestUtil.createVFile("data/logo.jpg", getClass()))
+				.withAttachments(TestUtil.createVFile("data/test.txt", getClass()))
 				.build();
 		mailManager.sendMail(mail);
 	}
@@ -614,8 +632,8 @@ public final class MailManagerTest extends AbstractTestCaseJU5 {
 				.to("Philippe Chretien (cc)<pchretien@kleegroup.com>")
 				.to("Denis Challas (cc)<dchallas@kleegroup.com>")
 
-				.withAttachments(TestUtil.createVFile(fileManager, "data/logo.jpg", getClass()))
-				.withAttachments(TestUtil.createVFile(fileManager, "data/test.txt", getClass()))
+				.withAttachments(TestUtil.createVFile("data/logo.jpg", getClass()))
+				.withAttachments(TestUtil.createVFile("data/test.txt", getClass()))
 				.build();
 		mailManager.sendMail(mail);
 	}

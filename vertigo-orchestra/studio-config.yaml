@@ -1,0 +1,18 @@
+---
+resources : 
+  - { type: kpr, path: src/main/resources/io/vertigo/orchestra/domains.kpr }
+  - { type: kpr, path: src/main/resources/io/vertigo/orchestra/model.kpr }
+  - { type: kpr, path: src/main/resources/io/vertigo/orchestra/tasks.kpr }
+mdaConfig: 
+  projectPackageName: io.vertigo.orchestra
+  targetGenDir : src/main/
+  properties : 
+    vertigo.domain.java: true
+    vertigo.domain.java.generateDtResources: false
+    vertigo.domain.sql: true
+    vertigo.domain.sql.targetSubDir: javagen/sqlgen
+    vertigo.domain.sql.baseCible: H2
+    vertigo.domain.sql.generateDrop: false
+    vertigo.domain.sql.generateMasterData: true
+    vertigo.task: true
+    vertigo.file: true

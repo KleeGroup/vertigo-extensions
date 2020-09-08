@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +18,18 @@
 package io.vertigo.stella.plugins.work.redis;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.vertigo.commons.codec.CodecManager;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.lang.Assertion;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.util.ClassUtil;
+import io.vertigo.core.util.MapBuilder;
 import io.vertigo.stella.impl.master.WorkResult;
 import io.vertigo.stella.impl.work.WorkItem;
 import io.vertigo.stella.work.WorkEngine;
-import io.vertigo.util.ClassUtil;
-import io.vertigo.util.DateUtil;
-import io.vertigo.util.MapBuilder;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 
@@ -47,15 +46,16 @@ public final class RedisDB {
 	 * @param redisConnector the redis connector
 	 */
 	public RedisDB(final CodecManager codecManager, final RedisConnector redisConnector) {
-		Assertion.checkNotNull(redisConnector);
-		Assertion.checkNotNull(codecManager);
+		Assertion.check()
+				.isNotNull(redisConnector)
+				.isNotNull(codecManager);
 		//-----
 		this.redisConnector = redisConnector;
 		this.codecManager = codecManager;
 	}
 
 	public void reset() {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			jedis.flushAll();
 		}
 	}
@@ -69,15 +69,15 @@ public final class RedisDB {
 	 * @param workItem the workItem
 	 */
 	public <R, W> void putWorkItem(final WorkItem<R, W> workItem) {
-		Assertion.checkNotNull(workItem);
+		Assertion.check().isNotNull(workItem);
 		//-----
-		try (Jedis jedis = redisConnector.getResource()) {
+		try (Jedis jedis = redisConnector.getClient()) {
 			//out.println("creating work [" + workId + "] : " + work.getClass().getSimpleName());
 
 			final Map<String, String> datas = new MapBuilder<String, String>()
 					.put("work64", encode(workItem.getWork()))
 					.put("provider64", encode(workItem.getWorkEngineClass().getName()))
-					.put("x-date", DateUtil.newDate().toString())
+					.put("x-date", LocalDate.now().toString())
 					.build();
 
 			try (final Transaction tx = jedis.multi()) {
@@ -97,7 +97,7 @@ public final class RedisDB {
 	 * @return null or a workitem
 	 */
 	public <R, W> WorkItem<R, W> pollWorkItem(final String workType) {
-		Assertion.checkNotNull(workType);
+		Assertion.check().isNotNull(workType);
 		//-----
 		final long start = System.currentTimeMillis();
 		while ((System.currentTimeMillis() - start) < 1 * 1000) {
@@ -116,7 +116,7 @@ public final class RedisDB {
 	}
 
 	private <W, R> WorkItem<W, R> doPollWorkItem(final String workType) {
-		try (Jedis jedis = redisConnector.getResource()) {
+		try (Jedis jedis = redisConnector.getClient()) {
 			final String workId = jedis.rpoplpush("works:todo:" + workType, "works:in progress");
 			if (workId == null) {
 				return null;
@@ -136,11 +136,12 @@ public final class RedisDB {
 	 * @param error if an error occurred
 	 */
 	public <R> void putResult(final String workId, final R result, final Throwable error) {
-		Assertion.checkArgNotEmpty(workId);
-		Assertion.checkArgument(result == null ^ error == null, "result xor error is null");
+		Assertion.check()
+				.isNotBlank(workId)
+				.isTrue(result == null ^ error == null, "result xor error is null");
 		//-----
 		final Map<String, String> datas = new HashMap<>();
-		try (Jedis jedis = redisConnector.getResource()) {
+		try (Jedis jedis = redisConnector.getClient()) {
 			if (error == null) {
 				datas.put("result", encode(result));
 				datas.put("status", "ok");
@@ -175,7 +176,7 @@ public final class RedisDB {
 	}
 
 	private <R> WorkResult<R> doPollResult() {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final String workId = jedis.rpoplpush("works:done", "works:completed");
 			if (workId == null) {
 				return null;
@@ -191,7 +192,7 @@ public final class RedisDB {
 	}
 
 	//	public void registerNode(final Node node) {
-	//		Assertion.checkNotNull(node);
+	//		Assertion.check().notNull(node);
 	//		//-----
 	//		try (Jedis jedis = jedisPool.getResource()) {
 	//			jedis.lpush("nodes", node.getUID());

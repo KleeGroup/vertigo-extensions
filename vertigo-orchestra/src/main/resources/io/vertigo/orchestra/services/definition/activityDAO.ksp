@@ -5,7 +5,7 @@ package io.vertigo.orchestra.dao.definition
 
 create Task TkGetFirstActivityByProcess {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         
         	select act.* 
@@ -21,14 +21,14 @@ create Task TkGetFirstActivityByProcess {
                  where 1=1
         	
 			"
-	attribute proId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute dtOActivity	 	{domain : DoDtOActivityDto 		required:"true" 	inOut :"out"}
+	in proId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtOActivity	 	{domain : DoDtOActivity 		cardinality: "1" 	}
 }
 
 
 create Task TkGetNextActivityByActId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select act.* 
                 from O_ACTIVITY act 
@@ -46,14 +46,14 @@ create Task TkGetNextActivityByActId {
         	
         	
 			"
-		attribute actId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-		attribute dtOActivity	 	{domain : DoDtOActivityDto		required:"false" 	inOut :"out"}
+		in actId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+		out dtOActivity	 	{domain : DoDtOActivity		cardinality: "?" 	}
 }
 
 
 create Task TkGetActivitiesByProId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         
         	select act.* 
@@ -61,14 +61,14 @@ create Task TkGetActivitiesByProId {
                 where act.PRO_ID = #proId#
         	
 			"
-	attribute proId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute dtOActivities	 	{domain : DoDtOActivityDtc 		required:"true" 	inOut :"out"}
+	in proId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtOActivities	 	{domain : DoDtOActivity 		cardinality: "*" 	}
 }
 
 
 create Task TkGetAllActivitiesInActiveProcesses {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         
         	select act.* 
@@ -77,5 +77,5 @@ create Task TkGetAllActivitiesInActiveProcesses {
                 where pro.ACTIVE_VERSION is true
         	
 			"
-	attribute dtOActivities	 	{domain : DoDtOActivityDtc 		required:"true" 	inOut :"out"}
+	out dtOActivities	 	{domain : DoDtOActivity 		cardinality: "*" 	}
 }

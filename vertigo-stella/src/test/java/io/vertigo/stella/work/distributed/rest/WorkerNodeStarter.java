@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +20,10 @@ package io.vertigo.stella.work.distributed.rest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.app.config.NodeConfig;
-import io.vertigo.lang.Assertion;
-import io.vertigo.util.ClassUtil;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.node.config.NodeConfig;
+import io.vertigo.core.util.ClassUtil;
 
 /**
  * @author npiedeloup
@@ -38,7 +37,7 @@ public class WorkerNodeStarter {
 	 * @throws InterruptedException Interrupt
 	 */
 	public static void main(final String[] args) throws InterruptedException {
-		Assertion.checkArgument(args.length >= 1 && args.length <= 2, "Usage WorkerNodeStarter managers.xml <maxLifeTime>");
+		Assertion.check().isTrue(args.length >= 1 && args.length <= 2, "Usage WorkerNodeStarter managers.xml <maxLifeTime>");
 		//-----
 		final long timeToWait = args.length == 2 ? Long.parseLong(args[1]) * 1000L : 5 * 60 * 1000L;
 
@@ -52,7 +51,7 @@ public class WorkerNodeStarter {
 	}
 
 	private static void run(final NodeConfig nodeConfig, final long timeToWait) {
-		try (AutoCloseableApp app = new AutoCloseableApp(nodeConfig)) {
+		try (AutoCloseableNode node = new AutoCloseableNode(nodeConfig)) {
 			System.out.println("Node started (timout in " + timeToWait / 1000 + "s)");
 			if (timeToWait > 0) {
 				Thread.sleep(timeToWait);

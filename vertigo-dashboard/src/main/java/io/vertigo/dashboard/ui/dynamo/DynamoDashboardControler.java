@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,26 +25,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.vertigo.app.App;
-import io.vertigo.app.Home;
-import io.vertigo.commons.analytics.metric.Metric;
+import io.vertigo.core.analytics.metric.Metric;
+import io.vertigo.core.node.Node;
 import io.vertigo.dashboard.ui.AbstractDashboardModuleControler;
-import io.vertigo.dashboard.ui.dynamo.model.DomainModel;
 import io.vertigo.dashboard.ui.dynamo.model.EntityModel;
+import io.vertigo.dashboard.ui.dynamo.model.SmartTypeModel;
 import io.vertigo.dashboard.ui.dynamo.model.TaskModel;
 import io.vertigo.database.timeseries.DataFilter;
 import io.vertigo.database.timeseries.TabularDataSerie;
 import io.vertigo.database.timeseries.TabularDatas;
 import io.vertigo.database.timeseries.TimeFilter;
-import io.vertigo.dynamo.domain.metamodel.Domain;
-import io.vertigo.dynamo.domain.metamodel.DtDefinition;
-import io.vertigo.dynamo.domain.metamodel.DtStereotype;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
+import io.vertigo.datamodel.smarttype.definitions.SmartTypeDefinition;
+import io.vertigo.datamodel.structure.definitions.DtDefinition;
+import io.vertigo.datamodel.structure.definitions.DtStereotype;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
 
 public final class DynamoDashboardControler extends AbstractDashboardModuleControler {
 
 	@Override
-	public void doBuildModel(final App app, final Map<String, Object> model) {
+	public void doBuildModel(final Node node, final Map<String, Object> model) {
 		final List<Metric> metrics = getDataProvider().getMetrics();
 		buildEntityModel(model, metrics);
 		buildDomainModel(model, metrics);
@@ -57,7 +55,7 @@ public final class DynamoDashboardControler extends AbstractDashboardModuleContr
 		final TimeFilter timeFilter = TimeFilter.builder("now() - 1d", "now()").build();
 		final TabularDatas tabularDatas = getDataProvider().getTabularData(Arrays.asList("duration:median", "duration:count"), dataFilter, timeFilter, "name");
 
-		final List<TaskModel> tasks = Home.getApp().getDefinitionSpace().getAll(TaskDefinition.class)
+		final List<TaskModel> tasks = Node.getNode().getDefinitionSpace().getAll(TaskDefinition.class)
 				.stream()
 				.map(taskDefinition -> new TaskModel(
 						taskDefinition,
@@ -104,7 +102,7 @@ public final class DynamoDashboardControler extends AbstractDashboardModuleContr
 				.filter(metric -> "definitionFieldCount".equals(metric.getName()))
 				.forEach(metric -> fieldCount.put(metric.getFeature(), metric.getValue()));
 
-		final Collection<DtDefinition> dtDefinitions = Home.getApp().getDefinitionSpace().getAll(DtDefinition.class);
+		final Collection<DtDefinition> dtDefinitions = Node.getNode().getDefinitionSpace().getAll(DtDefinition.class);
 		final List<EntityModel> entities = dtDefinitions
 				.stream()
 				.filter(DtDefinition::isPersistent)
@@ -135,17 +133,17 @@ public final class DynamoDashboardControler extends AbstractDashboardModuleContr
 				.filter(metric -> "domainUsageInDtDefinitions".equals(metric.getName()))
 				.forEach(metric -> dtDefinitionCount.put(metric.getFeature(), metric.getValue()));
 
-		final Collection<Domain> domains = Home.getApp().getDefinitionSpace().getAll(Domain.class);
-		final List<DomainModel> domainModels = domains
+		final Collection<SmartTypeDefinition> smartTypes = Node.getNode().getDefinitionSpace().getAll(SmartTypeDefinition.class);
+		final List<SmartTypeModel> smartTypeModels = smartTypes
 				.stream()
-				.filter(domain -> domain.getScope().isPrimitive()) // we display only primitives
-				.map(domain -> new DomainModel(
-						domain,
-						taskCount.get(domain.getName()),
-						dtDefinitionCount.get(domain.getName())))
+				.filter(smartType -> smartType.getScope().isPrimitive()) // we display only primitives
+				.map(smartType -> new SmartTypeModel(
+						smartType,
+						taskCount.get(smartType.getName()),
+						dtDefinitionCount.get(smartType.getName())))
 				.collect(Collectors.toList());
 
-		model.put("domains", domainModels);
+		model.put("smartTypes", smartTypeModels);
 
 	}
 

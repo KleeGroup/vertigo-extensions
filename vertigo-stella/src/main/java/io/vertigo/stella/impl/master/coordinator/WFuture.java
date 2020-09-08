@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
 import io.vertigo.stella.master.WorkResultHandler;
 
 /**
@@ -42,7 +41,7 @@ final class WFuture<R> implements Future<R>, WorkResultHandler<R> {
 	private final WorkResultHandler<R> redirect;
 
 	WFuture(final WorkResultHandler<R> redirect) {
-		Assertion.checkNotNull(redirect);
+		Assertion.check().isNotNull(redirect);
 		//---
 		this.redirect = redirect;
 	}
@@ -50,7 +49,7 @@ final class WFuture<R> implements Future<R>, WorkResultHandler<R> {
 	/** {@inheritDoc} */
 	@Override
 	public void onDone(final R result, final Throwable error) {
-		Assertion.checkArgument(result == null ^ error == null, "result xor error is null");
+		Assertion.check().isTrue(result == null ^ error == null, "result xor error is null");
 		//-----
 		if (done.compareAndSet(false, true)) {
 			myResult = result;

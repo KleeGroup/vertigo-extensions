@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@ package io.vertigo.stella.plugins.work.rest.master;
 
 import javax.inject.Inject;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.stella.impl.master.MasterPlugin;
 import io.vertigo.vega.webservice.WebServices;
 import io.vertigo.vega.webservice.stereotype.AnonymousAccessAllowed;
@@ -46,8 +45,9 @@ public final class RestMasterWebService implements WebServices {
 	 */
 	@Inject
 	public RestMasterWebService(final MasterPlugin masterPlugin) {
-		Assertion.checkNotNull(masterPlugin);
-		Assertion.checkArgument(masterPlugin instanceof RestMasterPlugin, "Node MasterPlugin must be a RestMasterPlugin, in order to use Rest protocol ({0})", masterPlugin.getClass().getName());
+		Assertion.check()
+				.isNotNull(masterPlugin)
+				.isTrue(masterPlugin instanceof RestMasterPlugin, "Node MasterPlugin must be a RestMasterPlugin, in order to use Rest protocol ({0})", masterPlugin.getClass().getName());
 		//-----
 		restQueueServer = ((RestMasterPlugin) masterPlugin).getRestQueueServer();
 	}

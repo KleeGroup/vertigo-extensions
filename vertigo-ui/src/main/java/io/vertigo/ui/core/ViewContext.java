@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,21 +30,22 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import io.vertigo.dynamo.collections.metamodel.FacetDefinition;
-import io.vertigo.dynamo.collections.model.Facet;
-import io.vertigo.dynamo.collections.model.FacetValue;
-import io.vertigo.dynamo.collections.model.FacetedQuery;
-import io.vertigo.dynamo.collections.model.FacetedQueryResult;
-import io.vertigo.dynamo.collections.model.SelectedFacetValues;
-import io.vertigo.dynamo.domain.metamodel.DtDefinition;
-import io.vertigo.dynamo.domain.metamodel.DtFieldName;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtListURIForMasterData;
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.model.Entity;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
-import io.vertigo.dynamo.search.model.SearchQuery;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.datafactory.collections.definitions.FacetDefinition;
+import io.vertigo.datafactory.collections.model.Facet;
+import io.vertigo.datafactory.collections.model.FacetValue;
+import io.vertigo.datafactory.collections.model.FacetedQuery;
+import io.vertigo.datafactory.collections.model.FacetedQueryResult;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues;
+import io.vertigo.datafactory.search.model.SearchQuery;
+import io.vertigo.datamodel.structure.definitions.DtDefinition;
+import io.vertigo.datamodel.structure.definitions.DtFieldName;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtListURIForMasterData;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.model.Entity;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
+import io.vertigo.vega.engines.webservice.json.JsonEngine;
 import io.vertigo.vega.webservice.model.UiList;
 import io.vertigo.vega.webservice.model.UiObject;
 import io.vertigo.vega.webservice.validation.DefaultDtObjectValidator;
@@ -67,10 +67,15 @@ public final class ViewContext implements Serializable {
 	private final Set<String> modifiedKeys = new HashSet<>();
 	private final ViewContextMap viewContextMap;
 
-	public ViewContext(final ViewContextMap viewContextMap) {
-		Assertion.checkNotNull(viewContextMap);
+	private final JsonEngine jsonEngine;
+
+	public ViewContext(final ViewContextMap viewContextMap, final JsonEngine jsonEngine) {
+		Assertion.check()
+				.isNotNull(viewContextMap)
+				.isNotNull(jsonEngine);
 		//---
 		this.viewContextMap = viewContextMap;
+		this.jsonEngine = jsonEngine;
 	}
 
 	/* ================================== Life cycle =====================================*/
@@ -123,6 +128,14 @@ public final class ViewContext implements Serializable {
 		return viewContextMap;
 	}
 
+	public ViewContextMap asUpdatesMap() {
+		return viewContextMap.getFilteredViewContext(Optional.of(modifiedKeys));
+	}
+
+	public String getFilteredViewContextAsJson() {
+		return jsonEngine.toJson(viewContextMap.getFilteredViewContext(Optional.empty()));
+	}
+
 	public void markModifiedKeys(final ViewContextKey... newModifiedKeys) {
 		modifiedKeys.addAll(Arrays.stream(newModifiedKeys)
 				.map(ViewContextKey::get)
@@ -131,10 +144,6 @@ public final class ViewContext implements Serializable {
 
 	public void markModifiedKeys(final String... newModifiedKeys) {
 		modifiedKeys.addAll(Arrays.asList(newModifiedKeys));
-	}
-
-	public ViewContextMap asUpdatesMap() {
-		return viewContextMap.getFilteredViewContext(Optional.of(modifiedKeys));
 	}
 
 	/* ================================== Map =====================================*/

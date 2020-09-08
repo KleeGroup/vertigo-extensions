@@ -3,10 +3,10 @@ package io.vertigo.orchestra.domain.execution
 create DtDefinition DtOActivityWorkspace {
 	storeName : "orchestra"
 	id acwId			{domain : DoOIdentifiant, label :"Id de l'execution d'un processus", }
-	field isIn  		{domain : DoOBooleen, label :"Workspace in/out", required:"true",}
-	field workspace 	{domain : DoOJsonText, label :"Contenu du workspace", required:"false",}
+	field isIn  		{domain : DoOBooleen, label :"Workspace in/out", cardinality: "1",}
+	field workspace 	{domain : DoOJsonText, label :"Contenu du workspace", cardinality: "?",}
   
-},
+}
 
 
 

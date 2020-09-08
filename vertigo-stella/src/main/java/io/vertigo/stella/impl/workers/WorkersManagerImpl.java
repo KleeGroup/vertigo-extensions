@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +23,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import io.vertigo.core.component.Activeable;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.component.Activeable;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.lang.Assertion;
 import io.vertigo.stella.impl.workers.coordinator.WorkersCoordinator;
 import io.vertigo.stella.workers.WorkersManager;
 
@@ -49,9 +48,10 @@ public final class WorkersManagerImpl implements WorkersManager, Activeable {
 			final @ParamValue("workersCount") int workersCount,
 			@ParamValue("workTypes") final String workTypes,
 			final WorkersPlugin workerPlugin) {
-		Assertion.checkArgNotEmpty(nodeId);
-		Assertion.checkNotNull(workerPlugin);
-		Assertion.checkArgNotEmpty(workTypes);
+		Assertion.check()
+				.isNotBlank(nodeId)
+				.isNotNull(workerPlugin)
+				.isNotBlank(workTypes);
 		//-----
 		workersCoordinator = new WorkersCoordinator(workersCount);
 		final Map<String, Integer> workTypesMap = WorkDispatcherConfUtil.readWorkTypeConf(workTypes);

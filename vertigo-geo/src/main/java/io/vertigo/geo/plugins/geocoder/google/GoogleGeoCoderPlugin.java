@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,11 +49,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.geo.impl.services.geocoder.GeoCoderPlugin;
-import io.vertigo.geo.services.geocoder.GeoLocation;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.geo.geocoder.GeoLocation;
+import io.vertigo.geo.impl.geocoder.GeoCoderPlugin;
 
 /**
  * @author spoitrenaud
@@ -78,18 +77,18 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 	//	 */
 	@Inject
 	public GoogleGeoCoderPlugin(
-			final @ParamValue("proxyHost") Optional<String> proxyHost,
-			@ParamValue("proxyPort") final Optional<String> proxyPort) {
-		Assertion.checkNotNull(proxyHost);
-		Assertion.checkNotNull(proxyPort);
-		Assertion.checkArgument((proxyHost.isPresent() && proxyPort.isPresent()) || (!proxyHost.isPresent() && !proxyPort.isPresent()),
-				"les deux paramètres host et port doivent être tous les deux remplis ou vides");
+			final @ParamValue("proxyHost") Optional<String> proxyHostOpt,
+			@ParamValue("proxyPort") final Optional<String> proxyPortOpt) {
+		Assertion.check()
+				.isNotNull(proxyHostOpt)
+				.isNotNull(proxyPortOpt)
+				.isTrue((proxyHostOpt.isPresent() && proxyPortOpt.isPresent()) || (proxyHostOpt.isEmpty() && proxyPortOpt.isEmpty()),
+						"les deux paramètres host et port doivent être tous les deux remplis ou vides");
 		//-----
-		if (proxyHost.isPresent()) {
-			proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost.get(), Integer.parseInt(proxyPort.get())));
-		} else {
-			proxy = Proxy.NO_PROXY;
-		}
+		proxy = proxyHostOpt
+				.map(proxyHost -> new Proxy(Proxy.Type.HTTP,
+						new InetSocketAddress(proxyHost, Integer.parseInt(proxyPortOpt.get()))))
+				.orElse(Proxy.NO_PROXY);
 	}
 
 	/**
@@ -107,7 +106,7 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 	}
 
 	private HttpURLConnection doCreateConnection(final URL url) throws IOException {
-		Assertion.checkNotNull(url);
+		Assertion.check().isNotNull(url);
 		//-----
 		final HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
 		connection.setDoOutput(true);
@@ -121,7 +120,7 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 	 * @return Document
 	 */
 	private Document geoCode(final String address) {
-		Assertion.checkNotNull(address);
+		Assertion.check().isNotNull(address);
 		//-----
 		final String urlString;
 		try {
@@ -166,8 +165,9 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 	 * @return NodeList contenant les données du fichier XML
 	 */
 	private NodeList findNodes(final Document xml, final String xPathString) {
-		Assertion.checkNotNull(xml);
-		Assertion.checkArgNotEmpty(xPathString);
+		Assertion.check()
+				.isNotNull(xml)
+				.isNotBlank(xPathString);
 		//-----
 		final XPath xpath = xPathFactory.newXPath();
 
@@ -186,8 +186,9 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 	 * @return Node contenant les données du fichier XML
 	 */
 	private Node findNode(final Document xml, final String xPathString) {
-		Assertion.checkNotNull(xml);
-		Assertion.checkArgNotEmpty(xPathString);
+		Assertion.check()
+				.isNotNull(xml)
+				.isNotBlank(xPathString);
 		//-----
 		final XPath xpath = xPathFactory.newXPath();
 		try {
@@ -218,7 +219,7 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public GeoLocation findLocation(final String address) {
-		Assertion.checkNotNull(address);
+		Assertion.check().isNotNull(address);
 		//-----
 		final Document geocoderResultDocument = geoCode(address);
 		if (geocoderResultDocument == null) {
@@ -237,8 +238,8 @@ public final class GoogleGeoCoderPlugin implements GeoCoderPlugin {
 		final NodeList addressNodes = findNodes(geocoderResultDocument, XPATH_ADDRESSES);
 		//-----
 		// 2- Typage des données
-		final Double latitude = Double.valueOf(latitudeNode.getTextContent().trim());
-		final Double longitude = Double.valueOf(longitudeNode.getTextContent().trim());
+		final double latitude = Double.parseDouble(latitudeNode.getTextContent().trim());
+		final double longitude = Double.parseDouble(longitudeNode.getTextContent().trim());
 		//-----
 		// 2- Cas des adresses dites "political"
 		//		<address_component>

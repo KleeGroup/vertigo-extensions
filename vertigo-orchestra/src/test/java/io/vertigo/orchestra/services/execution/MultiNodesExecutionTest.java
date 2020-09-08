@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +74,7 @@ public class MultiNodesExecutionTest extends ExecutionTest {
 	@Test
 	public void massExecution() throws InterruptedException {
 
-		final ProcessDefinition processDefinition = ProcessDefinition.builder("Test3Activities", "Test3Activities")
+		final ProcessDefinition processDefinition = ProcessDefinition.builder("ProTest3Activities", "Test3Activities")
 				.addActivity("100msActivity", "100MS ACTIVITY", io.vertigo.orchestra.services.execution.engine.TestJob2.class)
 				.addActivity("100msActivity", "100MS ACTIVITY", io.vertigo.orchestra.services.execution.engine.TestJob2.class)
 				.addActivity("100msActivity", "100MS ACTIVITY", io.vertigo.orchestra.services.execution.engine.TestJob2.class)

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +17,17 @@
  */
 package io.vertigo.audit;
 
-import io.vertigo.app.config.Feature;
-import io.vertigo.app.config.Features;
-import io.vertigo.audit.impl.services.trace.AuditTraceDefinitionProvider;
-import io.vertigo.audit.impl.services.trace.AuditTraceManagerImpl;
-import io.vertigo.audit.plugins.trace.memory.MemoryAuditTraceStorePlugin;
-import io.vertigo.audit.services.trace.AuditTraceManager;
+import io.vertigo.audit.impl.ledger.LedgerManagerImpl;
+import io.vertigo.audit.impl.trace.TraceDefinitionProvider;
+import io.vertigo.audit.impl.trace.TraceManagerImpl;
+import io.vertigo.audit.ledger.LedgerManager;
+import io.vertigo.audit.plugins.ledger.ethereum.EthereumLedgerPlugin;
+import io.vertigo.audit.plugins.ledger.fake.FakeLedgerPlugin;
+import io.vertigo.audit.plugins.trace.memory.MemoryTraceStorePlugin;
+import io.vertigo.audit.trace.TraceManager;
+import io.vertigo.core.node.config.Feature;
+import io.vertigo.core.node.config.Features;
+import io.vertigo.core.param.Param;
 
 public class AuditFeatures extends Features<AuditFeatures> {
 
@@ -31,18 +35,52 @@ public class AuditFeatures extends Features<AuditFeatures> {
 		super("vertigo-audit");
 	}
 
-	@Feature("memoryTrace")
+	@Feature("trace")
+	public AuditFeatures withTrace() {
+		getModuleConfigBuilder()
+				.addDefinitionProvider(TraceDefinitionProvider.class)
+				.addComponent(TraceManager.class, TraceManagerImpl.class);
+		return this;
+	}
+
+	@Feature("trace.memory")
 	public AuditFeatures withMemoryTrace() {
-		getModuleConfigBuilder().addPlugin(MemoryAuditTraceStorePlugin.class);
+		getModuleConfigBuilder().addPlugin(MemoryTraceStorePlugin.class);
+		return this;
+	}
+
+	@Feature("ledger")
+	public AuditFeatures withLedger() {
+		getModuleConfigBuilder()
+				.addComponent(LedgerManager.class, LedgerManagerImpl.class);
+		return this;
+	}
+
+	/**
+	 * Add Ethereum BlockChain Ledger
+	 * @return  the feature
+	 */
+	@Feature("ledger.ethereum")
+	public AuditFeatures withEthereumBlockChain(final Param... params) {
+		getModuleConfigBuilder()
+				.addPlugin(EthereumLedgerPlugin.class, params);
+		return this;
+	}
+
+	/**
+	 * Add Ethereum BlockChain Ledger
+	 * @return  the feature
+	 */
+	@Feature("ledger.fake")
+	public AuditFeatures withFakeBlockChain() {
+		getModuleConfigBuilder()
+				.addPlugin(FakeLedgerPlugin.class);
 		return this;
 	}
 
 	@Override
 	protected void buildFeatures() {
-		getModuleConfigBuilder()
-				.addDefinitionProvider(AuditTraceDefinitionProvider.class)
-				.addComponent(AuditTraceManager.class, AuditTraceManagerImpl.class);
-
+		//
 	}
 
 }

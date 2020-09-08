@@ -1,17 +1,35 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.dao.execution;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
-import io.vertigo.dynamo.task.model.Task;
-import io.vertigo.dynamo.task.model.TaskBuilder;
-import io.vertigo.dynamo.impl.store.util.DAO;
-import io.vertigo.dynamo.store.StoreManager;
-import io.vertigo.dynamo.store.StoreServices;
-import io.vertigo.dynamo.task.TaskManager;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.core.node.Node;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
+import io.vertigo.datamodel.task.model.Task;
+import io.vertigo.datamodel.task.model.TaskBuilder;
+import io.vertigo.datastore.entitystore.EntityStoreManager;
+import io.vertigo.datastore.impl.dao.DAO;
+import io.vertigo.datastore.impl.dao.StoreServices;
+import io.vertigo.datamodel.smarttype.SmartTypeManager;
+import io.vertigo.datamodel.task.TaskManager;
 import io.vertigo.orchestra.domain.execution.OActivityExecution;
-import io.vertigo.lang.Generated;
 
 /**
  * This class is automatically generated.
@@ -22,12 +40,13 @@ public final class OActivityExecutionDAO extends DAO<OActivityExecution, java.la
 
 	/**
 	 * Contructeur.
-	 * @param storeManager Manager de persistance
+	 * @param entityStoreManager Manager de persistance
 	 * @param taskManager Manager de Task
+	 * @param smartTypeManager SmartTypeManager
 	 */
 	@Inject
-	public OActivityExecutionDAO(final StoreManager storeManager, final TaskManager taskManager) {
-		super(OActivityExecution.class, storeManager, taskManager);
+	public OActivityExecutionDAO(final EntityStoreManager entityStoreManager, final TaskManager taskManager, final SmartTypeManager smartTypeManager) {
+		super(OActivityExecution.class, entityStoreManager, taskManager, smartTypeManager);
 	}
 
 
@@ -37,18 +56,29 @@ public final class OActivityExecutionDAO extends DAO<OActivityExecution, java.la
 	 * @return the builder 
 	 */
 	private static TaskBuilder createTaskBuilder(final String name) {
-		final TaskDefinition taskDefinition = Home.getApp().getDefinitionSpace().resolve(name, TaskDefinition.class);
+		final TaskDefinition taskDefinition = Node.getNode().getDefinitionSpace().resolve(name, TaskDefinition.class);
 		return Task.builder(taskDefinition);
 	}
 
 	/**
 	 * Execute la tache TkGetActivitiesToLaunch.
-	 * @param nodId Long 
+	 * @param nodId Long
 	 * @return DtList de OActivityExecution dtcActivityExecution
 	*/
-	public io.vertigo.dynamo.domain.model.DtList<io.vertigo.orchestra.domain.execution.OActivityExecution> getActivitiesToLaunch(final Long nodId) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetActivitiesToLaunch",
+			request = "select " + 
+ "        		ace.*" + 
+ "        	from o_activity_execution ace" + 
+ "        	where ace.EST_CD = 'RESERVED'" + 
+ "        	and ace.NOD_ID = #nodId#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOActivityExecution")
+	public io.vertigo.datamodel.structure.model.DtList<io.vertigo.orchestra.domain.execution.OActivityExecution> getActivitiesToLaunch(@io.vertigo.datamodel.task.proxy.TaskInput(name = "nodId", smartType = "STyOIdentifiant") final Long nodId) {
 		final Task task = createTaskBuilder("TkGetActivitiesToLaunch")
 				.addValue("nodId", nodId)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)
@@ -57,14 +87,25 @@ public final class OActivityExecutionDAO extends DAO<OActivityExecution, java.la
 
 	/**
 	 * Execute la tache TkGetActivityExecutionByToken.
-	 * @param aceId Long 
-	 * @param token String 
+	 * @param aceId Long
+	 * @param token String
 	 * @return OActivityExecution dtActivityExecution
 	*/
-	public io.vertigo.orchestra.domain.execution.OActivityExecution getActivityExecutionByToken(final Long aceId, final String token) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetActivityExecutionByToken",
+			request = "select " + 
+ "        		ace.*" + 
+ "        	from o_activity_execution ace" + 
+ "        	where ace.ACE_ID = #aceId#" + 
+ "        	and ace.TOKEN = #token#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOActivityExecution")
+	public io.vertigo.orchestra.domain.execution.OActivityExecution getActivityExecutionByToken(@io.vertigo.datamodel.task.proxy.TaskInput(name = "aceId", smartType = "STyOIdentifiant") final Long aceId, @io.vertigo.datamodel.task.proxy.TaskInput(name = "token", smartType = "STyOToken") final String token) {
 		final Task task = createTaskBuilder("TkGetActivityExecutionByToken")
 				.addValue("aceId", aceId)
 				.addValue("token", token)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)
@@ -73,12 +114,21 @@ public final class OActivityExecutionDAO extends DAO<OActivityExecution, java.la
 
 	/**
 	 * Execute la tache TkGetActivityExecutionsByPreId.
-	 * @param preId Long 
+	 * @param preId Long
 	 * @return DtList de OActivityExecution dtcOActivityExecution
 	*/
-	public io.vertigo.dynamo.domain.model.DtList<io.vertigo.orchestra.domain.execution.OActivityExecution> getActivityExecutionsByPreId(final Long preId) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetActivityExecutionsByPreId",
+			request = "select ace.*" + 
+ "        	from o_activity_execution ace" + 
+ "        	where ace.PRE_ID = #preId#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOActivityExecution")
+	public io.vertigo.datamodel.structure.model.DtList<io.vertigo.orchestra.domain.execution.OActivityExecution> getActivityExecutionsByPreId(@io.vertigo.datamodel.task.proxy.TaskInput(name = "preId", smartType = "STyOIdentifiant") final Long preId) {
 		final Task task = createTaskBuilder("TkGetActivityExecutionsByPreId")
 				.addValue("preId", preId)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)

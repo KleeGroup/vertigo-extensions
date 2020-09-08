@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,28 +22,31 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
 import io.vertigo.commons.transaction.Transactional;
-import io.vertigo.dynamo.collections.metamodel.FacetDefinition;
-import io.vertigo.dynamo.collections.model.FacetedQueryResult;
-import io.vertigo.dynamo.collections.model.SelectedFacetValues;
-import io.vertigo.dynamo.criteria.Criterions;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtListState;
-import io.vertigo.dynamo.domain.util.VCollectors;
-import io.vertigo.dynamo.search.model.SearchQuery;
-import io.vertigo.dynamo.search.model.SearchQueryBuilder;
+import io.vertigo.core.node.Node;
+import io.vertigo.datafactory.collections.definitions.FacetDefinition;
+import io.vertigo.datafactory.collections.model.FacetedQueryResult;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues;
+import io.vertigo.datafactory.search.model.SearchQuery;
+import io.vertigo.datafactory.search.model.SearchQueryBuilder;
+import io.vertigo.datamodel.criteria.Criterions;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtListState;
+import io.vertigo.datamodel.structure.util.VCollectors;
 import io.vertigo.ui.data.dao.movies.MovieDAO;
 import io.vertigo.ui.data.dao.movies.MoviesPAO;
 import io.vertigo.ui.data.domain.movies.Movie;
 import io.vertigo.ui.data.domain.movies.MovieDisplay;
 import io.vertigo.ui.data.domain.movies.MovieIndex;
+import io.vertigo.ui.data.search.movies.MovieSearchClient;
 
 @Transactional
 public class MovieServicesImpl implements MovieServices {
 
 	@Inject
 	private MovieDAO movieDAO;
+	@Inject
+	private MovieSearchClient movieSearchClient;
 	@Inject
 	private MoviesPAO moviesPAO;
 
@@ -69,18 +71,23 @@ public class MovieServicesImpl implements MovieServices {
 	public DtList<MovieDisplay> getMoviesDisplay(final DtListState dtListState) {
 		return movieDAO.findAll(Criterions.alwaysTrue(), dtListState)
 				.stream()
-				.map(movie -> new MovieDisplay(movie.getMovId(), movie.getTitle()))
+				.map(movie -> {
+					final MovieDisplay movieDisplay = new MovieDisplay();
+					movieDisplay.setMovId(movie.getMovId());
+					movieDisplay.setTitle(movie.getTitle());
+					return movieDisplay;
+				})
 				.collect(VCollectors.toDtList(MovieDisplay.class));
 	}
 
 	@Override
 	public FacetedQueryResult<MovieIndex, SearchQuery> searchMovies(final String criteria, final SelectedFacetValues listFilters, final DtListState dtListState, final Optional<String> group) {
-		final SearchQueryBuilder searchQueryBuilder = movieDAO.createSearchQueryBuilderMovie(criteria, listFilters);
+		final SearchQueryBuilder searchQueryBuilder = movieSearchClient.createSearchQueryBuilderMovie(criteria, listFilters);
 		if (group.isPresent()) {
-			final FacetDefinition clusteringFacetDefinition = Home.getApp().getDefinitionSpace().resolve(group.get(), FacetDefinition.class);
+			final FacetDefinition clusteringFacetDefinition = Node.getNode().getDefinitionSpace().resolve(group.get(), FacetDefinition.class);
 			searchQueryBuilder.withFacetClustering(clusteringFacetDefinition);
 		}
-		return movieDAO.loadList(searchQueryBuilder.build(), dtListState);
+		return movieSearchClient.loadList(searchQueryBuilder.build(), dtListState);
 	}
 
 	@Override

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@ package io.vertigo.ui.core;
 
 import java.io.PrintWriter;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 /**
  * Builder d'envoi de contenu Ajax.
@@ -39,7 +38,7 @@ public final class AjaxResponseBuilder {
 	 * @param useBuffer Si l'on utilise un buffer avant envoi
 	 */
 	AjaxResponseBuilder(final PrintWriter writer, final boolean useBuffer) {
-		Assertion.checkNotNull(writer);
+		Assertion.check().isNotNull(writer);
 		//-----
 		this.writer = writer;
 		this.useBuffer = useBuffer;
@@ -68,7 +67,7 @@ public final class AjaxResponseBuilder {
 	 * @return AjaxResponseBuilder
 	 */
 	public AjaxResponseBuilder appendHtml(final String content) {
-		Assertion.checkNotNull(content);
+		Assertion.check().isNotNull(content);
 		//-----
 		if (useBuffer) {
 			sb.append("<htmlUpdate>");

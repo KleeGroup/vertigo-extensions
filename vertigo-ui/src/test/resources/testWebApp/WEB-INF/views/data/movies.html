@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
-  xmlns:vu="http://www.morphbit.com/thymeleaf/component"
+  xmlns:vu="https://vertigo.io/thymeleaf/vertigo-ui"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   layout:decorate="~{templates/mmcLayout}"
 >
@@ -51,14 +51,14 @@
 			<h2>First</h2>
 			<vu:table list="movies" componentId="movieTable" selectable="true" sortUrl="@{/movies/_sort}" >
 				<vu:column field="movId" >
-					<a th::href="|'@{/movie/}?movId='+props.row.movId|" >{{props.row.movId}}</a>
+					<a th::href="|'@{/movie/}'+props.row.movId|" >{{props.row.movId}}</a>
 				</vu:column>
 				<vu:column field="title" sortable="true" />
 				<vu:column name="tata" label="Tata">
 					another column  : {{props.row.movId}} : {{props.row.title}}
 				</vu:column>
 				<vu:column name="action" label="Actions">
-					<q-btn label="View detail" th:@click="|openModal('movieDetailModal', '@{/movie/}', { 'movId' : props.row.movId })|"></q-btn>
+					<q-btn label="View detail" th:@click="|openModal('movieDetailModal', '@{/movie/}' + props.row.movId, {})|"></q-btn>
 				</vu:column>
 			</vu:table>
 			</div>

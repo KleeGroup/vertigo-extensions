@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +17,10 @@
  */
 package io.vertigo.ui.data.domain.movies;
 
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.stereotype.Field;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.stereotype.Field;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 
 /**
  * This class is automatically generated.
@@ -49,9 +48,9 @@ public final class MovieIndex implements DtObject {
 	/**
 	 * Champ : DATA.
 	 * Récupère la valeur de la propriété 'id'.
-	 * @return Long movId <b>Obligatoire</b>
+	 * @return Long movId
 	 */
-	@Field(domain = "DoId", required = true, label = "id")
+	@Field(smartType = "STyId", label = "id")
 	public Long getMovId() {
 		return movId;
 	}
@@ -59,7 +58,7 @@ public final class MovieIndex implements DtObject {
 	/**
 	 * Champ : DATA.
 	 * Définit la valeur de la propriété 'id'.
-	 * @param movId Long <b>Obligatoire</b>
+	 * @param movId Long
 	 */
 	public void setMovId(final Long movId) {
 		this.movId = movId;
@@ -70,7 +69,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'Title'.
 	 * @return String title
 	 */
-	@Field(domain = "DoLabel", label = "Title")
+	@Field(smartType = "STyLabel", label = "Title")
 	public String getTitle() {
 		return title;
 	}
@@ -86,17 +85,17 @@ public final class MovieIndex implements DtObject {
 
 	/**
 	 * Champ : DATA.
-	 * Récupère la valeur de la propriété 'Title'.
+	 * Récupère la valeur de la propriété 'label'.
 	 * @return String titleSortOnly
 	 */
-	@Field(domain = "DoTextNotTokenized", persistent = false, label = "Title")
+	@Field(smartType = "STyTextNotTokenized", label = "label")
 	public String getTitleSortOnly() {
 		return titleSortOnly;
 	}
 
 	/**
 	 * Champ : DATA.
-	 * Définit la valeur de la propriété 'Title'.
+	 * Définit la valeur de la propriété 'label'.
 	 * @param titleSortOnly String
 	 */
 	public void setTitleSortOnly(final String titleSortOnly) {
@@ -108,7 +107,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'Original Title'.
 	 * @return String originalTitle
 	 */
-	@Field(domain = "DoLabel", label = "Original Title")
+	@Field(smartType = "STyLabel", label = "Original Title")
 	public String getOriginalTitle() {
 		return originalTitle;
 	}
@@ -127,7 +126,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'Synopsis'.
 	 * @return String synopsis
 	 */
-	@Field(domain = "DoText", label = "Synopsis")
+	@Field(smartType = "STyText", label = "Synopsis")
 	public String getSynopsis() {
 		return synopsis;
 	}
@@ -143,17 +142,17 @@ public final class MovieIndex implements DtObject {
 
 	/**
 	 * Champ : DATA.
-	 * Récupère la valeur de la propriété 'shortSynopsis'.
+	 * Récupère la valeur de la propriété 'Synopsis'.
 	 * @return String shortSynopsis
 	 */
-	@Field(domain = "DoText", label = "shortSynopsis")
+	@Field(smartType = "STyText", label = "Synopsis")
 	public String getShortSynopsis() {
 		return shortSynopsis;
 	}
 
 	/**
 	 * Champ : DATA.
-	 * Définit la valeur de la propriété 'shortSynopsis'.
+	 * Définit la valeur de la propriété 'Synopsis'.
 	 * @param shortSynopsis String
 	 */
 	public void setShortSynopsis(final String shortSynopsis) {
@@ -165,7 +164,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'keywords'.
 	 * @return String keywords
 	 */
-	@Field(domain = "DoLabel", label = "keywords")
+	@Field(smartType = "STyLabel", label = "keywords")
 	public String getKeywords() {
 		return keywords;
 	}
@@ -184,7 +183,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'poster'.
 	 * @return String poster
 	 */
-	@Field(domain = "DoTextNotTokenized", label = "poster")
+	@Field(smartType = "STyTextNotTokenized", label = "poster")
 	public String getPoster() {
 		return poster;
 	}
@@ -203,7 +202,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'runtime'.
 	 * @return Integer runtime
 	 */
-	@Field(domain = "DoDuration", label = "runtime")
+	@Field(smartType = "STyDuration", label = "runtime")
 	public Integer getRuntime() {
 		return runtime;
 	}
@@ -222,7 +221,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'Movie type'.
 	 * @return String movieType
 	 */
-	@Field(domain = "DoLabel", label = "Movie type")
+	@Field(smartType = "STyLabel", label = "Movie type")
 	public String getMovieType() {
 		return movieType;
 	}
@@ -241,7 +240,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'productionYear'.
 	 * @return Integer productionYear
 	 */
-	@Field(domain = "DoYear", label = "productionYear")
+	@Field(smartType = "STyYear", label = "productionYear")
 	public Integer getProductionYear() {
 		return productionYear;
 	}
@@ -260,7 +259,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'userRating'.
 	 * @return Integer userRating
 	 */
-	@Field(domain = "DoRating", label = "userRating")
+	@Field(smartType = "STyRating", label = "userRating")
 	public Integer getUserRating() {
 		return userRating;
 	}
@@ -276,17 +275,17 @@ public final class MovieIndex implements DtObject {
 
 	/**
 	 * Champ : DATA.
-	 * Récupère la valeur de la propriété 'presRating'.
+	 * Récupère la valeur de la propriété 'pressRating'.
 	 * @return Integer pressRating
 	 */
-	@Field(domain = "DoRating", label = "presRating")
+	@Field(smartType = "STyRating", label = "pressRating")
 	public Integer getPressRating() {
 		return pressRating;
 	}
 
 	/**
 	 * Champ : DATA.
-	 * Définit la valeur de la propriété 'presRating'.
+	 * Définit la valeur de la propriété 'pressRating'.
 	 * @param pressRating Integer
 	 */
 	public void setPressRating(final Integer pressRating) {
@@ -298,7 +297,7 @@ public final class MovieIndex implements DtObject {
 	 * Récupère la valeur de la propriété 'Camera'.
 	 * @return String camera
 	 */
-	@Field(domain = "DoMultiValues", label = "Camera")
+	@Field(smartType = "STyMultiValues", label = "Camera")
 	public String getCamera() {
 		return camera;
 	}

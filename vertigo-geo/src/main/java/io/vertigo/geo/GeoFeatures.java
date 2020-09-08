@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +17,16 @@
  */
 package io.vertigo.geo;
 
-import io.vertigo.app.config.Feature;
-import io.vertigo.app.config.Features;
+import io.vertigo.core.node.config.Feature;
+import io.vertigo.core.node.config.Features;
 import io.vertigo.core.param.Param;
-import io.vertigo.geo.impl.services.geocoder.GeoCoderManagerImpl;
+import io.vertigo.geo.geocoder.GeoCoderManager;
+import io.vertigo.geo.geosearch.GeoSearchManager;
+import io.vertigo.geo.impl.geocoder.GeoCoderManagerImpl;
+import io.vertigo.geo.impl.geosearch.GeoSearchManagerImpl;
 import io.vertigo.geo.plugins.geocoder.ban.BanGeoCoderPlugin;
 import io.vertigo.geo.plugins.geocoder.google.GoogleGeoCoderPlugin;
-import io.vertigo.geo.services.geocoder.GeoCoderManager;
+import io.vertigo.geo.plugins.geosearch.es.ESGeoSearchPlugin;
 
 /**
  * Defines the 'geo' extension
@@ -44,8 +46,18 @@ public final class GeoFeatures extends Features<GeoFeatures> {
 	 * @return the features
 	 */
 	@Feature("geocoding")
-	public GeoFeatures withGeocoding() {
+	public GeoFeatures withGeoCoder() {
 		getModuleConfigBuilder().addComponent(GeoCoderManager.class, GeoCoderManagerImpl.class);
+		return this;
+	}
+
+	/**
+	 * Activates geosearch
+	 * @return the features
+	 */
+	@Feature("geosearch")
+	public GeoFeatures withGeoSearch() {
+		getModuleConfigBuilder().addComponent(GeoSearchManager.class, GeoSearchManagerImpl.class);
 		return this;
 	}
 
@@ -54,7 +66,7 @@ public final class GeoFeatures extends Features<GeoFeatures> {
 	 * @return the features
 	 */
 	@Feature("geocoding.google")
-	public GeoFeatures withGoogleGeocoder() {
+	public GeoFeatures withGoogleGeoCoder() {
 		getModuleConfigBuilder().addPlugin(GoogleGeoCoderPlugin.class);
 		return this;
 	}
@@ -64,8 +76,18 @@ public final class GeoFeatures extends Features<GeoFeatures> {
 	 * @return the features
 	 */
 	@Feature("geocoding.ban")
-	public GeoFeatures withBanGeocoder(final Param... params) {
+	public GeoFeatures withBanGeoCoder(final Param... params) {
 		getModuleConfigBuilder().addPlugin(BanGeoCoderPlugin.class, params);
+		return this;
+	}
+
+	/**
+	 * Activates comments
+	 * @return the features
+	 */
+	@Feature("geosearch.es")
+	public GeoFeatures withESGeosearch(final Param... params) {
+		getModuleConfigBuilder().addPlugin(ESGeoSearchPlugin.class, params);
 		return this;
 	}
 

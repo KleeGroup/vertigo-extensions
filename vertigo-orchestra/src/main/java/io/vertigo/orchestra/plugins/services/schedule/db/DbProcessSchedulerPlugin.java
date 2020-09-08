@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,19 +34,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
-import io.vertigo.commons.daemon.DaemonDefinition;
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
-import io.vertigo.core.component.Activeable;
-import io.vertigo.core.definition.Definition;
-import io.vertigo.core.definition.DefinitionSpace;
-import io.vertigo.core.definition.SimpleDefinitionProvider;
+import io.vertigo.core.daemon.definitions.DaemonDefinition;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.node.component.Activeable;
+import io.vertigo.core.node.definition.Definition;
+import io.vertigo.core.node.definition.DefinitionSpace;
+import io.vertigo.core.node.definition.SimpleDefinitionProvider;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.dynamo.store.StoreManager;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.datastore.entitystore.EntityStoreManager;
 import io.vertigo.orchestra.dao.execution.OProcessExecutionDAO;
 import io.vertigo.orchestra.dao.planification.OProcessPlanificationDAO;
 import io.vertigo.orchestra.dao.planification.PlanificationPAO;
@@ -80,7 +79,7 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 	@Inject
 	private OProcessExecutionDAO processExecutionDAO;
 	@Inject
-	private StoreManager storeManager;
+	private EntityStoreManager entityStoreManager;
 
 	private final String nodeName;
 	private Long nodId;
@@ -111,12 +110,13 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 			@ParamValue("nodeName") final String nodeName,
 			@ParamValue("planningPeriodSeconds") final Optional<Integer> planningPeriodSecondsOpt,
 			@ParamValue("forecastDurationSeconds") final Optional<Integer> forecastDurationSecondsOpt) {
-		Assertion.checkNotNull(nodeManager);
-		Assertion.checkNotNull(transactionManager);
-		Assertion.checkNotNull(definitionManager);
-		Assertion.checkArgNotEmpty(nodeName);
-		Assertion.checkNotNull(planningPeriodSecondsOpt);
-		Assertion.checkNotNull(forecastDurationSecondsOpt);
+		Assertion.check()
+				.isNotNull(nodeManager)
+				.isNotNull(transactionManager)
+				.isNotNull(definitionManager)
+				.isNotBlank(nodeName)
+				.isNotNull(planningPeriodSecondsOpt)
+				.isNotNull(forecastDurationSecondsOpt);
 		//-----
 		this.nodeManager = nodeManager;
 		this.transactionManager = transactionManager;
@@ -158,7 +158,7 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 
 	@Override
 	public void setProcessExecutor(final ProcessExecutor processExecutor) {
-		Assertion.checkNotNull(processExecutor);
+		Assertion.check().isNotNull(processExecutor);
 		//---
 		myProcessExecutor = processExecutor;
 	}
@@ -185,9 +185,10 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 
 	@Override
 	public void scheduleAt(final ProcessDefinition processDefinition, final Instant planifiedTime, final Map<String, String> initialParams) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(planifiedTime);
-		Assertion.checkNotNull(initialParams);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(planifiedTime)
+				.isNotNull(initialParams);
 		//---
 		if (transactionManager.hasCurrentTransaction()) {
 			doScheduleAt(processDefinition, planifiedTime, initialParams);
@@ -204,7 +205,7 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 	//--------------------------------------------------------------------------------------------------
 
 	private void doScheduleAt(final ProcessDefinition processDefinition, final Instant planifiedTime, final Map<String, String> initialParams) {
-		Assertion.checkNotNull(processDefinition);
+		Assertion.check().isNotNull(processDefinition);
 		// ---
 		final OProcessPlanification processPlanification = new OProcessPlanification();
 		processPlanification.setProId(processDefinition.getId());
@@ -239,7 +240,7 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 
 	private void lockProcess(final ProcessDefinition processDefinition) {
 		final UID<OProcess> processURI = UID.of(OProcess.class, processDefinition.getId());
-		storeManager.getDataStore().readOneForUpdate(processURI);
+		entityStoreManager.readOneForUpdate(processURI);
 	}
 
 	private void plannRecurrentProcesses() {
@@ -273,7 +274,7 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 	}
 
 	private Optional<OProcessPlanification> getLastPlanificationsByProcess(final Long proId) {
-		Assertion.checkNotNull(proId);
+		Assertion.check().isNotNull(proId);
 		// ---
 		return processPlanificationDAO.getLastPlanificationByProId(proId);
 	}
@@ -284,7 +285,7 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 		try {
 			final CronExpression cronExpression = new CronExpression(processDefinition.getTriggeringStrategy().getCronExpression().get());
 
-			if (!lastPlanificationOption.isPresent()) {
+			if (lastPlanificationOption.isEmpty()) {
 				final Instant compatibleNow = Instant.now().plusMillis(planningPeriodSeconds / 2L * 1000);// Normalement ca doit être bon quelque soit la synchronisation entre les deux timers (même fréquence)
 				return Optional.of(cronExpression.getNextValidTimeAfter(compatibleNow));
 			}
@@ -308,9 +309,10 @@ public class DbProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activea
 				.collect(Collectors.toList());
 	}
 
-	private void changeState(final OProcessPlanification processPlanification, final SchedulerState planificationState) {
-		Assertion.checkNotNull(processPlanification);
-		Assertion.checkNotNull(planificationState);
+	private static void changeState(final OProcessPlanification processPlanification, final SchedulerState planificationState) {
+		Assertion.check()
+				.isNotNull(processPlanification)
+				.isNotNull(planificationState);
 		// ---
 		processPlanification.setSstCd(planificationState.name());
 	}

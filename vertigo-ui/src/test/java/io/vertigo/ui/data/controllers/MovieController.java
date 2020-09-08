@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import io.vertigo.dynamo.domain.model.DtListState;
+import io.vertigo.datamodel.structure.model.DtListState;
 import io.vertigo.ui.core.ViewContext;
 import io.vertigo.ui.core.ViewContextKey;
 import io.vertigo.ui.data.domain.movies.Movie;
@@ -67,10 +65,9 @@ public class MovieController extends AbstractVSpringMvcController {
 
 	@PostMapping("/_save")
 	public String doSave(
-			@ViewAttribute("movie") final Movie movie, final RedirectAttributes redirectAttributes) {
+			@ViewAttribute("movie") final Movie movie) {
 		movieServices.save(movie);
-		redirectAttributes.addAttribute("movId", movie.getMovId());
-		return "redirect:/movie/";
+		return "redirect:/movie/" + movie.getMovId();
 	}
 
 }

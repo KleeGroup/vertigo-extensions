@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +23,21 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.vertigo.dynamo.domain.metamodel.DataType;
-import io.vertigo.dynamo.domain.metamodel.Domain;
-import io.vertigo.dynamo.domain.metamodel.DtField;
-import io.vertigo.dynamo.domain.metamodel.FormatterException;
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.BasicType;
+import io.vertigo.core.node.Node;
+import io.vertigo.datamodel.smarttype.SmartTypeManager;
+import io.vertigo.datamodel.smarttype.definitions.SmartTypeDefinition;
+import io.vertigo.datamodel.structure.definitions.DtField;
+import io.vertigo.datamodel.structure.definitions.FormatterException;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 import io.vertigo.ui.core.encoders.EncoderDate;
 import io.vertigo.vega.engines.webservice.json.VegaUiObject;
 
@@ -48,7 +50,7 @@ import io.vertigo.vega.engines.webservice.json.VegaUiObject;
  */
 public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> implements Map<String, Serializable> {
 	private static final long serialVersionUID = -4639050257543017072L;
-	private static final String DOMAIN_MULTIPLE_IDS = "DoMultipleIds";
+	private static final String SMART_TYPE_MULTIPLE_IDS = "STyMultipleIds";
 
 	/**
 	 * Constructor.
@@ -73,8 +75,9 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 	@Override
 	public Serializable get(final Object key) {
 		final String keyFieldName = String.class.cast(key);
-		Assertion.checkArgNotEmpty(keyFieldName);
-		Assertion.checkArgument(Character.isLowerCase(keyFieldName.charAt(0)) && !keyFieldName.contains("_"), "Le nom du champs doit-être en camelCase ({0}).", keyFieldName);
+		Assertion.check()
+				.isNotBlank(keyFieldName)
+				.isTrue(Character.isLowerCase(keyFieldName.charAt(0)) && !keyFieldName.contains("_"), "Le nom du champs doit-être en camelCase ({0}).", keyFieldName);
 		//-----
 		final DtField dtField = getDtField(keyFieldName);
 		if (isMultiple(dtField)) {
@@ -91,9 +94,10 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 	/** {@inheritDoc} */
 	@Override
 	public String put(final String fieldName, final Serializable value) {
-		Assertion.checkArgNotEmpty(fieldName);
-		Assertion.checkNotNull(value, "La valeur formatée ne doit pas être null mais vide ({0})", fieldName);
-		Assertion.checkState(value instanceof String || value instanceof String[], "Les données saisies doivent être de type String ou String[] ({0} : {1})", fieldName, value.getClass());
+		Assertion.check()
+				.isNotBlank(fieldName)
+				.isNotNull(value, "La valeur formatée ne doit pas être null mais vide ({0})", fieldName)
+				.isTrue(value instanceof String || value instanceof String[], "Les données saisies doivent être de type String ou String[] ({0} : {1})", fieldName, value.getClass());
 		//-----
 		final DtField dtField = getDtField(fieldName);
 		String strValue;
@@ -102,8 +106,9 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 		} else if (isAboutDate(dtField)) {
 			strValue = requestParameterToString(value);
 			try {
-				final Object typedValue = EncoderDate.stringToValue(strValue, dtField.getDomain().getDataType());
-				strValue = dtField.getDomain().valueToString(typedValue);// we fall back in the normal case if everything is right -> go to formatter
+				final SmartTypeManager smartTypeManager = Node.getNode().getComponentSpace().resolve(SmartTypeManager.class);
+				final Object typedValue = EncoderDate.stringToValue(strValue, dtField.getSmartTypeDefinition().getBasicType());
+				strValue = smartTypeManager.valueToString(dtField.getSmartTypeDefinition(), typedValue);// we fall back in the normal case if everything is right -> go to formatter
 			} catch (final FormatterException e) {
 				// do nothing we keep the input value
 			}
@@ -134,15 +139,15 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 	}
 
 	private static boolean isMultiple(final DtField dtField) {
-		return DOMAIN_MULTIPLE_IDS.equals(dtField.getDomain().getName());
+		return SMART_TYPE_MULTIPLE_IDS.equals(dtField.getSmartTypeDefinition().getName());
 	}
 
 	private static boolean isBoolean(final DtField dtField) {
-		return dtField.getDomain().getDataType() == DataType.Boolean;
+		return dtField.getSmartTypeDefinition().getScope().isPrimitive() && dtField.getSmartTypeDefinition().getBasicType() == BasicType.Boolean;
 	}
 
 	private static boolean isAboutDate(final DtField dtField) {
-		return dtField.getDomain().getDataType().isAboutDate();
+		return dtField.getSmartTypeDefinition().getScope().isPrimitive() && dtField.getSmartTypeDefinition().getBasicType().isAboutDate();
 	}
 
 	/** {@inheritDoc} */
@@ -224,11 +229,11 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 	 * @return HashMap (needed for Serializable)
 	 */
 	public HashMap<String, Serializable> mapForClient(final Set<String> fieldsForClient, final Map<String, Function<Serializable, String>> valueTransformers) {
-		final Set<String> filterSet;
+		final Set<String> filterSet = new HashSet<>();
+		filterSet.addAll(fieldsForClient);
 		if (fieldsForClient.contains("*")) {
-			filterSet = fieldIndex;
-		} else {
-			filterSet = fieldsForClient;
+			filterSet.remove("*");
+			filterSet.addAll(fieldIndex);
 		}
 		final HashMap<String, Serializable> mapForClient = new HashMap<>(filterSet.size());
 		filterSet
@@ -263,26 +268,29 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 
 	private Serializable getEncodedValue(final String key) {
 		final String keyFieldName = String.class.cast(key);
-		Assertion.checkArgNotEmpty(keyFieldName);
-		Assertion.checkArgument(Character.isLowerCase(keyFieldName.charAt(0)) && !keyFieldName.contains("_"), "Le nom du champs doit-être en camelCase ({0}).", keyFieldName);
+		Assertion.check()
+				.isNotBlank(keyFieldName)
+				.isTrue(Character.isLowerCase(keyFieldName.charAt(0)) && !keyFieldName.contains("_"), "Le nom du champs doit-être en camelCase ({0}).", keyFieldName);
 		//---
 		final DtField dtField = getDtField(keyFieldName);
-		if (isAboutDate(dtField)) {
-			final Serializable value = getTypedValue(keyFieldName, Serializable.class);
-			final Domain domain = dtField.getDomain();
-			return EncoderDate.valueToString(value, domain.getDataType());// encodeValue
-		} else if (isMultiple(dtField)) {
-			final String value = getTypedValue(keyFieldName, String.class);
-			return value != null ? parseMultipleValue(value) : new String[0];
+		final SmartTypeDefinition smartType = dtField.getSmartTypeDefinition();
+		if (smartType.getScope().isPrimitive()) {
+			if (isAboutDate(dtField)) {
+				final Serializable value = getTypedValue(keyFieldName, Serializable.class);
+				return EncoderDate.valueToString(value, dtField.getSmartTypeDefinition().getBasicType());// encodeValue
+			} else if (isMultiple(dtField)) {
+				final String value = getTypedValue(keyFieldName, String.class);
+				return value != null ? parseMultipleValue(value) : new String[0];
+			}
 		}
 		return getTypedValue(keyFieldName, Serializable.class);
 	}
 
 	private String getFormattedValue(final String keyFieldName) {
-
+		final SmartTypeManager smartTypeManager = Node.getNode().getComponentSpace().resolve(SmartTypeManager.class);
 		final DtField dtField = getDtField(keyFieldName);
 		final Serializable typedValue = getEncodedValue(keyFieldName);
-		return typedValue != null ? dtField.getDomain().valueToString(typedValue) : null;
+		return typedValue != null ? smartTypeManager.valueToString(dtField.getSmartTypeDefinition(), typedValue) : null;
 	}
 
 }

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.stella.impl.work.Coordinator;
 import io.vertigo.stella.impl.work.WorkItem;
 import io.vertigo.stella.master.WorkResultHandler;
@@ -44,7 +43,7 @@ public final class WorkersCoordinator implements Coordinator, Closeable {
 	 * @param workerCount paramètres d'initialisation du pool
 	 */
 	public WorkersCoordinator(final int workerCount) {
-		Assertion.checkArgument(workerCount >= 1, "At least one thread must be allowed to process asynchronous works.");
+		Assertion.check().isTrue(workerCount >= 1, "At least one thread must be allowed to process asynchronous works.");
 		//-----
 		workers = Executors.newFixedThreadPool(workerCount);
 	}
@@ -79,7 +78,7 @@ public final class WorkersCoordinator implements Coordinator, Closeable {
 	 */
 	@Override
 	public <W, R> Future<R> submit(final WorkItem<W, R> workItem, final WorkResultHandler<R> workResultHandler) {
-		Assertion.checkNotNull(workItem);
+		Assertion.check().isNotNull(workItem);
 		//-----
 		return workers.submit(new Worker<>(workItem, workResultHandler));
 	}

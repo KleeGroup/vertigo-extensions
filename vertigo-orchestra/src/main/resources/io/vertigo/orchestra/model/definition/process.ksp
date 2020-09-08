@@ -3,17 +3,17 @@ package io.vertigo.orchestra.domain.definition
 create DtDefinition DtOProcess {
 	storeName : "orchestra"
 	id proId					{domain : DoOIdentifiant, label :"Id de la definition du processus"}
-	field name   				{domain : DoOLibelle, label :"Nom du processus", required:"false",}
-	field label   				{domain : DoOLibelle, label :"Libellé du processus", required:"false",},
-	field cronExpression		{domain : DoOLibelle, label :"Expression récurrence du processus", required:"false",}
-	field initialParams			{domain : DoOJsonText, label :"Paramètres initiaux sous forme de JSON ", required:"false",}
-	field multiexecution   		{domain : DoOBooleen, label :"Accepte la multi-execution", required:"false",}
-	field activeVersion  		{domain : DoOBooleen, label :"Version active", required:"true",}
-	field active   				{domain : DoOBooleen, label :"Processus actif", required:"true",}
-	field rescuePeriod			{domain : DoONombre, label :"Temps de validité d'une planification", required:"true",}
-	field metadatas				{domain : DoOMetadatas, label :"Meta-données du processus", required:"false",}
-  	field needUpdate  			{domain : DoOBooleen, label :"Doit être mise à jour lors du démarrage", required:"true",}
-},
+	field name   				{domain : DoOLibelle, label :"Nom du processus", cardinality: "?",}
+	field label   				{domain : DoOLibelle, label :"Libellé du processus", cardinality: "?",},
+	field cronExpression		{domain : DoOLibelle, label :"Expression récurrence du processus", cardinality: "?",}
+	field initialParams			{domain : DoOJsonText, label :"Paramètres initiaux sous forme de JSON ", cardinality: "?",}
+	field multiexecution   		{domain : DoOBooleen, label :"Accepte la multi-execution", cardinality: "?",}
+	field activeVersion  		{domain : DoOBooleen, label :"Version active", cardinality: "1",}
+	field active   				{domain : DoOBooleen, label :"Processus actif", cardinality: "1",}
+	field rescuePeriod			{domain : DoONombre, label :"Temps de validité d'une planification", cardinality: "1",}
+	field metadatas				{domain : DoOMetadatas, label :"Meta-données du processus", cardinality: "?",}
+  	field needUpdate  			{domain : DoOBooleen, label :"Doit être mise à jour lors du démarrage", cardinality: "1",}
+}
 
 
 
@@ -34,7 +34,7 @@ create Association AProTrt {
 	roleA : "Process"
 	roleB : "TriggerType"
 			
-},
+}
 
 create Association AProPrt {
   fkFieldName : "prtCd"
@@ -53,4 +53,4 @@ create Association AProPrt {
 	roleA : "Process"
 	roleB : "ProcessType"
 			
-},
+}

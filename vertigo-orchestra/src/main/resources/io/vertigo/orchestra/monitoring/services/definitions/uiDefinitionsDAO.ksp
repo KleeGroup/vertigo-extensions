@@ -3,8 +3,8 @@ package io.vertigo.orchestra.monitoring.dao.uidefinitions
 
 create Task TkGetProcessByName {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
-        request : "
+    className : "io.vertigo.basics.task.TaskEngineSelect"
+    request : "
         	select  pro.PRO_ID as PRO_ID,
         			pro.NAME as NAME,
         			pro.LABEL as LABEL,
@@ -17,14 +17,14 @@ create Task TkGetProcessByName {
         	from o_process pro   
         	where pro.NAME = #name# and pro.ACTIVE_VERSION is true  	
 			"
-	attribute name	 	{domain : DoOLibelle		required:"true" 	inOut :"in"}
-	attribute dtOProcessUi	 	{domain : DoDtOProcessUiDto		required:"true" 	inOut :"out"}
-},
+    in name	 	{domain : DoOLibelle		cardinality: "1" }
+	out dtOProcessUi	 	{domain : DoDtOProcessUi		cardinality: "1" }
+}
 
 create Task TkSearchProcessByLabel {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
-        request : "
+    className : "io.vertigo.basics.task.TaskEngineSelect"
+    request : "
         	select  pro.PRO_ID as PRO_ID,
         			pro.NAME as NAME,
         			pro.LABEL as LABEL,
@@ -37,7 +37,7 @@ create Task TkSearchProcessByLabel {
         	from o_process pro   
         	where lower(pro.LABEL) like lower(#search#)  and pro.ACTIVE_VERSION is true
 			"
-	attribute search	 	{domain : DoOLibelle		required:"true" 	inOut :"in"}
-	attribute dtcOProcessUi	 	{domain : DoDtOProcessUiDtc		required:"true" 	inOut :"out"}
+	in search	 	{domain : DoOLibelle		cardinality: "1" }
+	out dtcOProcessUi	 	{domain : DoDtOProcessUi		cardinality: "*" }
 }
 

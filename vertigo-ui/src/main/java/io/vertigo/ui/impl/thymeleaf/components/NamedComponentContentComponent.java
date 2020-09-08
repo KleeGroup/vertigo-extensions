@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,25 +30,23 @@ import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.standard.StandardDialect;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 public final class NamedComponentContentComponent {
 
 	private final IModel innerModel;
 	private final String name;
-	private final boolean elementTag;
 	private final boolean standaloneTag;
 	private final boolean openTag;
 	private final boolean closeTag;
 	private final Map<String, String> attributes;
 
 	public NamedComponentContentComponent(final IModel innerModel) {
-		Assertion.checkNotNull(innerModel);
+		Assertion.check().isNotNull(innerModel);
 		//-----
 		this.innerModel = innerModel;
 		final IElementTag firstLevelTag = (IElementTag) innerModel.get(0);
 		name = firstLevelTag.getElementDefinition().getElementName().getElementName();
-		elementTag = firstLevelTag instanceof IElementTag;
 		standaloneTag = firstLevelTag instanceof IStandaloneElementTag;
 		openTag = firstLevelTag instanceof IOpenElementTag;
 		closeTag = firstLevelTag instanceof ICloseElementTag;
@@ -68,10 +65,10 @@ public final class NamedComponentContentComponent {
 	public boolean isTag(final String testedName) {
 		return name.equals(testedName);
 	}
-
-	public boolean isElement() {
-		return elementTag;
-	}
+	//
+	//	public boolean isElement() {
+	//		return elementTag;
+	//	}
 
 	public boolean isStandalone() {
 		return standaloneTag;

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.Builder;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.Builder;
+import io.vertigo.core.util.ListBuilder;
+import io.vertigo.core.util.MapBuilder;
 import io.vertigo.orchestra.services.execution.ActivityEngine;
-import io.vertigo.util.ListBuilder;
-import io.vertigo.util.MapBuilder;
 
 /**
  * Builder d'une définition de processus Orchestra.
@@ -54,7 +53,7 @@ public final class ProcessDefinitionBuilder implements Builder<ProcessDefinition
 	 * @param processLabel le libellé du processus
 	 */
 	ProcessDefinitionBuilder(final String processName, final String processLabel) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		//-----
 		name = processName;
 		label = processLabel;
@@ -77,7 +76,7 @@ public final class ProcessDefinitionBuilder implements Builder<ProcessDefinition
 	 * @return this
 	 */
 	public ProcessDefinitionBuilder withProcessType(final ProcessType type) {
-		Assertion.checkNotNull(type);
+		Assertion.check().isNotNull(type);
 		myType = type;
 		return this;
 	}
@@ -128,7 +127,7 @@ public final class ProcessDefinitionBuilder implements Builder<ProcessDefinition
 	 * @return this
 	 */
 	public ProcessDefinitionBuilder withCronExpression(final String cronExpression) {
-		Assertion.checkNotNull(cronExpression);
+		Assertion.check().isNotNull(cronExpression);
 		// ---
 		myCronExpression = Optional.of(cronExpression);
 		return this;
@@ -153,7 +152,7 @@ public final class ProcessDefinitionBuilder implements Builder<ProcessDefinition
 	 * @return this
 	 */
 	public ProcessDefinitionBuilder withMetadatas(final Map<String, String> metadatas) {
-		Assertion.checkNotNull(metadatas);
+		Assertion.check().isNotNull(metadatas);
 		// ---
 		myMetadatas.putAll(metadatas);
 		return this;

@@ -8,21 +8,21 @@ package io.vertigo.orchestra.dao.monitoring
 
 create Task TkGetPlanificationsByProId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select prp.*
         	from o_process_planification prp
         	where prp.PRO_ID = #proId#
         	
 			"
-	attribute proId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute dtcOProcessPlanification	 	{domain : DoDtOProcessPlanificationDtc		required:"true" 	inOut :"out"}
+	in proId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtcOProcessPlanification	 	{domain : DoDtOProcessPlanification		cardinality: "*" 	}
 }
 
 
 create Task TkGetExecutionsByProId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select pre.*
         	from o_process_execution pre
@@ -30,37 +30,37 @@ create Task TkGetExecutionsByProId {
         	order by pre.begin_time desc
         	
 			"
-	attribute proId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute dtcOProcessExecution	 	{domain : DoDtOProcessExecutionDtc		required:"true" 	inOut :"out"}
+	in proId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtcOProcessExecution	 	{domain : DoDtOProcessExecution		cardinality: "*" 	}
 }
 
 
 
 create Task TkGetActivityExecutionsByPreId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select ace.*
         	from o_activity_execution ace
         	where ace.PRE_ID = #preId#
         	
 			"
-	attribute preId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute dtcOActivityExecution	 	{domain : DoDtOActivityExecutionDtc		required:"true" 	inOut :"out"}
+	in preId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtcOActivityExecution	 	{domain : DoDtOActivityExecution		cardinality: "*" 	}
 }
 
 
 create Task TkGetActivityLogByAceId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select acl.*
         	from o_activity_log acl
         	where acl.ACE_ID = #aceId#
         	
 			"
-	attribute aceId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute dtcOActivityLog	 	{domain : DoDtOActivityLogDto		required:"false" 	inOut :"out"}
+	in aceId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtcOActivityLog	 	{domain : DoDtOActivityLog		cardinality: "?" 	}
 }
 
 

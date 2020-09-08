@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
-  xmlns:vu="http://www.morphbit.com/thymeleaf/component"
+  xmlns:vu="https://vertigo.io/thymeleaf/vertigo-ui"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   layout:decorate="~{templates/mmcLayout}"
 >
@@ -32,6 +32,14 @@
 						<vu:text-field object="movie" field="movId"/>
 						<vu:text-field object="movie" field="title" />
 						<vu:chips-autocomplete object="movie" field="tags" list="movies" staticData="false"/>
+					
+						<vu:grid-cell>
+							<a th:href="@{/componentsDemo/myFiles}">insee.csv</a>
+							<div v-for="(item, index) in vueData.myFiles" :name="index" > 
+								<a href="|'@{/componentsDemo/myFiles/}'+item|">{{item}}</a>
+							</div>
+							<vu:fileupload float-label="Upload file" th:url="'@{/componentsDemo/upload}'" key="myFilesUris" multiple />
+						</vu:grid-cell>
 						<vu:modal componentId="myModal" closeLabel="Close"/>
 						<vu:grid-cell>
 							<vu:button-submit th:if="${!model.modeReadOnly}" label="Read" action="@{_read}" color="primary"/>

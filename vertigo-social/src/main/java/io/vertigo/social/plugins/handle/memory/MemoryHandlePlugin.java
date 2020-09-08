@@ -1,3 +1,20 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.social.plugins.handle.memory;
 
 import java.util.HashMap;
@@ -5,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.vertigo.dynamo.domain.model.UID;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.handle.Handle;
 import io.vertigo.social.impl.handle.HandlePlugin;
-import io.vertigo.social.services.handle.Handle;
 
 public class MemoryHandlePlugin implements HandlePlugin {
 
@@ -17,7 +34,7 @@ public class MemoryHandlePlugin implements HandlePlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void add(final List<Handle> handles) {
-		handles.stream().forEach(handle -> {
+		handles.forEach(handle -> {
 			handlesPerUid.put(handle.getUid(), handle);
 			handlesPerCode.put(handle.getCode(), handle);
 		});
@@ -26,7 +43,7 @@ public class MemoryHandlePlugin implements HandlePlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void remove(final List<UID> uids) {
-		uids.stream().forEach(uid -> {
+		uids.forEach(uid -> {
 			final Handle handle = handlesPerUid.remove(uid);
 			if (handle != null) {
 				handlesPerCode.remove(handle.getCode());

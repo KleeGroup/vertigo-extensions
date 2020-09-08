@@ -1,0 +1,52 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.vertigo.datamodel;
+
+import io.vertigo.core.node.config.Features;
+import io.vertigo.datamodel.impl.smarttype.SmartTypeManagerImpl;
+import io.vertigo.datamodel.impl.structure.metrics.StructureMetricsProvider;
+import io.vertigo.datamodel.impl.task.TaskManagerImpl;
+import io.vertigo.datamodel.impl.task.metrics.TasksMetricsProvider;
+import io.vertigo.datamodel.smarttype.SmartTypeManager;
+import io.vertigo.datamodel.task.TaskManager;
+
+/**
+ * Defines dynamo features.
+ *
+ * @author pchretien
+ */
+public final class DataModelFeatures extends Features<DataModelFeatures> {
+
+	/**
+	 * Constructor.
+	 */
+	public DataModelFeatures() {
+		super("vertigo-datamodel");
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected void buildFeatures() {
+		getModuleConfigBuilder()
+				.addComponent(SmartTypeManager.class, SmartTypeManagerImpl.class)
+				.addComponent(TaskManager.class, TaskManagerImpl.class)
+				.addComponent(StructureMetricsProvider.class)
+				.addComponent(TasksMetricsProvider.class);
+
+	}
+}

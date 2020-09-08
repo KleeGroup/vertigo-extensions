@@ -1,5 +1,5 @@
-<th:block th:fragment="page(content)">
-		
+<th:block th:fragment="page(content, vuiDevMode)"
+	th:with="isVuiDevMode=${vuiDevMode != null ? vuiDevMode : false}">
 	<vu:content/>
 	
 	<script>
@@ -7,24 +7,26 @@
 	    loadingBar: { 'skip-hijack' : true } // disable quasar's ajaxbar
 	  }
 	</script>
-	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.4.1/dist/quasar.umd.min.js}"></script>
-	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.4.1/dist/lang/__${model.util.getCurrentLocalePrefixForQuasar()}__.umd.min.js}"></script>
+	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.12.13/dist/quasar.umd.min.js}"></script>
+	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.12.13/dist/lang/__${model.util.getCurrentLocalePrefixForQuasar()}__.umd.min.js}"></script>
+	<script th:if="${!isVuiDevMode}" th:src="@{/vertigo-ui/static/js/vertigo-ui.umd.min.js}"></script>
+	<script th:if="${isVuiDevMode}" src="http://localhost:3000/js/chunk-vendors.js"></script>
+	<script th:if="${isVuiDevMode}" src="http://localhost:3000/js/app.js"></script>
 	<vu:vue-data/>
-	<script th:src="@{/vertigo-ui/static/js/vertigo-ui.js}"></script>
-	<script th:src="@{/vertigo-ui/static/js/vertigo-ui-lang-__${model.util.getCurrentLocalePrefixForQuasar()}__.js}"></script>
 	<script>
+		Vue.use(VertigoUi);
 		Quasar.lang.set(Quasar.lang.[[${model.util.getCurrentLocaleForQuasar()}]])
 		var data = {
-				  vueData : vueData,
-				  componentStates : componentStates,
-				  uiMessageStack: uiMessageStack,
+				  vueData : VertigoUi.vueData,
+				  componentStates : VertigoUi.componentStates,
+				  uiMessageStack: VertigoUi.uiMessageStack,
 				  dataX : VUiExtensions.dataX
 			  };
 		
 		var VUiPage = new Vue({
 		  el: '#page',
 		  data: data,
-		  methods: Vue.util.extend(VUi.methods, VUiExtensions.methods ||  {}) 
+		  methods: Vue.util.extend(VertigoUi.methods, VUiExtensions.methods ||  {}) 
 		});
 
 		// fixes wrong components states due to firefox bfcache (back-forward cache)

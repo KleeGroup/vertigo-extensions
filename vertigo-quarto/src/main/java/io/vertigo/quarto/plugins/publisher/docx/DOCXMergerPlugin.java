@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,17 +28,16 @@ import java.util.zip.ZipFile;
 import javax.inject.Inject;
 
 import io.vertigo.commons.script.ScriptManager;
-import io.vertigo.lang.Assertion;
-import io.vertigo.quarto.impl.services.publisher.MergerPlugin;
-import io.vertigo.quarto.impl.services.publisher.merger.grammar.ScriptGrammarUtil;
-import io.vertigo.quarto.impl.services.publisher.merger.processor.GrammarEvaluatorProcessor;
-import io.vertigo.quarto.impl.services.publisher.merger.processor.GrammarXMLBalancerProcessor;
-import io.vertigo.quarto.impl.services.publisher.merger.processor.MergerProcessor;
-import io.vertigo.quarto.impl.services.publisher.merger.processor.MergerScriptEvaluatorProcessor;
-import io.vertigo.quarto.impl.services.publisher.merger.script.ScriptGrammar;
-import io.vertigo.quarto.services.publisher.PublisherFormat;
-import io.vertigo.quarto.services.publisher.model.PublisherData;
-import io.vertigo.util.ListBuilder;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.quarto.impl.publisher.MergerPlugin;
+import io.vertigo.quarto.impl.publisher.merger.grammar.ScriptGrammarUtil;
+import io.vertigo.quarto.impl.publisher.merger.processor.GrammarEvaluatorProcessor;
+import io.vertigo.quarto.impl.publisher.merger.processor.GrammarXMLBalancerProcessor;
+import io.vertigo.quarto.impl.publisher.merger.processor.MergerProcessor;
+import io.vertigo.quarto.impl.publisher.merger.processor.MergerScriptEvaluatorProcessor;
+import io.vertigo.quarto.impl.publisher.merger.script.ScriptGrammar;
+import io.vertigo.quarto.publisher.PublisherFormat;
+import io.vertigo.quarto.publisher.model.PublisherData;
 
 /**
  * Gestionnaire des fusions de documents Docx.
@@ -56,27 +54,27 @@ public final class DOCXMergerPlugin implements MergerPlugin {
 	 */
 	@Inject
 	public DOCXMergerPlugin(final ScriptManager scriptManager) {
-		Assertion.checkNotNull(scriptManager);
+		Assertion.check().isNotNull(scriptManager);
 		//-----
 		mergerProcessors = createMergerProcessors(scriptManager, ScriptGrammarUtil.createScriptGrammar());
 	}
 
 	private static List<MergerProcessor> createMergerProcessors(final ScriptManager scriptManager, final ScriptGrammar scriptGrammar) {
-		Assertion.checkNotNull(scriptManager);
-		Assertion.checkNotNull(scriptGrammar);
+		Assertion.check()
+				.isNotNull(scriptManager)
+				.isNotNull(scriptGrammar);
 		//-----
-		return new ListBuilder<MergerProcessor>()
+		return List.of(
 				// Extraction des variables.
-				.add(new DOCXReverseInputProcessor())
+				new DOCXReverseInputProcessor(),
 				// équilibrage de l'arbre xml.
-				.add(new GrammarXMLBalancerProcessor())
+				new GrammarXMLBalancerProcessor(),
 				// kscript <##> => jsp <%%>.
-				.add(new GrammarEvaluatorProcessor(scriptManager, scriptGrammar))
+				new GrammarEvaluatorProcessor(scriptManager, scriptGrammar),
 				// Traitement Janino (TEXT balisé en java + Données => TEXT).
-				.add(new MergerScriptEvaluatorProcessor(scriptManager, new DOCXValueEncoder()))
+				new MergerScriptEvaluatorProcessor(scriptManager, new DOCXValueEncoder()),
 				// Post traitements (TEXT => XML(DOCX)).
-				.add(new DOCXCleanerProcessor())
-				.build();
+				new DOCXCleanerProcessor());
 	}
 
 	/**
@@ -87,8 +85,9 @@ public final class DOCXMergerPlugin implements MergerPlugin {
 	 */
 	@Override
 	public File execute(final URL modelFileURL, final PublisherData data) throws IOException {
-		Assertion.checkNotNull(modelFileURL);
-		Assertion.checkNotNull(data);
+		Assertion.check()
+				.isNotNull(modelFileURL)
+				.isNotNull(data);
 		//-----
 		final File file = DOCXUtil.obtainModelFile(modelFileURL);
 		file.setReadOnly(); //on protège le fichier

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +30,8 @@ import org.thymeleaf.processor.element.AbstractElementModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VSystemException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VSystemException;
 
 public class ContentItemComponentProcessor extends AbstractElementModelProcessor {
 
@@ -60,7 +59,7 @@ public class ContentItemComponentProcessor extends AbstractElementModelProcessor
 	protected void doProcess(final ITemplateContext context, final IModel model, final IElementModelStructureHandler structureHandler) {
 		final Map<String, String> attributes = processAttribute(model);
 		final Object content = context.getVariable(CONTENT_VAR_NAME);
-		Assertion.checkNotNull(content, "'" + CONTENT_VAR_NAME + "' variable missing. For loop use th:each=\"" + CONTENT_VAR_NAME + ":contentTags\".");
+		Assertion.check().isNotNull(content, "'" + CONTENT_VAR_NAME + "' variable missing. For loop use th:each=\"" + CONTENT_VAR_NAME + ":contentTags\".");
 		//-----
 		removeCurrentTag(model);
 		final IModel defaultModel = model.cloneModel(); //default is the body of the content tag

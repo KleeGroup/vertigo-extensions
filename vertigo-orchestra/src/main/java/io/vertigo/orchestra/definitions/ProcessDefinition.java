@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +20,9 @@ package io.vertigo.orchestra.definitions;
 import java.util.List;
 import java.util.Map;
 
-import io.vertigo.core.definition.Definition;
-import io.vertigo.core.definition.DefinitionPrefix;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.definition.AbstractDefinition;
+import io.vertigo.core.node.definition.DefinitionPrefix;
 import io.vertigo.orchestra.services.execution.RunnableActivityEngine;
 
 /**
@@ -31,12 +30,13 @@ import io.vertigo.orchestra.services.execution.RunnableActivityEngine;
  * Une définition doit être créee par le builder associé.
  * @author mlaroche.
  */
-@DefinitionPrefix("Pro")
-public final class ProcessDefinition implements Definition {
+@DefinitionPrefix(ProcessDefinition.PREFIX)
+public final class ProcessDefinition extends AbstractDefinition {
+	public static final String PREFIX = "Pro";
+
 	//TODO : ID doit être immutable!!
 	//---immutables
 	private long id;
-	private final String name;
 	private final List<ActivityDefinition> activities;
 	private final ProcessType processType;
 
@@ -65,14 +65,15 @@ public final class ProcessDefinition implements Definition {
 			final boolean needUpdate,
 			final ProcessTriggeringStrategy triggeringStrategy,
 			final List<ActivityDefinition> activities) {
-		Assertion.checkArgNotEmpty(name);
-		Assertion.checkArgNotEmpty(label);
-		Assertion.checkNotNull(processType);
-		Assertion.checkNotNull(metadatas);
-		Assertion.checkNotNull(triggeringStrategy);
-		Assertion.checkNotNull(activities);
+		super(name);
 		//---
-		this.name = name;
+		Assertion.check()
+				.isNotBlank(label)
+				.isNotNull(processType)
+				.isNotNull(metadatas)
+				.isNotNull(triggeringStrategy)
+				.isNotNull(activities);
+		//---
 		this.label = label;
 		this.active = active;
 		this.processType = processType;
@@ -96,7 +97,7 @@ public final class ProcessDefinition implements Definition {
 		return new ProcessDefinitionBuilder(processName, processName)
 				.withProcessType(ProcessType.UNSUPERVISED)
 				.withMultiExecution()
-				.addActivity("MAIN", "Main", engineClass);
+				.addActivity("main", "Main", engineClass);
 
 	}
 
@@ -106,11 +107,6 @@ public final class ProcessDefinition implements Definition {
 
 	public void setId(final long id) {
 		this.id = id;
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	public String getLabel() {

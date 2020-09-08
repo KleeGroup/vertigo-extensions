@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +27,9 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 
-import io.vertigo.app.Home;
-import io.vertigo.commons.analytics.AnalyticsManager;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.core.analytics.AnalyticsManager;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.node.Node;
 
 public class VSpringDispatcherServlet extends DispatcherServlet {
 
@@ -80,7 +79,7 @@ public class VSpringDispatcherServlet extends DispatcherServlet {
 	}
 
 	private synchronized void setAnalyticsManager() {
-		analyticsManager = Home.getApp().getComponentSpace().resolve(AnalyticsManager.class);
+		analyticsManager = Node.getNode().getComponentSpace().resolve(AnalyticsManager.class);
 	}
 
 }

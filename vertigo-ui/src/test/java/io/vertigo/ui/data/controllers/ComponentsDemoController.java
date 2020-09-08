@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +17,10 @@
  */
 package io.vertigo.ui.data.controllers;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
@@ -32,8 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.vertigo.account.security.VSecurityManager;
 import io.vertigo.core.locale.LocaleManager;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtListState;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtListState;
+import io.vertigo.datastore.filestore.model.VFile;
+import io.vertigo.datastore.impl.filestore.model.FSFile;
+import io.vertigo.ui.core.ProtectedValueUtil;
 import io.vertigo.ui.core.ViewContext;
 import io.vertigo.ui.core.ViewContextKey;
 import io.vertigo.ui.data.domain.DtDefinitions.MovieDisplayFields;
@@ -45,8 +51,10 @@ import io.vertigo.ui.data.services.movies.MovieServices;
 import io.vertigo.ui.impl.springmvc.argumentresolvers.ViewAttribute;
 import io.vertigo.ui.impl.springmvc.controller.AbstractVSpringMvcController;
 import io.vertigo.vega.webservice.model.UiObject;
+import io.vertigo.vega.webservice.stereotype.QueryParam;
 import io.vertigo.vega.webservice.validation.DefaultDtObjectValidator;
 import io.vertigo.vega.webservice.validation.UiMessageStack;
+import io.vertigo.vega.webservice.validation.UiMessageStack.Level;
 import io.vertigo.vega.webservice.validation.ValidationUserException;
 
 @Controller
@@ -70,6 +78,8 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 	private final ViewContextKey<String[]> timeZoneList = ViewContextKey.of("timeZoneList");
 	private final ViewContextKey<String> zoneId = ViewContextKey.of("zoneId");
 
+	public static final ViewContextKey<String[]> myFiles = ViewContextKey.of("myFiles");
+
 	@Inject
 	private VSecurityManager securityManager;
 
@@ -80,7 +90,7 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 	private MovieServices movieServices;
 
 	@GetMapping("/")
-	public void initContext(final ViewContext viewContext) {
+	public void initContext(final ViewContext viewContext) throws IOException, URISyntaxException {
 		viewContext.publishDto(movieKey, new Movie());
 		viewContext.publishDto(castingKey, new Casting());
 		viewContext.publishDtList(movieList, movieServices.getMovies(DtListState.defaultOf(Movie.class)));
@@ -94,6 +104,8 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 		viewContext.publishRef(currentZoneId, localeManager.getCurrentZoneId().getId());
 		viewContext.publishRef(zoneId, timeZoneListStatic[0]);
 		viewContext.publishRef(timeZoneList, timeZoneListStatic);
+
+		viewContext.publishRef(myFiles, new String[0]);
 
 		toModeCreate();
 	}
@@ -141,6 +153,11 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 		viewContext.publishRef(currentZoneId, localeManager.getCurrentZoneId().getId());
 	}
 
+	@PostMapping("/_save")
+	public void doSave(final ViewContext viewContext, @ViewAttribute("movie") final Movie movie) {
+		viewContext.publishDto(movieKey, movie);
+	}
+
 	@PostMapping("/_read")
 	public void toRead() {
 		toModeReadOnly();
@@ -149,6 +166,28 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 	@PostMapping("/_edit")
 	public void toEdit() {
 		toModeEdit();
+	}
+
+	@GetMapping("/myFiles")
+	public VFile downloadFile() throws IOException, URISyntaxException {
+		final URI fullPath = getClass().getResource("/data/insee.csv").toURI();
+		return new FSFile("insee.csv", "text/csv", Paths.get(fullPath));
+	}
+
+	@GetMapping("/myFiles/{protectedUrl}")
+	public VFile loadFile(@PathVariable("protectedUrl") final String protectedUrl) throws URISyntaxException, IOException {
+		final URI fullPath = getClass().getResource(ProtectedValueUtil.readProtectedValue(protectedUrl, String.class)).toURI();
+		return new FSFile("insee.csv", "text/csv", Paths.get(fullPath));
+	}
+
+	@PostMapping("/upload")
+	public void uploadFile(@QueryParam("file") final VFile vFile) {
+		getUiMessageStack().addGlobalMessage(Level.INFO, "Fichier recu : " + vFile.getFileName() + " (" + vFile.getMimeType() + ")");
+		//final String protectedPath = ProtectedValueUtil.generateProtectedValue(FileUtil.obtainReadOnlyPath(vFile).toFile().getAbsolutePath());
+		//final List<String> newFiles = Arrays.asList((String[]) viewContext.get(myFiles));
+		//newFiles.add(protectedPath);
+		//viewContext.publishRef(myFiles, newFiles.toArray(new String[newFiles.size()]));
+		//return FileUtil.obtainReadOnlyPath(vFile).toFile().getAbsolutePath();
 	}
 
 	private void nop(final Object obj) {

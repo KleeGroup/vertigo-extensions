@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +34,6 @@ import io.vertigo.orchestra.services.execution.engine.TestJob;
 import io.vertigo.orchestra.services.execution.engine.TestJob2;
 import io.vertigo.orchestra.services.execution.engine.TestJob3;
 import io.vertigo.orchestra.services.execution.engine.TestJobScheduled;
-import io.vertigo.util.MapBuilder;
 
 /**
  * TODO : Description de la classe.
@@ -109,10 +107,9 @@ public class LocalExecutionTest extends AbstractOrchestraTestCase {
 
 		final ProcessDefinition processDefinition = orchestraDefinitionManager.getProcessDefinition("ProTestUnsupervisedManual3");
 
-		final Map<String, String> planifParams = new MapBuilder<String, String>()
-				.put(TestJob3.PARAM_KEY_1, "overide")
-				.put(TestJob3.PARAM_KEY_2, "value2")
-				.build();
+		final Map<String, String> planifParams = Map.of(
+				TestJob3.PARAM_KEY_1, "overide",
+				TestJob3.PARAM_KEY_2, "value2");
 
 		// We plan right now
 		orchestraServices.getScheduler()
@@ -134,8 +131,8 @@ public class LocalExecutionTest extends AbstractOrchestraTestCase {
 
 		// process "PRO_TEST_UNSUPERVISED_RECURRENT" is scheduled with cron expression
 
-		// The task takes 10 secondes to run we wait 12 secondes to check the final states
-		Thread.sleep(1000 * 8);
+		// The task takes 10 secondes to run we wait 10 secondes to check the final states
+		Thread.sleep(1000 * 10);
 		Assertions.assertEquals(2, TestJobScheduled.getCount());
 	}
 

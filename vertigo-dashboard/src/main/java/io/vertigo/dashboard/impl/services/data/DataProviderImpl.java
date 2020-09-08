@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +17,6 @@
  */
 package io.vertigo.dashboard.impl.services.data;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -26,87 +24,90 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.commons.analytics.health.HealthCheck;
-import io.vertigo.commons.analytics.health.HealthMeasure;
-import io.vertigo.commons.analytics.health.HealthMeasureBuilder;
-import io.vertigo.commons.analytics.metric.Metric;
+import io.vertigo.core.analytics.health.HealthCheck;
+import io.vertigo.core.analytics.health.HealthMeasure;
+import io.vertigo.core.analytics.health.HealthMeasureBuilder;
+import io.vertigo.core.analytics.metric.Metric;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.Node;
 import io.vertigo.core.param.ParamValue;
 import io.vertigo.dashboard.services.data.DataProvider;
 import io.vertigo.database.timeseries.ClusteredMeasure;
 import io.vertigo.database.timeseries.DataFilter;
 import io.vertigo.database.timeseries.TabularDatas;
 import io.vertigo.database.timeseries.TimeFilter;
-import io.vertigo.database.timeseries.TimeSeriesDataBaseManager;
+import io.vertigo.database.timeseries.TimeSeriesManager;
 import io.vertigo.database.timeseries.TimedDatas;
-import io.vertigo.lang.Assertion;
 
 public final class DataProviderImpl implements DataProvider {
 
-	private final TimeSeriesDataBaseManager timeSeriesDataBaseManager;
+	private final TimeSeriesManager timeSeriesManager;
 	private final String appName;
 
 	@Inject
 	public DataProviderImpl(
 			@ParamValue("appName") final Optional<String> appNameOpt,
-			final TimeSeriesDataBaseManager timeSeriesDataBaseManager) {
-		Assertion.checkNotNull(appNameOpt);
-		Assertion.checkNotNull(timeSeriesDataBaseManager);
+			final TimeSeriesManager timeSeriesManager) {
+		Assertion.check()
+				.isNotNull(appNameOpt)
+				.isNotNull(timeSeriesManager);
 		//---
-		appName = appNameOpt.orElseGet(() -> Home.getApp().getNodeConfig().getAppName());
-		this.timeSeriesDataBaseManager = timeSeriesDataBaseManager;
+		appName = appNameOpt.orElseGet(() -> Node.getNode().getNodeConfig().getAppName());
+		this.timeSeriesManager = timeSeriesManager;
 	}
 
 	@Override
 	public TimedDatas getTimeSeries(final List<String> measures, final DataFilter dataFilter, final TimeFilter timeFilter) {
-		Assertion.checkNotNull(measures);
-		Assertion.checkNotNull(dataFilter);
-		Assertion.checkNotNull(timeFilter.getDim());// we check dim is not null because we need it
+		Assertion.check()
+				.isNotNull(measures)
+				.isNotNull(dataFilter)
+				.isNotNull(timeFilter.getDim());// we check dim is not null because we need it
 		//---
-		return timeSeriesDataBaseManager.getTimeSeries(appName, measures, dataFilter, timeFilter);
+		return timeSeriesManager.getTimeSeries(appName, measures, dataFilter, timeFilter);
 
 	}
 
 	@Override
 	public TimedDatas getClusteredTimeSeries(final ClusteredMeasure clusteredMeasure, final DataFilter dataFilter, final TimeFilter timeFilter) {
-		Assertion.checkNotNull(dataFilter);
-		Assertion.checkNotNull(timeFilter);
-		Assertion.checkNotNull(timeFilter.getDim()); // we check dim is not null because we need it
-		Assertion.checkNotNull(clusteredMeasure);
-		//---
-		Assertion.checkArgNotEmpty(clusteredMeasure.getMeasure());
-		Assertion.checkNotNull(clusteredMeasure.getThresholds());
-		Assertion.checkState(!clusteredMeasure.getThresholds().isEmpty(), "For clustering the measure '{0}' you need to provide at least one threshold", clusteredMeasure.getMeasure());
+		Assertion.check()
+				.isNotNull(dataFilter)
+				.isNotNull(timeFilter)
+				.isNotNull(timeFilter.getDim()) // we check dim is not null because we need it
+				.isNotNull(clusteredMeasure)
+				//---
+				.isNotBlank(clusteredMeasure.getMeasure())
+				.isNotNull(clusteredMeasure.getThresholds())
+				.isFalse(clusteredMeasure.getThresholds().isEmpty(), "For clustering the measure '{0}' you need to provide at least one threshold", clusteredMeasure.getMeasure());
 		//we use the natural order
 		clusteredMeasure.getThresholds().sort(Comparator.naturalOrder());
 		//---
-		return timeSeriesDataBaseManager.getClusteredTimeSeries(appName, clusteredMeasure, dataFilter, timeFilter);
+		return timeSeriesManager.getClusteredTimeSeries(appName, clusteredMeasure, dataFilter, timeFilter);
 	}
 
 	@Override
 	public TimedDatas getTabularTimedData(final List<String> measures, final DataFilter dataFilter, final TimeFilter timeFilter, final String... groupBy) {
-		return timeSeriesDataBaseManager.getTabularTimedData(appName, measures, dataFilter, timeFilter, groupBy);
+		return timeSeriesManager.getTabularTimedData(appName, measures, dataFilter, timeFilter, groupBy);
 	}
 
 	@Override
 	public TabularDatas getTabularData(final List<String> measures, final DataFilter dataFilter, final TimeFilter timeFilter, final String... groupBy) {
-		return timeSeriesDataBaseManager.getTabularData(appName, measures, dataFilter, timeFilter, groupBy);
+		return timeSeriesManager.getTabularData(appName, measures, dataFilter, timeFilter, groupBy);
 	}
 
 	@Override
 	public TabularDatas getTops(final String measure, final DataFilter dataFilter, final TimeFilter timeFilter, final String groupBy, final int maxRows) {
-		return timeSeriesDataBaseManager.getTops(appName, measure, dataFilter, timeFilter, groupBy, maxRows);
+		return timeSeriesManager.getTops(appName, measure, dataFilter, timeFilter, groupBy, maxRows);
 	}
 
 	@Override
 	public List<String> getTagValues(final String measurement, final String tag) {
-		return timeSeriesDataBaseManager.getTagValues(appName, measurement, tag);
+		return timeSeriesManager.getTagValues(appName, measurement, tag);
 	}
 
 	@Override
 	public List<HealthCheck> getHealthChecks() {
 
-		final List<String> measures = Arrays.asList("status:last", "message:last", "name:last", "module:last", "feature:last", "checker:last");
+		final List<String> measures = List.of("status:last", "message:last", "name:last", "module:last", "feature:last", "checker:last");
 		final DataFilter dataFilter = DataFilter.builder("healthcheck").build();
 		final TimeFilter timeFilter = TimeFilter.builder("now() - 5w", "now()").build();// before 5 weeks we consider that we don't have data
 
@@ -149,7 +150,7 @@ public final class DataProviderImpl implements DataProvider {
 
 	@Override
 	public List<Metric> getMetrics() {
-		final List<String> measures = Arrays.asList("value:last", "name:last", "feature:last");
+		final List<String> measures = List.of("value:last", "name:last", "feature:last");
 		final DataFilter dataFilter = DataFilter.builder("metric").build();
 		final TimeFilter timeFilter = TimeFilter.builder("now() - 5w", "now()").build();// before 5 weeks we consider that we don't have data
 

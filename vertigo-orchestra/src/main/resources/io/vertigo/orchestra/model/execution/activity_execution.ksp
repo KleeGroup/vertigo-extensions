@@ -3,15 +3,13 @@ package io.vertigo.orchestra.domain.execution
 create DtDefinition DtOActivityExecution {
 	storeName : "orchestra"
 	id aceId			{domain : DoOIdentifiant, label :"Id de l'execution d'un processus", },
-	field creationTime   	{domain : DoOTimestamp, label :"Date de création", required:"true",},
-	field beginTime   	{domain : DoOTimestamp, label :"Date de début", required:"false",},
-	field endTime   	{domain : DoOTimestamp, label :"Date de fin", required:"false",},
-	field engine   	{domain : DoOClasse, label :"Implémentation effective de l'execution", required:"false",},
-	field token   	{domain : DoOToken, label :"Token d'identification", required:"false",},
+	field creationTime   	{domain : DoOTimestamp, label :"Date de création", cardinality: "1",},
+	field beginTime   	{domain : DoOTimestamp, label :"Date de début", cardinality: "?",},
+	field endTime   	{domain : DoOTimestamp, label :"Date de fin", cardinality: "?",},
+	field engine   	{domain : DoOClasse, label :"Implémentation effective de l'execution", cardinality: "?",},
+	field token   	{domain : DoOToken, label :"Token d'identification", cardinality: "?",},
   
-},
-
-
+}
 
 create Association AAceAct {
   fkFieldName : "actId"

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.vertigo</groupId>
+		<artifactId>vertigo-extensions</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>vertigo-datastore</artifactId>
+	<packaging>jar</packaging>
+	<name>vertigo-datastore</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-database</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-datamodel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-basics</artifactId>
+			<version>${project.version}</version>
+		</dependency> 
+
+		<!-- tests -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.200</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+		    <artifactId>ojdbc10</artifactId>
+		    <version>19.7.0.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- libs -->
+		<!-- kvdatastore -->
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>je</artifactId>
+			<version>18.3.12</version>
+		</dependency>
+
+		<!-- Connections Pool -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5.5</version>
+			<optional>true</optional><!-- C3p0DataSourceProviderPlugin -->
+		</dependency>
+
+		<!--redis -->
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-redis-connector</artifactId>
+			<version>${vertigo.version}</version>
+			<optional>true</optional> <!-- pour RedisCache -->
+		</dependency>
+		
+		<!--cache -->
+		<dependency>
+			<groupId>org.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>3.9.0</version> 
+			<optional>true</optional> <!-- pour EhCachePlugin -->
+		</dependency>
+	</dependencies>
+</project>

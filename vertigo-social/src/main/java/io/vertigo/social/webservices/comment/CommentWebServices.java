@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +27,16 @@ import javax.inject.Inject;
 import io.vertigo.account.account.Account;
 import io.vertigo.account.authentication.AuthenticationManager;
 import io.vertigo.account.authorization.VSecurityException;
-import io.vertigo.app.Home;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.locale.MessageText;
-import io.vertigo.dynamo.domain.metamodel.DataType;
-import io.vertigo.dynamo.domain.metamodel.DtDefinition;
-import io.vertigo.dynamo.domain.metamodel.DtField;
-import io.vertigo.dynamo.domain.model.KeyConcept;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.lang.Assertion;
-import io.vertigo.social.services.comment.Comment;
-import io.vertigo.social.services.comment.CommentServices;
-import io.vertigo.util.MapBuilder;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.util.MapBuilder;
+import io.vertigo.datamodel.structure.definitions.DtDefinition;
+import io.vertigo.datamodel.structure.definitions.DtField;
+import io.vertigo.datamodel.structure.model.KeyConcept;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.comment.Comment;
+import io.vertigo.social.comment.CommentManager;
 import io.vertigo.vega.webservice.WebServices;
 import io.vertigo.vega.webservice.stereotype.AnonymousAccessAllowed;
 import io.vertigo.vega.webservice.stereotype.ExcludedFields;
@@ -61,7 +59,7 @@ public final class CommentWebServices implements WebServices {
 	private static final String IMPL_VERSION = "0.9.2";
 
 	@Inject
-	private CommentServices commentServices;
+	private CommentManager commentServices;
 
 	@Inject
 	private AuthenticationManager authenticationManager;
@@ -98,9 +96,10 @@ public final class CommentWebServices implements WebServices {
 	 */
 	@PUT("/api/comments/{uuid}")
 	public Comment updateComment(@PathParam("uuid") final String uuid, final Comment comment) {
-		Assertion.checkNotNull(uuid);
-		Assertion.checkNotNull(comment);
-		Assertion.checkArgument(uuid.equals(comment.getUuid().toString()), "Comment uuid ({0}) must match WebService route ({1})", comment.getUuid(), uuid);
+		Assertion.check()
+				.isNotNull(uuid)
+				.isNotNull(comment)
+				.isTrue(uuid.equals(comment.getUuid().toString()), "Comment uuid ({0}) must match WebService route ({1})", comment.getUuid(), uuid);
 		//-----
 		commentServices.update(getLoggedAccountURI(), comment);
 		return comment;
@@ -156,21 +155,21 @@ public final class CommentWebServices implements WebServices {
 	}
 
 	private static UID<KeyConcept> readKeyConceptURI(final String keyConcept, @QueryParam("id") final String id) {
-		final DtDefinition dtDefinition = Home.getApp().getDefinitionSpace().resolve("Dt" + keyConcept, DtDefinition.class);
+		final DtDefinition dtDefinition = Node.getNode().getDefinitionSpace().resolve("Dt" + keyConcept, DtDefinition.class);
 		final Object keyConceptId = stringToId(id, dtDefinition);
 		return UID.of(dtDefinition, keyConceptId);
 	}
 
 	private static Object stringToId(final String id, final DtDefinition dtDefinition) {
-		final Optional<DtField> idFieldOption = dtDefinition.getIdField();
-		Assertion.checkArgument(idFieldOption.isPresent(), "KeyConcept {0} must have an id field, in order to support Comment extension", dtDefinition.getLocalName());
+		final Optional<DtField> idFieldOpt = dtDefinition.getIdField();
+		Assertion.check().isTrue(idFieldOpt.isPresent(), "KeyConcept {0} must have an id field, in order to support Comment extension", dtDefinition.getLocalName());
 
-		final DataType dataType = idFieldOption.get().getDomain().getDataType();
-		if (dataType == DataType.String) {
+		final Class dataType = idFieldOpt.get().getSmartTypeDefinition().getJavaClass();
+		if (String.class.isAssignableFrom(dataType)) {
 			return id;
-		} else if (dataType == DataType.Integer) {
+		} else if (Integer.class.isAssignableFrom(dataType)) {
 			return Integer.valueOf(id);
-		} else if (dataType == DataType.Long) {
+		} else if (Long.class.isAssignableFrom(dataType)) {
 			return Long.valueOf(id);
 		}
 		throw new IllegalArgumentException("the id of the keyConcept " + dtDefinition.getLocalName() + " must be String, Long or Integer");

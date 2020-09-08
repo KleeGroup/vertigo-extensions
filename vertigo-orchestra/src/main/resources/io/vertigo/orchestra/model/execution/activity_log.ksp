@@ -3,10 +3,10 @@ package io.vertigo.orchestra.domain.execution
 create DtDefinition DtOActivityLog {
 	storeName : "orchestra"
 	id aclId			{domain : DoOIdentifiant, label :"Id du log", }
-	field log 			{domain : DoOText, label :"Contenu du log", required:"false",}
-	field attachment 		{domain : DoOText, label :"Fichier joint", required:"false",}
+	field log 			{domain : DoOText, label :"Contenu du log", cardinality: "?",}
+	field attachment 		{domain : DoOText, label :"Fichier joint", cardinality: "?",}
   
-},
+}
 
 
 

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +39,10 @@ import org.glassfish.jersey.message.GZipEncoder;
 import com.google.gson.Gson;
 
 import io.vertigo.commons.codec.CodecManager;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VSystemException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VSystemException;
+import io.vertigo.core.util.ClassUtil;
 import io.vertigo.stella.impl.work.WorkItem;
-import io.vertigo.util.ClassUtil;
 
 /**
  * api de distributedWorkQueueManager en REST avec jersey.
@@ -63,8 +62,9 @@ final class RestQueueClient {
 	 * Constructeur.
 	 */
 	RestQueueClient(final String serverUrl, final int timeoutSeconds, final CodecManager codecManager) {
-		Assertion.checkArgNotEmpty(serverUrl);
-		Assertion.checkNotNull(codecManager);
+		Assertion.check()
+				.isNotBlank(serverUrl)
+				.isNotNull(codecManager);
 		//-----
 		this.serverUrl = serverUrl;
 		this.codecManager = codecManager;
@@ -139,8 +139,9 @@ final class RestQueueClient {
 	}
 
 	<R> void putResult(final String workId, final R result, final Throwable error) {
-		Assertion.checkArgNotEmpty(workId);
-		Assertion.checkArgument(result == null ^ error == null, "result xor error is null");
+		Assertion.check()
+				.isNotBlank(workId)
+				.isTrue(result == null ^ error == null, "result xor error is null");
 		//-----
 		final String address;
 		final Object value;

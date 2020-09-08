@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +25,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import io.vertigo.dynamo.domain.model.KeyConcept;
-import io.vertigo.dynamo.domain.model.UID;
+import io.vertigo.datamodel.structure.model.KeyConcept;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.comment.Comment;
 import io.vertigo.social.impl.comment.CommentPlugin;
-import io.vertigo.social.services.comment.Comment;
 
 /**
  * @author pchretien
@@ -64,7 +63,7 @@ public final class MemoryCommentPlugin implements CommentPlugin {
 	public synchronized <S extends KeyConcept> List<Comment> getComments(final UID<S> uid) {
 		return commentsMap.getOrDefault(uid, Collections.emptyList())
 				.stream()
-				.map(uuid -> get(uuid))
+				.map(this::get)
 				.collect(Collectors.toList());
 	}
 }

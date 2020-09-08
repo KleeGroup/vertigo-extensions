@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +22,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import io.vertigo.commons.transaction.Transactional;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.datamodel.structure.model.DtList;
 import io.vertigo.orchestra.dao.execution.OActivityExecutionDAO;
 import io.vertigo.orchestra.dao.execution.OActivityLogDAO;
 import io.vertigo.orchestra.dao.execution.OActivityWorkspaceDAO;
@@ -60,7 +59,7 @@ public class MonitoringServicesImpl implements MonitoringServices {
 	/** {@inheritDoc} */
 	@Override
 	public DtList<OProcessPlanification> getPlanificationsByProId(final Long proId) {
-		Assertion.checkNotNull(proId);
+		Assertion.check().isNotNull(proId);
 		// ---
 		return processPlanificationDAO.getPlanificationsByProId(proId);
 	}
@@ -68,7 +67,7 @@ public class MonitoringServicesImpl implements MonitoringServices {
 	/** {@inheritDoc} */
 	@Override
 	public DtList<OProcessExecution> getExecutionsByProId(final Long proId) {
-		Assertion.checkNotNull(proId);
+		Assertion.check().isNotNull(proId);
 		// ---
 		return processExecutionDAO.getExecutionsByProId(proId);
 	}
@@ -76,7 +75,7 @@ public class MonitoringServicesImpl implements MonitoringServices {
 	/** {@inheritDoc} */
 	@Override
 	public DtList<OActivityExecution> getActivityExecutionsByPreId(final Long preId) {
-		Assertion.checkNotNull(preId);
+		Assertion.check().isNotNull(preId);
 		// ---
 		return activityExecutionDAO.getActivityExecutionsByPreId(preId);
 	}
@@ -84,7 +83,7 @@ public class MonitoringServicesImpl implements MonitoringServices {
 	/** {@inheritDoc} */
 	@Override
 	public OActivityWorkspace getActivityWorkspaceByAceId(final Long aceId, final boolean isIn) {
-		Assertion.checkNotNull(aceId);
+		Assertion.check().isNotNull(aceId);
 		// ---
 		return activityWorkspaceDAO.getActivityWorkspace(aceId, isIn).get();
 	}
@@ -92,7 +91,7 @@ public class MonitoringServicesImpl implements MonitoringServices {
 	/** {@inheritDoc} */
 	@Override
 	public Optional<OActivityLog> getActivityLogByAceId(final Long aceId) {
-		Assertion.checkNotNull(aceId);
+		Assertion.check().isNotNull(aceId);
 		// ---
 		return activityLogDAO.getActivityLogByAceId(aceId);
 

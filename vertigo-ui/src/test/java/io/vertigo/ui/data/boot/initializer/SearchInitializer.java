@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +19,9 @@ package io.vertigo.ui.data.boot.initializer;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.core.component.ComponentInitializer;
-import io.vertigo.dynamo.search.SearchManager;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.node.component.ComponentInitializer;
+import io.vertigo.datafactory.search.SearchManager;
 import io.vertigo.ui.data.domain.movies.Movie;
 
 /**
@@ -38,6 +37,6 @@ public final class SearchInitializer implements ComponentInitializer {
 	/** {@inheritDoc} */
 	@Override
 	public void init() {
-		Home.getApp().registerPreActivateFunction(() -> searchManager.reindexAll(searchManager.findFirstIndexDefinitionByKeyConcept(Movie.class)));
+		Node.getNode().registerPreActivateFunction(() -> searchManager.reindexAll(searchManager.findFirstIndexDefinitionByKeyConcept(Movie.class)));
 	}
 }

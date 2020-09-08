@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +17,22 @@
  */
 package io.vertigo.dashboard.ui;
 
-import io.vertigo.app.Home;
-import io.vertigo.core.component.Activeable;
-import io.vertigo.core.component.Component;
+import javax.inject.Inject;
 
-public final class DashboardUiManager implements Component, Activeable {
+import io.vertigo.connectors.javalin.JavalinConnector;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.node.component.Activeable;
+import io.vertigo.core.node.component.Manager;
+
+public final class DashboardUiManager implements Manager, Activeable {
+
+	@Inject
+	private JavalinConnector javalinConnector;
 
 	@Override
 	public void start() {
-		final DashboardRouter dashboardRouter = new DashboardRouter(Home.getApp());
-		dashboardRouter.route();
+		final DashboardRouter dashboardRouter = new DashboardRouter(Node.getNode());
+		dashboardRouter.route(javalinConnector.getClient());
 	}
 
 	@Override

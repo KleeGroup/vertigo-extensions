@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,32 +19,47 @@ package io.vertigo.geo.services.geocoder.google;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.vertigo.AbstractTestCaseJU5;
-import io.vertigo.app.config.NodeConfig;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.node.component.di.DIInjector;
+import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.geo.GeoFeatures;
-import io.vertigo.geo.services.geocoder.GeoCoderManager;
-import io.vertigo.geo.services.geocoder.GeoLocation;
+import io.vertigo.geo.geocoder.GeoCoderManager;
+import io.vertigo.geo.geocoder.GeoLocation;
 
 /**
  * @author spoitrenaud
  */
 @Disabled
-public class GoogleGeoCoderManagerTest extends AbstractTestCaseJU5 {
+public class GoogleGeoCoderManagerTest {
 	@Inject
 	private GeoCoderManager geoCoderManager;
 
-	@Override
-	protected NodeConfig buildNodeConfig() {
+	private AutoCloseableNode node;
+
+	@BeforeEach
+	public final void setUp() {
+		node = new AutoCloseableNode(buildNodeConfig());
+		DIInjector.injectMembers(this, node.getComponentSpace());
+	}
+
+	@AfterEach
+	public final void tearDown() {
+		if (node != null) {
+			node.close();
+		}
+	}
+
+	private NodeConfig buildNodeConfig() {
 		return NodeConfig.builder()
-				.beginBoot()
-				.endBoot()
 				.addModule(new GeoFeatures()
-						.withGeocoding()
-						.withGoogleGeocoder()
+						.withGeoCoder()
+						.withGoogleGeoCoder()
 						.build())
 				.build();
 	}

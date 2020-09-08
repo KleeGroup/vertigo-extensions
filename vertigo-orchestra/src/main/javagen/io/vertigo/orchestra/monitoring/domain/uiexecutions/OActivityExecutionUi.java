@@ -1,9 +1,26 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.monitoring.domain.uiexecutions;
 
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.stereotype.Field;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.stereotype.Field;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 
 /**
  * This class is automatically generated.
@@ -29,7 +46,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Id de l'activité'.
 	 * @return Long aceId <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOIdentifiant", required = true, label = "Id de l'activité")
+	@Field(smartType = "STyOIdentifiant", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Id de l'activité")
 	public Long getAceId() {
 		return aceId;
 	}
@@ -48,7 +65,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Libellé'.
 	 * @return String label
 	 */
-	@Field(domain = "DoOLibelle", label = "Libellé")
+	@Field(smartType = "STyOLibelle", label = "Libellé")
 	public String getLabel() {
 		return label;
 	}
@@ -67,7 +84,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Démarrage'.
 	 * @return Instant beginTime <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOTimestamp", required = true, label = "Démarrage")
+	@Field(smartType = "STyOTimestamp", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Démarrage")
 	public java.time.Instant getBeginTime() {
 		return beginTime;
 	}
@@ -86,7 +103,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Fin'.
 	 * @return Instant endTime <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOTimestamp", required = true, label = "Fin")
+	@Field(smartType = "STyOTimestamp", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Fin")
 	public java.time.Instant getEndTime() {
 		return endTime;
 	}
@@ -105,7 +122,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Durée'.
 	 * @return Integer executionTime
 	 */
-	@Field(domain = "DoONombre", label = "Durée")
+	@Field(smartType = "STyONombre", label = "Durée")
 	public Integer getExecutionTime() {
 		return executionTime;
 	}
@@ -124,7 +141,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Statut'.
 	 * @return String status
 	 */
-	@Field(domain = "DoOCodeIdentifiant", label = "Statut")
+	@Field(smartType = "STyOCodeIdentifiant", label = "Statut")
 	public String getStatus() {
 		return status;
 	}
@@ -143,7 +160,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Paramètres entrants'.
 	 * @return String workspaceIn
 	 */
-	@Field(domain = "DoOJsonText", label = "Paramètres entrants")
+	@Field(smartType = "STyOJsonText", label = "Paramètres entrants")
 	public String getWorkspaceIn() {
 		return workspaceIn;
 	}
@@ -162,7 +179,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Paramètres sortants'.
 	 * @return String workspaceOut
 	 */
-	@Field(domain = "DoOJsonText", label = "Paramètres sortants")
+	@Field(smartType = "STyOJsonText", label = "Paramètres sortants")
 	public String getWorkspaceOut() {
 		return workspaceOut;
 	}
@@ -181,7 +198,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Fichier de log'.
 	 * @return Boolean hasAttachment
 	 */
-	@Field(domain = "DoOBooleen", label = "Fichier de log")
+	@Field(smartType = "STyOBooleen", label = "Fichier de log")
 	public Boolean getHasAttachment() {
 		return hasAttachment;
 	}
@@ -200,7 +217,7 @@ public final class OActivityExecutionUi implements DtObject {
 	 * Récupère la valeur de la propriété 'Log technique'.
 	 * @return Boolean hasTechnicalLog
 	 */
-	@Field(domain = "DoOBooleen", label = "Log technique")
+	@Field(smartType = "STyOBooleen", label = "Log technique")
 	public Boolean getHasTechnicalLog() {
 		return hasTechnicalLog;
 	}

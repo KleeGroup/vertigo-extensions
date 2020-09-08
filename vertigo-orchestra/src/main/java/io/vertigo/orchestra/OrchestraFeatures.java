@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +19,13 @@ package io.vertigo.orchestra;
 
 import java.util.stream.Stream;
 
-import io.vertigo.app.config.DefinitionProviderConfig;
-import io.vertigo.app.config.Feature;
-import io.vertigo.app.config.Features;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VSystemException;
+import io.vertigo.core.node.config.DefinitionProviderConfig;
+import io.vertigo.core.node.config.Feature;
+import io.vertigo.core.node.config.Features;
 import io.vertigo.core.param.Param;
-import io.vertigo.dynamo.plugins.environment.DynamoDefinitionProvider;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VSystemException;
+import io.vertigo.datamodel.impl.smarttype.ModelDefinitionProvider;
 import io.vertigo.orchestra.dao.definition.DefinitionPAO;
 import io.vertigo.orchestra.dao.definition.OActivityDAO;
 import io.vertigo.orchestra.dao.definition.OProcessDAO;
@@ -39,6 +38,7 @@ import io.vertigo.orchestra.dao.execution.OProcessExecutionDAO;
 import io.vertigo.orchestra.dao.planification.OProcessPlanificationDAO;
 import io.vertigo.orchestra.dao.planification.PlanificationPAO;
 import io.vertigo.orchestra.definitions.OrchestraDefinitionManager;
+import io.vertigo.orchestra.definitions.OrchestraSmartTypes;
 import io.vertigo.orchestra.domain.DtDefinitions;
 import io.vertigo.orchestra.impl.definitions.OrchestraDefinitionManagerImpl;
 import io.vertigo.orchestra.impl.node.ONodeManager;
@@ -75,7 +75,7 @@ public final class OrchestraFeatures extends Features<OrchestraFeatures> {
 	}
 
 	private static Param findParamByName(final String paramName, final Param[] params) {
-		Assertion.checkArgNotEmpty(paramName);
+		Assertion.check().isNotBlank(paramName);
 		//---
 		return Stream.of(params)
 				.filter(param -> paramName.equals(param.getName()))
@@ -129,9 +129,9 @@ public final class OrchestraFeatures extends Features<OrchestraFeatures> {
 				.addComponent(UiexecutionsPAO.class)
 				.addComponent(SummaryPAO.class)
 				//----Definitions
-				.addDefinitionProvider(DefinitionProviderConfig.builder(DynamoDefinitionProvider.class)
-						.addDefinitionResource("kpr", "io/vertigo/orchestra/execution.kpr")
-						.addDefinitionResource("classes", DtDefinitions.class.getName())
+				.addDefinitionProvider(DefinitionProviderConfig.builder(ModelDefinitionProvider.class)
+						.addDefinitionResource("smarttypes", OrchestraSmartTypes.class.getName())
+						.addDefinitionResource("dtobjects", DtDefinitions.class.getName())
 						.build());
 		return this;
 	}

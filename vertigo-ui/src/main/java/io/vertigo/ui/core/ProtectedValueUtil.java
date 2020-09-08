@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +19,10 @@ package io.vertigo.ui.core;
 
 import java.io.Serializable;
 
-import io.vertigo.app.Home;
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
-import io.vertigo.dynamo.kvstore.KVStoreManager;
+import io.vertigo.core.node.Node;
+import io.vertigo.datastore.kvstore.KVStoreManager;
 
 /**
  * @author npiedeloup
@@ -54,19 +53,19 @@ public final class ProtectedValueUtil {
 		if (protectedValue == null) {
 			return null;
 		}
-		final V unprotectedValue;
 		try (VTransactionWritable transactionWritable = getTransactionManager().createCurrentTransaction()) {
+			final V unprotectedValue;
 			unprotectedValue = getKVStoreManager().find(PROTECTED_VALUE_COLLECTION_NAME, protectedValue, clazz).orElse(null);
+			return unprotectedValue;
 		}
-		return unprotectedValue;
 	}
 
 	private static VTransactionManager getTransactionManager() {
-		return Home.getApp().getComponentSpace().resolve(VTransactionManager.class);
+		return Node.getNode().getComponentSpace().resolve(VTransactionManager.class);
 	}
 
 	private static KVStoreManager getKVStoreManager() {
-		return Home.getApp().getComponentSpace().resolve(KVStoreManager.class);
+		return Node.getNode().getComponentSpace().resolve(KVStoreManager.class);
 	}
 
 }

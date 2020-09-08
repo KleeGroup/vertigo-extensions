@@ -2,7 +2,7 @@ package io.vertigo.orchestra.dao.execution
 
 create Task TkGetActivitiesToLaunch {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		ace.*
@@ -11,30 +11,29 @@ create Task TkGetActivitiesToLaunch {
         	and ace.NOD_ID = #nodId#
         	
 			"
-	attribute dtcActivityExecution	 	{domain : DoDtOActivityExecutionDtc 		required:"true" 	inOut :"out"}
-	attribute nodId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-},
+	in nodId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtcActivityExecution	 	{domain : DoDtOActivityExecution 		cardinality: "*" 	}
+}
 
 
 create Task TkGetActivityExecutionByToken {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		ace.*
         	from o_activity_execution ace
         	where ace.ACE_ID = #aceId#
         	and ace.TOKEN = #token#
-        	
 			"
-	attribute dtActivityExecution	 	{domain : DoDtOActivityExecutionDto 		required:"true" 	inOut :"out"}
-	attribute aceId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-	attribute token	 	{domain : DoOToken 		required:"true" 	inOut :"in"}
-},
+	in aceId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	in token	 	{domain : DoOToken 		cardinality: "1" 	}
+	out dtActivityExecution	 	{domain : DoDtOActivityExecution 		cardinality: "1" 	}
+}
 
 create Task TkReserveActivitiesToLaunch {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update  o_activity_execution 
         	set EST_CD = 'RESERVED',
@@ -48,24 +47,23 @@ create Task TkReserveActivitiesToLaunch {
         			limit #maxNumber#
         	)
 			"
-		attribute nodId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-		attribute maxNumber	 	{domain : DoONombre 		required:"true" 	inOut :"in"}
+		in nodId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+		in maxNumber	 	{domain : DoONombre 		cardinality: "1" 	}
 }
 
 
 create Task TkGetActivityWorkspace {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select acw.*
         	 from o_activity_workspace acw
         	 where acw.ACE_ID = #aceId#
-        	 and   acw.IS_IN = #in#
-        	
+        	 and   acw.IS_IN = #workspaceIn#
 			"
 			
-		attribute aceId	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-		attribute in	 	{domain : DoOBooleen 			required:"true" 	inOut :"in"}
-		attribute dtOActivityWorkspace	 	{domain : DoDtOActivityWorkspaceDto 		required:"false" 	inOut :"out"}
+		in aceId			{domain : DoOIdentifiant 		cardinality: "1" 	}
+		in workspaceIn	 	{domain : DoOBooleen 			cardinality: "1" 	}
+		out dtOActivityWorkspace	 	{domain : DoDtOActivityWorkspace 		cardinality: "?" 	}
 }
 

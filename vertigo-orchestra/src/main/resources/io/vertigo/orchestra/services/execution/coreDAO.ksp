@@ -2,21 +2,21 @@ package io.vertigo.orchestra.dao.execution
 
 create Task TkGetNodeByName {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select 
         		nod.*
         	from o_node nod
         	where nod.NAME = #nodeName#
 			"
-	attribute dtoONode	 	{domain : DoDtONodeDto 		required:"false" 	inOut :"out"}
-	attribute nodeName	 	{domain : DoOLibelle 		required:"true" 	inOut :"in"}
-},
+	in nodeName	 	{domain : DoOLibelle 		cardinality: "1" 	}
+	out dtoONode	 	{domain : DoDtONode 		cardinality: "?" 	}
+}
 
 
 create Task TkHandleProcessesOfDeadNodes {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update o_activity_execution 
         	set EST_CD = 'ABORTED'
@@ -35,12 +35,12 @@ create Task TkHandleProcessesOfDeadNodes {
 				where ace.EST_CD = 'ABORTED');
         	
 			"
-	attribute maxDate	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-},
+	in maxDate	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+}
 
 create Task TkHandleDeadProcessesOfNode {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update o_activity_execution 
         	set EST_CD = 'ABORTED'
@@ -58,7 +58,7 @@ create Task TkHandleDeadProcessesOfNode {
 				where ace.EST_CD = 'ABORTED');
         	
 			"
-	attribute nodId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-},
+	in nodId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+}
 
 

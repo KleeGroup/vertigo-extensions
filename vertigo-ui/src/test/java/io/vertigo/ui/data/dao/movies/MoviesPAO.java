@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +17,16 @@
  */
 package io.vertigo.ui.data.dao.movies;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.dynamo.store.StoreServices;
-import io.vertigo.dynamo.task.TaskManager;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
-import io.vertigo.dynamo.task.model.Task;
-import io.vertigo.dynamo.task.model.TaskBuilder;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.Generated;
-import io.vertigo.ui.data.domain.movies.MovieIndex;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.core.node.Node;
+import io.vertigo.datamodel.task.TaskManager;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
+import io.vertigo.datamodel.task.model.Task;
+import io.vertigo.datamodel.task.model.TaskBuilder;
+import io.vertigo.datastore.impl.dao.StoreServices;
 
 /**
  * This class is automatically generated.
@@ -46,7 +42,7 @@ public final class MoviesPAO implements StoreServices {
 	 */
 	@Inject
 	public MoviesPAO(final TaskManager taskManager) {
-		Assertion.checkNotNull(taskManager);
+		Assertion.check().isNotNull(taskManager);
 		//-----
 		this.taskManager = taskManager;
 	}
@@ -57,40 +53,39 @@ public final class MoviesPAO implements StoreServices {
 	 * @return the builder
 	 */
 	private static TaskBuilder createTaskBuilder(final String name) {
-		final TaskDefinition taskDefinition = Home.getApp().getDefinitionSpace().resolve(name, TaskDefinition.class);
+		final TaskDefinition taskDefinition = Node.getNode().getDefinitionSpace().resolve(name, TaskDefinition.class);
 		return Task.builder(taskDefinition);
 	}
 
 	/**
-	 * Execute la tache TK_LOAD_MOVIE_INDEX.
-	 * @param dtc io.vertigo.dynamo.domain.model.DtList<io.vertigo.pandora.domain.movies.Dummy>
-	 * @return io.vertigo.dynamo.domain.model.DtList<io.vertigo.pandora.domain.movies.MovieIndex> dtcIndex
+	 * Execute la tache StTkLoadMovieIndex.
+	 * @param movieIds List de Long
+	 * @return DtList de MovieIndex dtcIndex
 	*/
-	public io.vertigo.dynamo.domain.model.DtList<MovieIndex> loadMovieIndex(final List<Long> movieIds) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			name = "TkLoadMovieIndex",
+			request = "select MOV_ID," +
+					"						 TITLE," +
+					"						 TITLE as TITLE_SORT_ONLY," +
+					"						 YEAR as PRODUCTION_YEAR," +
+					"						 'Film' as MOVIE_TYPE," +
+					"						 POSTER," +
+					"						 TITLE as ORIGINAL_TITLE," +
+					"						 RUNTIME," +
+					"						 DESCRIPTION as SHORT_SYNOPSIS," +
+					"						 DESCRIPTION as SYNOPSIS," +
+					"						 RATED as USER_RATING" +
+					"				from MOVIE mov" +
+					"				where MOV_ID in (#movieIds.rownum#);",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtMovieIndex")
+	public io.vertigo.datamodel.structure.model.DtList<io.vertigo.ui.data.domain.movies.MovieIndex> loadMovieIndex(@io.vertigo.datamodel.task.proxy.TaskInput(name = "movieIds", smartType = "STyId") final java.util.List<Long> movieIds) {
 		final Task task = createTaskBuilder("TkLoadMovieIndex")
 				.addValue("movieIds", movieIds)
 				.build();
 		return getTaskManager()
 				.execute(task)
 				.getResult();
-	}
-
-	/**
-	 * Execute la tache TK_REMOVE_ALL_ACTOR_ROLES.
-	*/
-	public void removeAllActorRoles() {
-		final Task task = createTaskBuilder("TkRemoveAllActorRoles")
-				.build();
-		getTaskManager().execute(task);
-	}
-
-	/**
-	 * Execute la tache TK_REMOVE_ALL_MOVIES.
-	*/
-	public void removeAllMovies() {
-		final Task task = createTaskBuilder("TkRemoveAllMovies")
-				.build();
-		getTaskManager().execute(task);
 	}
 
 	private TaskManager getTaskManager() {

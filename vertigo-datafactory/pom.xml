@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.vertigo</groupId>
+		<artifactId>vertigo-extensions</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>vertigo-datafactory</artifactId>
+	<packaging>jar</packaging>
+	<name>vertigo-datafactory</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-core</artifactId>
+			<version>${vertigo.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-database</artifactId>
+			<version>${project.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-datastore</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-elasticsearch-connector</artifactId>
+			<version>${vertigo.version}</version>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- tests -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.200</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!-- libs -->
+		<!-- kvdatastore -->
+
+		<!-- CollectionsManager/LuceneIndexPlugin -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>8.6.0</version><!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers-common</artifactId>
+			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Connections Pool -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5.5</version>
+			<optional>true</optional><!-- C3p0DataSourceProviderPlugin -->
+		</dependency>
+
+		<!-- Dépendances à des librairies spécifiques au module -->
+		<dependency>
+		    <groupId>org.elasticsearch.client</groupId>
+		    <artifactId>transport</artifactId>
+		    <version>7.9.0</version>
+		    <scope>test</scope> <!-- TransportSearchServicesPlugin -->
+		</dependency>
+		<dependency>
+		    <groupId>org.elasticsearch.client</groupId>
+		    <artifactId>elasticsearch-rest-high-level-client</artifactId>
+		    <version>7.9.0</version>
+		    <optional>true</optional> <!-- RestHighLevelSearchServicesPlugin -->
+		</dependency>
+		<dependency>
+	        <groupId>org.codelibs.elasticsearch.module</groupId>
+	        <artifactId>analysis-common</artifactId> 
+	        <version>7.9.0</version> <!-- required by EmbeddedSearchServicesPlugin -->
+	        <scope>test</scope>
+	    </dependency>
+	   	<dependency>
+		    <groupId>org.codelibs.elasticsearch.module</groupId>
+		    <artifactId>mapper-extras</artifactId>
+		    <version>7.9.0</version> <!-- required by EmbeddedSearchServicesPlugin -->
+	        <scope>test</scope>
+		</dependency>
+
+	</dependencies>
+	<build>
+		<!-- To use the plugin goals in your POM or parent POM -->
+		<plugins>
+			<plugin>
+				<!-- We need a test jar too -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<forceCreation>true</forceCreation>
+					<skipIfEmpty>true</skipIfEmpty>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

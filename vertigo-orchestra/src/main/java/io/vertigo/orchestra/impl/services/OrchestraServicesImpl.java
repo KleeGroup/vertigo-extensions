@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.impl.services.execution.ProcessExecutorImpl;
 import io.vertigo.orchestra.impl.services.execution.ProcessExecutorPlugin;
 import io.vertigo.orchestra.impl.services.schedule.ProcessSchedulerImpl;
@@ -60,10 +59,11 @@ public final class OrchestraServicesImpl implements OrchestraServices {
 			final Optional<ProcessLoggerPlugin> logProviderPlugin,
 			final Optional<ProcessReportPlugin> processReportPlugin,
 			final List<ProcessSchedulerPlugin> processSchedulerPlugins) {
-		Assertion.checkNotNull(processExecutorPlugins);
-		Assertion.checkNotNull(logProviderPlugin);
-		Assertion.checkNotNull(processReportPlugin);
-		Assertion.checkNotNull(processSchedulerPlugins);
+		Assertion.check()
+				.isNotNull(processExecutorPlugins)
+				.isNotNull(logProviderPlugin)
+				.isNotNull(processReportPlugin)
+				.isNotNull(processSchedulerPlugins);
 		// ---
 		processExecutor = new ProcessExecutorImpl(processExecutorPlugins);
 		processScheduler = new ProcessSchedulerImpl(processSchedulerPlugins, processExecutor);

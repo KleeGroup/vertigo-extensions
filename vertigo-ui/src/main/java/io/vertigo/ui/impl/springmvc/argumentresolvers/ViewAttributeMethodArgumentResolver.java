@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,15 +34,17 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.vertigo.dynamo.collections.model.SelectedFacetValues;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.util.InjectorUtil;
+import io.vertigo.datafactory.collections.model.SelectedFacetValues;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtObject;
 import io.vertigo.ui.core.UiSelectedFacetValues;
 import io.vertigo.ui.core.ViewContext;
 import io.vertigo.ui.impl.springmvc.util.UiRequestUtil;
 import io.vertigo.vega.engines.webservice.json.SelectedFacetValuesDeserializer;
 import io.vertigo.vega.webservice.model.UiObject;
+import io.vertigo.vega.webservice.stereotype.Validate;
 import io.vertigo.vega.webservice.validation.DefaultDtObjectValidator;
 import io.vertigo.vega.webservice.validation.DtObjectValidator;
 import io.vertigo.vega.webservice.validation.UiMessageStack;
@@ -67,7 +68,7 @@ public final class ViewAttributeMethodArgumentResolver implements HandlerMethodA
 			final WebDataBinderFactory binderFactory) throws Exception {
 		final ViewContext viewContext = UiRequestUtil.getCurrentViewContext();
 		final UiMessageStack uiMessageStack = UiRequestUtil.obtainCurrentUiMessageStack();
-		Assertion.checkNotNull(viewContext);
+		Assertion.check().isNotNull(viewContext);
 		//---
 		final String contextKey = parameter.getParameterAnnotation(ViewAttribute.class).value();
 		//---
@@ -86,20 +87,20 @@ public final class ViewAttributeMethodArgumentResolver implements HandlerMethodA
 			}
 			return viewContext.getSelectedFacetValues(() -> contextKey);
 		} else if (DtObject.class.isAssignableFrom(parameter.getParameterType()) || DtList.class.isAssignableFrom(parameter.getParameterType())) {
-			Assertion.checkNotNull(uiMessageStack);
+			Assertion.check().isNotNull(uiMessageStack);
 			//---
 			final Object value;
 			if (DtObject.class.isAssignableFrom(parameter.getParameterType())) {
 				//object
 				if (viewContext.getUiObject(() -> contextKey).checkFormat(uiMessageStack)) {
-					value = viewContext.getUiObject(() -> contextKey).mergeAndCheckInput(defaultDtObjectValidators, uiMessageStack);
+					value = viewContext.getUiObject(() -> contextKey).mergeAndCheckInput(getDtObjectValidators(parameter), uiMessageStack);
 				} else {
 					value = null;
 				}
 			} else {
 				//list
 				if (viewContext.getUiList(() -> contextKey).checkFormat(uiMessageStack)) {
-					value = viewContext.getUiList(() -> contextKey).mergeAndCheckInput(defaultDtObjectValidators, uiMessageStack);
+					value = viewContext.getUiList(() -> contextKey).mergeAndCheckInput(getDtObjectValidators(parameter), uiMessageStack);
 				} else {
 					value = null;
 				}
@@ -111,6 +112,19 @@ public final class ViewAttributeMethodArgumentResolver implements HandlerMethodA
 			return value;
 		}
 		return viewContext.get(contextKey);// for primitive or other objects
+	}
+
+	private List<DtObjectValidator<DtObject>> getDtObjectValidators(final MethodParameter parameter) {
+		final Validate validateAnnotation = parameter.getParameterAnnotation(Validate.class);
+		List<DtObjectValidator<DtObject>> validators;
+		if (validateAnnotation != null) {
+			validators = Stream.of(validateAnnotation.value())
+					.map(dtObjectValidatorClass -> (DtObjectValidator<DtObject>) InjectorUtil.newInstance(dtObjectValidatorClass))
+					.collect(Collectors.toList());
+		} else {
+			validators = defaultDtObjectValidators;
+		}
+		return validators;
 	}
 
 	private static boolean isNotLastDt(final MethodParameter parameter) {

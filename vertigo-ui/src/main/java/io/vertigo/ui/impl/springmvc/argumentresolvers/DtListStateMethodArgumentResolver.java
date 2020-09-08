@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +25,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import io.vertigo.dynamo.domain.model.DtListState;
-import io.vertigo.util.StringUtil;
+import io.vertigo.core.util.StringUtil;
+import io.vertigo.datamodel.structure.model.DtListState;
 
 public final class DtListStateMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -46,7 +45,7 @@ public final class DtListStateMethodArgumentResolver implements HandlerMethodArg
 		//---
 		final Integer top = parametersMap.containsKey("top") ? Integer.parseInt(webRequest.getParameter("top")) : null;
 		final int skip = parametersMap.containsKey("skip") ? Integer.parseInt(webRequest.getParameter("skip")) : 0;
-		final String sortFieldName = parametersMap.containsKey("sortFieldName") ? !StringUtil.isEmpty(webRequest.getParameter("sortFieldName")) ? webRequest.getParameter("sortFieldName") : null : null;
+		final String sortFieldName = parametersMap.containsKey("sortFieldName") ? !StringUtil.isBlank(webRequest.getParameter("sortFieldName")) ? webRequest.getParameter("sortFieldName") : null : null;
 		final Boolean sortDesc = parametersMap.containsKey("sortDesc") ? Boolean.valueOf(webRequest.getParameter("sortDesc")) : null;
 
 		return DtListState.of(top, skip, sortFieldName, sortDesc);

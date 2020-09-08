@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,35 +23,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.vertigo.app.App;
-import io.vertigo.app.Home;
-import io.vertigo.commons.analytics.AnalyticsManager;
-import io.vertigo.commons.analytics.health.HealthCheck;
-import io.vertigo.commons.analytics.health.HealthStatus;
-import io.vertigo.commons.cache.CacheDefinition;
-import io.vertigo.commons.daemon.DaemonDefinition;
-import io.vertigo.commons.daemon.DaemonManager;
-import io.vertigo.commons.daemon.DaemonStat;
-import io.vertigo.commons.eventbus.EventBusSubscriptionDefinition;
+import io.vertigo.commons.eventbus.definitions.EventBusSubscriptionDefinition;
+import io.vertigo.core.analytics.AnalyticsManager;
+import io.vertigo.core.analytics.health.HealthCheck;
+import io.vertigo.core.analytics.health.HealthStatus;
+import io.vertigo.core.daemon.DaemonManager;
+import io.vertigo.core.daemon.DaemonStat;
+import io.vertigo.core.daemon.definitions.DaemonDefinition;
+import io.vertigo.core.node.Node;
 import io.vertigo.dashboard.ui.AbstractDashboardModuleControler;
 import io.vertigo.dashboard.ui.commons.model.CacheModel;
 import io.vertigo.dashboard.ui.commons.model.DaemonModel;
 import io.vertigo.dashboard.ui.commons.model.EventBusModel;
+import io.vertigo.datastore.cache.definitions.CacheDefinition;
 
 public class CommonsDashboardControler extends AbstractDashboardModuleControler {
 
 	@Override
-	public void doBuildModel(final App app, final Map<String, Object> model) {
-		buildDaemonsModel(app, model);
-		buildEventBusModel(app, model);
-		buildCacheModel(app, model);
+	public void doBuildModel(final Node node, final Map<String, Object> model) {
+		buildDaemonsModel(node, model);
+		buildEventBusModel(node, model);
+		buildCacheModel(node, model);
 	}
 
-	private static void buildDaemonsModel(final App app, final Map<String, Object> model) {
-		final DaemonManager daemonManager = app.getComponentSpace().resolve(DaemonManager.class);
+	private static void buildDaemonsModel(final Node node, final Map<String, Object> model) {
+		final DaemonManager daemonManager = node.getComponentSpace().resolve(DaemonManager.class);
 		final List<DaemonStat> daemonStats = daemonManager.getStats();
 		//---
-		final List<DaemonModel> daemonModels = Home.getApp().getDefinitionSpace().getAll(DaemonDefinition.class)
+		final List<DaemonModel> daemonModels = Node.getNode().getDefinitionSpace().getAll(DaemonDefinition.class)
 				.stream()
 				.map(daemonDefinition -> new DaemonModel(
 						daemonDefinition,
@@ -64,12 +62,12 @@ public class CommonsDashboardControler extends AbstractDashboardModuleControler 
 				.collect(Collectors.toList());
 		model.put("daemons", daemonModels);
 		//---
-		model.put("daemonsStatus", getHealthStatus(app, model, "daemons"));
+		model.put("daemonsStatus", getHealthStatus(node, model, "daemons"));
 
 	}
 
-	private static void buildEventBusModel(final App app, final Map<String, Object> model) {
-		final Collection<EventBusSubscriptionDefinition> eventBusSubscriptions = Home.getApp().getDefinitionSpace().getAll(EventBusSubscriptionDefinition.class);
+	private static void buildEventBusModel(final Node node, final Map<String, Object> model) {
+		final Collection<EventBusSubscriptionDefinition> eventBusSubscriptions = Node.getNode().getDefinitionSpace().getAll(EventBusSubscriptionDefinition.class);
 		final List<EventBusModel> events = eventBusSubscriptions
 				.stream()
 				.collect(Collectors.groupingBy(EventBusSubscriptionDefinition::getEventType))
@@ -80,20 +78,20 @@ public class CommonsDashboardControler extends AbstractDashboardModuleControler 
 		model.put("events", events);
 		//---
 		model.put("eventSubcriptionsCount", eventBusSubscriptions.size());
-		model.put("eventsStatus", getHealthStatus(app, model, "events"));
+		model.put("eventsStatus", getHealthStatus(node, model, "events"));
 	}
 
-	private static void buildCacheModel(final App app, final Map<String, Object> model) {
-		final List<CacheModel> caches = Home.getApp().getDefinitionSpace().getAll(CacheDefinition.class)
+	private static void buildCacheModel(final Node node, final Map<String, Object> model) {
+		final List<CacheModel> caches = Node.getNode().getDefinitionSpace().getAll(CacheDefinition.class)
 				.stream()
-				.map(cacheDefinition -> new CacheModel(cacheDefinition))
+				.map(CacheModel::new)
 				.collect(Collectors.toList());
 		model.put("caches", caches);
-		model.put("cacheStatus", getHealthStatus(app, model, "cache"));
+		model.put("cacheStatus", getHealthStatus(node, model, "cache"));
 	}
 
-	private static HealthStatus getHealthStatus(final App app, final Map<String, Object> model, final String... topics) {
-		final AnalyticsManager analyticsManager = app.getComponentSpace().resolve(AnalyticsManager.class);
+	private static HealthStatus getHealthStatus(final Node node, final Map<String, Object> model, final String... topics) {
+		final AnalyticsManager analyticsManager = node.getComponentSpace().resolve(AnalyticsManager.class);
 		final Map<String, List<HealthCheck>> healthCheckByTopic = (Map<String, List<HealthCheck>>) model.get("healthchecksByFeature");
 		final List<String> myTopics = Arrays.asList(topics);
 		final List<HealthCheck> healtChecksToAggregate = healthCheckByTopic

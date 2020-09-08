@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +25,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.App;
-import io.vertigo.app.config.ModuleConfig;
-import io.vertigo.commons.analytics.health.HealthCheck;
+import io.vertigo.core.analytics.health.HealthCheck;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.node.config.ModuleConfig;
 import io.vertigo.dashboard.services.data.DataProvider;
 
 public abstract class AbstractDashboardModuleControler implements DashboardModuleControler {
@@ -41,16 +40,16 @@ public abstract class AbstractDashboardModuleControler implements DashboardModul
 	}
 
 	@Override
-	public Map<String, Object> buildModel(final App app, final String moduleName) {
+	public Map<String, Object> buildModel(final Node node, final String moduleName) {
 		final Map<String, Object> model = new HashMap<>();
 		//---
-		initModuleModel(app, model, moduleName);
-		doBuildModel(app, model);
+		initModuleModel(node, model, moduleName);
+		doBuildModel(node, model);
 		return model;
 	}
 
-	private void initModuleModel(final App app, final Map<String, Object> model, final String moduleName) {
-		final Set<String> modules = app.getNodeConfig().getModuleConfigs().stream().map(ModuleConfig::getName).collect(Collectors.toSet());
+	private void initModuleModel(final Node node, final Map<String, Object> model, final String moduleName) {
+		final Set<String> modules = node.getNodeConfig().getModuleConfigs().stream().map(ModuleConfig::getName).collect(Collectors.toSet());
 		//---
 		model.put("modules", modules);
 		//---
@@ -72,6 +71,6 @@ public abstract class AbstractDashboardModuleControler implements DashboardModul
 		model.put("moduleName", moduleName);
 	}
 
-	public abstract void doBuildModel(final App app, final Map<String, Object> model);
+	public abstract void doBuildModel(final Node node, final Map<String, Object> model);
 
 }

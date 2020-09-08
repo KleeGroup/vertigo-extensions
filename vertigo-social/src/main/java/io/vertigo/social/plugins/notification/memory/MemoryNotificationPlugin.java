@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import io.vertigo.account.account.Account;
-import io.vertigo.commons.daemon.DaemonScheduled;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.daemon.DaemonScheduled;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.datamodel.structure.model.UID;
 import io.vertigo.social.impl.notification.NotificationEvent;
 import io.vertigo.social.impl.notification.NotificationPlugin;
-import io.vertigo.social.services.notification.Notification;
+import io.vertigo.social.notification.Notification;
 
 /**
  * @author pchretien
@@ -43,7 +42,7 @@ public final class MemoryNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void send(final NotificationEvent notificationEvent) {
-		Assertion.checkNotNull(notificationEvent);
+		Assertion.check().isNotNull(notificationEvent);
 		//-----
 		//0 - Remplir la pile des événements
 
@@ -58,8 +57,9 @@ public final class MemoryNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void updateUserContent(final UID<Account> accountURI, final UUID notificationUUID, final String userContent) {
-		Assertion.checkNotNull(accountURI);
-		Assertion.checkNotNull(notificationUUID);
+		Assertion.check()
+				.isNotNull(accountURI)
+				.isNotNull(notificationUUID);
 		//-----
 		//on recopie la notification et on ajoute la modif
 		final List<Notification> newNotifications = getCurrentNotifications(accountURI)
@@ -89,7 +89,7 @@ public final class MemoryNotificationPlugin implements NotificationPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public List<Notification> getCurrentNotifications(final UID<Account> userProfileURI) {
-		Assertion.checkNotNull(userProfileURI);
+		Assertion.check().isNotNull(userProfileURI);
 		//-----
 		final List<Notification> notifications = notificationsByAccountURI.get(userProfileURI);
 		if (notifications == null) {
@@ -100,7 +100,7 @@ public final class MemoryNotificationPlugin implements NotificationPlugin {
 	}
 
 	private List<Notification> obtainNotifications(final UID<Account> accountURI) {
-		Assertion.checkNotNull(accountURI);
+		Assertion.check().isNotNull(accountURI);
 		//-----
 		final List<Notification> notifications = notificationsByAccountURI.computeIfAbsent(accountURI, uri -> new ArrayList<>());
 		cleanTooOldNotifications(notifications);

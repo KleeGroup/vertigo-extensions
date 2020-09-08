@@ -3,10 +3,10 @@ package io.vertigo.orchestra.domain.planification
 create DtDefinition DtOProcessPlanification {
 	storeName : "orchestra"
 	id prpId	{domain : DoOIdentifiant, label :"Id Planification", },
-	field expectedTime   	{domain : DoOTimestamp, label :"Date d'execution prévue", required:"false",},
-	field initialParams	{domain : DoOJsonText, label :"Paramètres initiaux sous forme de JSON ", required:"false",},
+	field expectedTime   	{domain : DoOTimestamp, label :"Date d'execution prévue", cardinality: "?",},
+	field initialParams	{domain : DoOJsonText, label :"Paramètres initiaux sous forme de JSON ", cardinality: "?",},
   
-},
+}
 
 create Association APrpPro {
   fkFieldName : "proId"
@@ -25,7 +25,7 @@ create Association APrpPro {
 	roleA : "ProcessPlanification"
 	roleB : "Processus"
 			
-},
+}
 
 
 create Association APrpNod {
@@ -45,7 +45,7 @@ create Association APrpNod {
 	roleA : "ProcessPlanification"
 	roleB : "Node"
 			
-},
+}
 
 
 

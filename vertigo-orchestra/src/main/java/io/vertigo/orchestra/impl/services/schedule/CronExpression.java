@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +28,30 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
+/*
+ * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 /**
+ *
+ * This File is a modified and simplified version of the quartz CronExpression.
+ * Thanks to the original authors, feel free to reuse or contriubute to this version as it's redistributed in Apache 2.0 Licence
+ *
+ *
  * Provides a parser and evaluator for unix-like cron expressions. Cron
  * expressions provide the ability to specify complex time combinations such as
  * &quot;At 8:00am every Monday through Friday&quot; or &quot;At 1:30am every
@@ -347,7 +367,7 @@ public final class CronExpression {
 	 *         <CODE>CronExpression</CODE>
 	 */
 	public CronExpression(final String cronExpression) throws ParseException {
-		Assertion.checkNotNull(cronExpression, "cronExpression cannot be null");
+		Assertion.check().isNotNull(cronExpression, "cronExpression cannot be null");
 		//--
 
 		this.cronExpression = cronExpression.toUpperCase(Locale.FRENCH);

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.definitions.ProcessType;
 import io.vertigo.orchestra.impl.definitions.ProcessDefinitionStorePlugin;
@@ -45,17 +44,17 @@ public class MemoryProcessDefinitionStorePlugin implements ProcessDefinitionStor
 
 	@Override
 	public boolean processDefinitionExists(final String processName) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		// ---
 		return processDefinitions.containsKey(processName);
 	}
 
 	@Override
 	public ProcessDefinition getProcessDefinition(final String processName) {
-		Assertion.checkArgNotEmpty(processName);
+		Assertion.check().isNotBlank(processName);
 		// ---
 		final ProcessDefinition processDefinition = processDefinitions.get(processName);
-		Assertion.checkNotNull(processDefinition, "ProcessDefinition '{0}' not found in ({1})", processName, processDefinitions.keySet());
+		Assertion.check().isNotNull(processDefinition, "ProcessDefinition '{0}' not found in ({1})", processName, processDefinitions.keySet());
 		return processDefinition;
 	}
 

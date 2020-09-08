@@ -18,6 +18,7 @@
 			    th::selected.sync="|componentStates.${componentId}.selected|"
 			    th::loading="|componentStates.${componentId}.loading|"
 			    th::pagination.sync="|componentStates.${componentId}.pagination|"
+			    :sort-method="VertigoUi.methods.sortCiAi"
 			    th:table-class="${tableClass?:'table-'+(color?:'secondary')}"
 			    th:attr="__${other_attrs}__"
 			  >

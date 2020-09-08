@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +17,17 @@
  */
 package io.vertigo.orchestra.services.execution;
 
-import io.vertigo.app.config.ModuleConfig;
-import io.vertigo.app.config.NodeConfig;
-import io.vertigo.app.config.NodeConfigBuilder;
 import io.vertigo.commons.CommonsFeatures;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.ModuleConfig;
+import io.vertigo.core.node.config.NodeConfig;
+import io.vertigo.core.node.config.NodeConfigBuilder;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin;
 import io.vertigo.core.plugins.resource.url.URLResourceResolverPlugin;
 import io.vertigo.database.DatabaseFeatures;
 import io.vertigo.database.impl.sql.vendor.h2.H2DataBase;
-import io.vertigo.dynamo.DynamoFeatures;
+import io.vertigo.datastore.DataStoreFeatures;
 import io.vertigo.orchestra.OrchestraFeatures;
 import io.vertigo.orchestra.util.monitoring.MonitoringServices;
 import io.vertigo.orchestra.util.monitoring.MonitoringServicesImpl;
@@ -37,14 +37,12 @@ public final class OrchestraNode1NodeConfig {
 	public static NodeConfigBuilder createNodeConfigBuilder() {
 		return NodeConfig.builder()
 				.withNodeId("NodeTest2")
-				.beginBoot()
-				.withLocales("fr_FR")
-				.addPlugin(ClassPathResourceResolverPlugin.class)
-				.addPlugin(URLResourceResolverPlugin.class)
-				.endBoot()
+				.withBoot(BootConfig.builder()
+						.withLocales("fr_FR")
+						.addPlugin(ClassPathResourceResolverPlugin.class)
+						.addPlugin(URLResourceResolverPlugin.class)
+						.build())
 				.addModule(new CommonsFeatures()
-						.withCache()
-						.withMemoryCache()
 						.withScript()
 						.withJaninoScript()
 						.build())
@@ -56,13 +54,15 @@ public final class OrchestraNode1NodeConfig {
 								Param.of("jdbcDriver", org.h2.Driver.class.getName()),
 								Param.of("jdbcUrl", "jdbc:h2:~/vertigo/orchestra;MVCC=FALSE;AUTO_SERVER=TRUE"))
 						.build())
-				.addModule(new DynamoFeatures()
+				.addModule(new DataStoreFeatures()
+						.withCache()
+						.withMemoryCache()
 						.withKVStore()
 						.withDelayedMemoryKV(
 								Param.of("collections", "tokens"),
 								Param.of("timeToLiveSeconds", "120"))
-						.withStore()
-						.withSqlStore(
+						.withEntityStore()
+						.withSqlEntityStore(
 								Param.of("dataSpace", "orchestra"),
 								Param.of("connectionName", "orchestra"),
 								Param.of("sequencePrefix", "SEQ_"))

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.definitions.ProcessType;
 import io.vertigo.orchestra.services.execution.ProcessExecutor;
@@ -43,14 +42,15 @@ public final class ProcessSchedulerImpl implements ProcessScheduler {
 	 * @param schedulerPlugins la liste des plugins de gestion de la planification
 	 */
 	public ProcessSchedulerImpl(final List<ProcessSchedulerPlugin> schedulerPlugins, final ProcessExecutor processExecutor) {
-		Assertion.checkNotNull(schedulerPlugins);
-		Assertion.checkNotNull(processExecutor);
+		Assertion.check()
+				.isNotNull(schedulerPlugins)
+				.isNotNull(processExecutor);
 		//---
 		for (final ProcessSchedulerPlugin schedulerPlugin : schedulerPlugins) {
 			//-1-- start
 			schedulerPlugin.setProcessExecutor(processExecutor);
 			//-2-- register
-			Assertion.checkState(!schedulerPluginsMap.containsKey(schedulerPlugin.getHandledProcessType()), "Only one plugin can manage the processType {0}", schedulerPlugin.getHandledProcessType());
+			Assertion.check().isFalse(schedulerPluginsMap.containsKey(schedulerPlugin.getHandledProcessType()), "Only one plugin can manage the processType {0}", schedulerPlugin.getHandledProcessType());
 			schedulerPluginsMap.put(schedulerPlugin.getHandledProcessType(), schedulerPlugin);
 		}
 	}
@@ -62,9 +62,10 @@ public final class ProcessSchedulerImpl implements ProcessScheduler {
 	/** {@inheritDoc} */
 	@Override
 	public void scheduleAt(final ProcessDefinition processDefinition, final Instant planifiedTime, final Map<String, String> initialParams) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(planifiedTime);
-		Assertion.checkNotNull(initialParams);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(planifiedTime)
+				.isNotNull(initialParams);
 		// ---
 		getPluginByType(processDefinition.getProcessType())
 				.scheduleAt(processDefinition, planifiedTime, initialParams);
@@ -72,7 +73,7 @@ public final class ProcessSchedulerImpl implements ProcessScheduler {
 
 	private ProcessSchedulerPlugin getPluginByType(final ProcessType processType) {
 		final ProcessSchedulerPlugin schedulerPlugin = schedulerPluginsMap.get(processType);
-		Assertion.checkNotNull(schedulerPlugin, "No plugin found for managing processType {0}", processType.name());
+		Assertion.check().isNotNull(schedulerPlugin, "No plugin found for managing processType {0}", processType.name());
 		return schedulerPlugin;
 	}
 

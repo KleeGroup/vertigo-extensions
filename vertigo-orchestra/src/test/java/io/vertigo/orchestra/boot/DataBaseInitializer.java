@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +24,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.Collections;
 
 import javax.inject.Inject;
 
-import io.vertigo.core.component.Activeable;
-import io.vertigo.core.component.Component;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.node.component.Activeable;
+import io.vertigo.core.node.component.Component;
 import io.vertigo.core.resource.ResourceManager;
-import io.vertigo.database.sql.SqlDataBaseManager;
+import io.vertigo.database.sql.SqlManager;
 import io.vertigo.database.sql.connection.SqlConnection;
 import io.vertigo.database.sql.statement.SqlStatement;
-import io.vertigo.lang.WrappedException;
 
 /**
  * Init masterdata list.
@@ -47,7 +47,7 @@ public class DataBaseInitializer implements Component, Activeable {
 	@Inject
 	private ResourceManager resourceManager;
 	@Inject
-	private SqlDataBaseManager sqlDataBaseManager;
+	private SqlManager sqlManager;
 
 	/** {@inheritDoc} */
 	@Override
@@ -62,12 +62,10 @@ public class DataBaseInitializer implements Component, Activeable {
 	}
 
 	private void createDataBase() {
-		final SqlConnection connection = sqlDataBaseManager.getConnectionProvider(ORCHESTRA_CONNECTION_NAME).obtainConnection();
-		execCallableStatement(connection, sqlDataBaseManager, "DROP ALL OBJECTS; ");
-		execSqlScript(connection, "file:./src/main/database/scripts/install/orchestra_create_init_v1.0.0.sql");
-		try {
+		try (final SqlConnection connection = sqlManager.getConnectionProvider(ORCHESTRA_CONNECTION_NAME).obtainConnection()) {
+			execCallableStatement(connection, sqlManager, "DROP ALL OBJECTS; ");
+			execSqlScript(connection, "file:./src/main/database/scripts/install/orchestra_create_init_v1.0.0.sql");
 			connection.commit();
-			connection.release();
 		} catch (final SQLException e) {
 			throw WrappedException.wrap(e, "Can't release connection");
 		}
@@ -83,7 +81,7 @@ public class DataBaseInitializer implements Component, Activeable {
 					crebaseSql.append(adaptedInputLine).append('\n');
 				}
 				if (inputLine.trim().endsWith(";")) {
-					execCallableStatement(connection, sqlDataBaseManager, crebaseSql.toString());
+					execCallableStatement(connection, sqlManager, crebaseSql.toString());
 					crebaseSql.setLength(0);
 				}
 			}
@@ -92,9 +90,9 @@ public class DataBaseInitializer implements Component, Activeable {
 		}
 	}
 
-	private static void execCallableStatement(final SqlConnection connection, final SqlDataBaseManager sqlDataBaseManager, final String sql) {
+	private static void execCallableStatement(final SqlConnection connection, final SqlManager sqlManager, final String sql) {
 		try {
-			sqlDataBaseManager.executeUpdate(SqlStatement.builder(sql).build(), connection);
+			sqlManager.executeUpdate(SqlStatement.builder(sql).build(), Collections.emptyMap(), connection);
 		} catch (final SQLException e) {
 			throw WrappedException.wrap(e, "Can't exec command {0}", sql);
 		}

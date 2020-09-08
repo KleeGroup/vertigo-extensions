@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.definitions.ProcessType;
 import io.vertigo.orchestra.services.execution.ActivityExecutionWorkspace;
@@ -34,10 +33,10 @@ public final class ProcessExecutorImpl implements ProcessExecutor {
 	private final Map<ProcessType, ProcessExecutorPlugin> executorPluginsMap = new EnumMap<>(ProcessType.class);
 
 	public ProcessExecutorImpl(final List<ProcessExecutorPlugin> processExecutorPlugins) {
-		Assertion.checkNotNull(processExecutorPlugins);
+		Assertion.check().isNotNull(processExecutorPlugins);
 		// ---
 		for (final ProcessExecutorPlugin processExecutorPlugin : processExecutorPlugins) {
-			Assertion.checkState(!executorPluginsMap.containsKey(processExecutorPlugin.getHandledProcessType()), "Only one plugin can manage the processType {0}",
+			Assertion.check().isFalse(executorPluginsMap.containsKey(processExecutorPlugin.getHandledProcessType()), "Only one plugin can manage the processType {0}",
 					processExecutorPlugin.getHandledProcessType());
 			executorPluginsMap.put(processExecutorPlugin.getHandledProcessType(), processExecutorPlugin);
 		}
@@ -46,8 +45,9 @@ public final class ProcessExecutorImpl implements ProcessExecutor {
 	/** {@inheritDoc} */
 	@Override
 	public void execute(final ProcessDefinition processDefinition, final Optional<String> initialParams) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(initialParams);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(initialParams);
 		// ---
 		getPluginByType(processDefinition.getProcessType()).execute(processDefinition, initialParams);
 	}
@@ -68,7 +68,7 @@ public final class ProcessExecutorImpl implements ProcessExecutor {
 
 	private ProcessExecutorPlugin getPluginByType(final ProcessType processType) {
 		final ProcessExecutorPlugin executorPlugin = executorPluginsMap.get(processType);
-		Assertion.checkNotNull(executorPlugin, "No plugin found for managing processType {0}", processType.name());
+		Assertion.check().isNotNull(executorPlugin, "No plugin found for managing processType {0}", processType.name());
 		return executorPlugin;
 	}
 }

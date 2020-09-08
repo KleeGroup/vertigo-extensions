@@ -24,49 +24,50 @@
 		</dependency>
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-commons-impl</artifactId>
-			<version>${vertigo.version}</version>
+			<artifactId>vertigo-commons</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-dynamo-impl</artifactId>
-			<version>${vertigo.version}</version>
+			<artifactId>vertigo-datastore</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-vega-impl</artifactId>
-			<version>${vertigo.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-studio</artifactId>
-			<version>${vertigo.version}</version>
-		</dependency>
+			<artifactId>vertigo-vega</artifactId>
+			<version>${project.version}</version>
+		</dependency> 
 
 		<!-- Dependencies for tests -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.199</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-core</artifactId>
-			<version>${vertigo.version}</version>
-			<type>test-jar</type>
+			<version>1.4.200</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.5.3</version>
+			<version>0.9.5.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>3.3.0</version>
+			<version>4.3.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- For javalin embedded -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.31.v20200723</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
+			<version>9.4.31.v20200723</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

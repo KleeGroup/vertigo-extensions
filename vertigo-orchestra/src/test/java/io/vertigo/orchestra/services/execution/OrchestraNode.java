@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +27,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 /**
  * @author npiedeloup
@@ -46,8 +45,9 @@ final class OrchestraNode {
 	 * @param maxLifeTime Durée de vie max en seconde
 	 */
 	OrchestraNode(final int nodeId, final int maxLifeTime) {
-		Assertion.checkArgument(nodeId == 1 || nodeId == 2, "You must specified nodeId : 1 or 2");
-		Assertion.checkArgument(maxLifeTime >= 0 && maxLifeTime < 30000, "MaxLifeTime is in seconde and must be less than 30000 ({0}). Use 0 if you need infinit life.", maxLifeTime);
+		Assertion.check()
+				.isTrue(nodeId == 1 || nodeId == 2, "You must specified nodeId : 1 or 2")
+				.isTrue(maxLifeTime >= 0 && maxLifeTime < 30000, "MaxLifeTime is in seconde and must be less than 30000 ({0}). Use 0 if you need infinit life.", maxLifeTime);
 		//-----
 		this.maxLifeTime = maxLifeTime;
 		this.nodeId = nodeId;
@@ -78,7 +78,7 @@ final class OrchestraNode {
 	}
 
 	private static String properSystemPath(final String path) {
-		Assertion.checkNotNull(path);
+		Assertion.check().isNotNull(path);
 		//---
 		return path.replaceAll("([^;]+);([^;]+)", "\"$1\";\"$2\"");
 	}

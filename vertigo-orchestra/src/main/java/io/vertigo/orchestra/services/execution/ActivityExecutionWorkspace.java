@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +20,7 @@ package io.vertigo.orchestra.services.execution;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 /**
  * ActivityExecutionWorkspace.
@@ -47,7 +46,7 @@ public final class ActivityExecutionWorkspace {
 	 * @param params un workspace sous forme de Map
 	 */
 	public ActivityExecutionWorkspace(final Map<String, String> params) {
-		Assertion.checkNotNull(params);
+		Assertion.check().isNotNull(params);
 		//---
 		this.params = params;
 	}
@@ -58,7 +57,7 @@ public final class ActivityExecutionWorkspace {
 	 * @return la valeur
 	 */
 	public String getValue(final String key) {
-		Assertion.checkNotNull(key);
+		Assertion.check().isNotNull(key);
 		//---
 		return params.get(key);
 	}
@@ -69,7 +68,7 @@ public final class ActivityExecutionWorkspace {
 	 * @return true si la clé existe
 	 */
 	public boolean containsKey(final String key) {
-		Assertion.checkNotNull(key);
+		Assertion.check().isNotNull(key);
 		//---
 		return params.containsKey(key);
 	}
@@ -80,8 +79,9 @@ public final class ActivityExecutionWorkspace {
 	 * @param value la valeur
 	 */
 	public void setValue(final String key, final String value) {
-		Assertion.checkNotNull(key);
-		Assertion.checkState(!STATUS_KEY.equals(key), "Status cannot be set directly");
+		Assertion.check()
+				.isNotNull(key)
+				.isFalse(STATUS_KEY.equals(key), "Status cannot be set directly");
 		// ---
 		params.put(key, value);
 	}
@@ -91,7 +91,7 @@ public final class ActivityExecutionWorkspace {
 	 * @param key la clé à retirer
 	 */
 	public void removeKey(final String key) {
-		Assertion.checkNotNull(key);
+		Assertion.check().isNotNull(key);
 		// ---
 		params.remove(key);
 	}

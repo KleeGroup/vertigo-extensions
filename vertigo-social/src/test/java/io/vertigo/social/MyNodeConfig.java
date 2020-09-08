@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +18,20 @@
 package io.vertigo.social;
 
 import io.vertigo.account.AccountFeatures;
-import io.vertigo.account.plugins.account.cache.memory.MemoryAccountCachePlugin;
-import io.vertigo.account.plugins.account.cache.redis.RedisAccountCachePlugin;
-import io.vertigo.app.config.NodeConfig;
-import io.vertigo.app.config.NodeConfigBuilder;
-import io.vertigo.app.config.ModuleConfig;
 import io.vertigo.commons.CommonsFeatures;
+import io.vertigo.connectors.javalin.JavalinFeatures;
+import io.vertigo.connectors.redis.RedisFeatures;
+import io.vertigo.core.node.config.BootConfig;
+import io.vertigo.core.node.config.ModuleConfig;
+import io.vertigo.core.node.config.NodeConfig;
+import io.vertigo.core.node.config.NodeConfigBuilder;
 import io.vertigo.core.param.Param;
 import io.vertigo.core.plugins.resource.classpath.ClassPathResourceResolverPlugin;
-import io.vertigo.dynamo.DynamoFeatures;
+import io.vertigo.datamodel.DataModelFeatures;
+import io.vertigo.datastore.DataStoreFeatures;
 import io.vertigo.social.data.MockIdentities;
 import io.vertigo.social.notification.data.TestUserSession;
 import io.vertigo.social.notification.webservices.TestLoginWebServices;
-import io.vertigo.social.plugins.comment.memory.MemoryCommentPlugin;
-import io.vertigo.social.plugins.comment.redis.RedisCommentPlugin;
-import io.vertigo.social.plugins.notification.memory.MemoryNotificationPlugin;
-import io.vertigo.social.plugins.notification.redis.RedisNotificationPlugin;
 import io.vertigo.social.webservices.account.AccountWebServices;
 import io.vertigo.social.webservices.comment.CommentWebServices;
 import io.vertigo.social.webservices.notification.NotificationWebServices;
@@ -49,19 +46,25 @@ public final class MyNodeConfig {
 		final String redisDatabase = "15";
 
 		final NodeConfigBuilder nodeConfigBuilder = NodeConfig.builder()
-				.beginBoot()
-				.withLocales("fr")
-				.addPlugin(ClassPathResourceResolverPlugin.class)
-				.endBoot();
+				.withBoot(BootConfig.builder()
+						.withLocales("fr")
+						.addPlugin(ClassPathResourceResolverPlugin.class)
+						.build());
 
 		final CommonsFeatures commonsFeatures = new CommonsFeatures();
 		if (redis) {
-			commonsFeatures.withRedisConnector(Param.of("host", redisHost), Param.of("port", redisPort), Param.of("database", redisDatabase));
+			nodeConfigBuilder.addModule(new RedisFeatures()
+					.withJedis(
+							Param.of("host", redisHost),
+							Param.of("port", redisPort),
+							Param.of("database", redisDatabase))
+					.build());
 		}
 
 		nodeConfigBuilder
 				.addModule(commonsFeatures.build())
-				.addModule(new DynamoFeatures().build())
+				.addModule(new DataModelFeatures().build())
+				.addModule(new DataStoreFeatures().build())
 				.addModule(ModuleConfig.builder("identities")
 						.addComponent(MockIdentities.class)
 						.build());
@@ -82,21 +85,21 @@ public final class MyNodeConfig {
 		if (redis) {
 			return nodeConfigBuilder
 					.addModule(accountFeatures
-							.addPlugin(RedisAccountCachePlugin.class)
+							.withRedisAccountCache()
 							.build())
 					.addModule(socialFeatures
-							.addPlugin(RedisNotificationPlugin.class)
-							.addPlugin(RedisCommentPlugin.class)
+							.withRedisNotifications()
+							.withRedisComments()
 							.build());
 		}
 		//else we use memory
 		return nodeConfigBuilder
 				.addModule(accountFeatures
-						.addPlugin(MemoryAccountCachePlugin.class)
+						.withMemoryAccountCache()
 						.build())
 				.addModule(socialFeatures
-						.addPlugin(MemoryNotificationPlugin.class)
-						.addPlugin(MemoryCommentPlugin.class)
+						.withMemoryNotifications()
+						.withMemoryComments()
 						.build());
 	}
 
@@ -106,10 +109,13 @@ public final class MyNodeConfig {
 
 	public static NodeConfig vegaConfig() {
 		return createNodeConfigBuilder(true)
+				.addModule(new JavalinFeatures()
+						.withEmbeddedServer(Param.of("port", WS_PORT))
+						.build())
 				.addModule(new VegaFeatures()
 						.withWebServices()
+						.withJavalinWebServerPlugin()
 						.withWebServicesSecurity()
-						.withWebServicesEmbeddedServer(Param.of("port", Integer.toString(WS_PORT)))
 						.build())
 				.addModule(ModuleConfig.builder("ws-account")
 						.addComponent(AccountWebServices.class)

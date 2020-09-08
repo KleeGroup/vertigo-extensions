@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +35,12 @@ import javax.inject.Inject;
 
 import com.google.gson.Gson;
 
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.geo.impl.services.geocoder.GeoCoderPlugin;
+import io.vertigo.geo.geocoder.GeoLocation;
+import io.vertigo.geo.impl.geocoder.GeoCoderPlugin;
 import io.vertigo.geo.plugins.geocoder.ban.BanGeoCoderPlugin.BanResponse.GeoJsonFeature;
-import io.vertigo.geo.services.geocoder.GeoLocation;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
 
 /**
  * @author spoitrenaud
@@ -56,15 +55,16 @@ public final class BanGeoCoderPlugin implements GeoCoderPlugin {
 
 	@Inject
 	public BanGeoCoderPlugin(
-			final @ParamValue("proxyHost") Optional<String> proxyHost,
-			final @ParamValue("proxyPort") Optional<String> proxyPort) {
-		Assertion.checkNotNull(proxyHost);
-		Assertion.checkNotNull(proxyPort);
-		Assertion.checkArgument((proxyHost.isPresent() && proxyPort.isPresent()) || (!proxyHost.isPresent() && !proxyPort.isPresent()),
-				"les deux paramètres host et port doivent être tous les deux remplis ou vides");
+			final @ParamValue("proxyHost") Optional<String> proxyHostOpt,
+			final @ParamValue("proxyPort") Optional<String> proxyPortOpt) {
+		Assertion.check()
+				.isNotNull(proxyHostOpt)
+				.isNotNull(proxyPortOpt)
+				.isTrue((proxyHostOpt.isPresent() && proxyPortOpt.isPresent()) || (proxyHostOpt.isEmpty() && proxyPortOpt.isEmpty()),
+						"les deux paramètres host et port doivent être tous les deux remplis ou vides");
 		//-----
-		if (proxyHost.isPresent()) {
-			proxyOpt = Optional.of(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost.get(), Integer.parseInt(proxyPort.get()))));
+		if (proxyHostOpt.isPresent()) {
+			proxyOpt = Optional.of(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHostOpt.get(), Integer.parseInt(proxyPortOpt.get()))));
 		} else {
 			proxyOpt = Optional.empty();
 		}
@@ -77,7 +77,7 @@ public final class BanGeoCoderPlugin implements GeoCoderPlugin {
 	 * @return Document
 	 */
 	private BanResponse geoCode(final String address) {
-		Assertion.checkNotNull(address);
+		Assertion.check().isNotNull(address);
 		//-----
 		final String urlString;
 		try {
@@ -94,7 +94,7 @@ public final class BanGeoCoderPlugin implements GeoCoderPlugin {
 		}
 
 		//-----
-		Assertion.checkNotNull(url);
+		Assertion.check().isNotNull(url);
 		try {
 			final HttpURLConnection connection = proxyOpt.isPresent() ? (HttpURLConnection) url.openConnection(proxyOpt.get()) : (HttpURLConnection) url.openConnection();
 			connection.setConnectTimeout(500); //500 ms timeout
@@ -104,8 +104,7 @@ public final class BanGeoCoderPlugin implements GeoCoderPlugin {
 
 			final Gson gson = new Gson();
 			try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-				final BanResponse response = gson.fromJson(bufferedReader, BanResponse.class);
-				return response;
+				return gson.fromJson(bufferedReader, BanResponse.class);
 			}
 		} catch (final IOException e) {
 			throw WrappedException.wrap(e);
@@ -115,7 +114,7 @@ public final class BanGeoCoderPlugin implements GeoCoderPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public GeoLocation findLocation(final String address) {
-		Assertion.checkNotNull(address);
+		Assertion.check().isNotNull(address);
 		//-----
 		final BanResponse banResponse = geoCode(address);
 		if (banResponse == null) {
@@ -123,7 +122,7 @@ public final class BanGeoCoderPlugin implements GeoCoderPlugin {
 		}
 		//-----
 		// 0- Vérification du status
-		Assertion.checkState(banResponse.features.size() <= 1, "Only one address when looking for a single location");
+		Assertion.check().isTrue(banResponse.features.size() <= 1, "Only one address when looking for a single location");
 		if (banResponse.features.size() == 0) {
 			return GeoLocation.UNDEFINED;
 		}

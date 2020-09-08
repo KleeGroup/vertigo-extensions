@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +17,9 @@
  */
 package io.vertigo.dashboard.ui.commons.model;
 
-import io.vertigo.commons.daemon.DaemonDefinition;
-import io.vertigo.commons.daemon.DaemonStat;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.daemon.DaemonStat;
+import io.vertigo.core.daemon.definitions.DaemonDefinition;
+import io.vertigo.core.lang.Assertion;
 
 public final class DaemonModel {
 	private final DaemonDefinition daemonDefinition;
@@ -29,8 +28,9 @@ public final class DaemonModel {
 	public DaemonModel(
 			final DaemonDefinition daemonDefinition,
 			final DaemonStat daemonStat) {
-		Assertion.checkNotNull(daemonDefinition);
-		Assertion.checkNotNull(daemonStat);
+		Assertion.check()
+				.isNotNull(daemonDefinition)
+				.isNotNull(daemonStat);
 		//---
 		this.daemonDefinition = daemonDefinition;
 		this.daemonStat = daemonStat;

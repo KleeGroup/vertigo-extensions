@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 /**
  * Map of componentStates that need to be stored
@@ -36,7 +35,7 @@ public final class ComponentStates extends HashMap<String, Serializable> {
 	private static final long serialVersionUID = -8925934036136725151L;
 
 	public ComponentState addComponentState(final String componentId) {
-		Assertion.checkArgNotEmpty(componentId);
+		Assertion.check().isNotBlank(componentId);
 		//---
 		final ComponentState componentState = new ComponentState();
 		put(componentId, componentState);
@@ -48,7 +47,7 @@ public final class ComponentStates extends HashMap<String, Serializable> {
 		private static final long serialVersionUID = -162303456261091792L;
 
 		public List<Serializable> addList(final String key) {
-			Assertion.checkArgNotEmpty(key);
+			Assertion.check().isNotBlank(key);
 			//---
 			final ArrayList<Serializable> list = new ArrayList<>();
 			put(key, list);
@@ -56,8 +55,9 @@ public final class ComponentStates extends HashMap<String, Serializable> {
 		}
 
 		public HashMap<String, Serializable> addObjectToList(final String listKey, final Map object) {
-			Assertion.checkArgNotEmpty(listKey);
-			Assertion.checkNotNull(object);
+			Assertion.check()
+					.isNotBlank(listKey)
+					.isNotNull(object);
 			//---
 			final HashMap<String, Serializable> modifiableObject = new HashMap<>(object);// just to have a modifiable map
 			((List) get(listKey)).add(modifiableObject);
@@ -69,12 +69,12 @@ public final class ComponentStates extends HashMap<String, Serializable> {
 		}
 
 		public void addPrimitive(final String key, final Serializable value) {
-			Assertion.checkArgNotEmpty(key);
+			Assertion.check().isNotBlank(key);
 			put(key, value);
 		}
 
 		public HashMap<String, Serializable> addObject(final String key, final Map object) {
-			Assertion.checkArgNotEmpty(key);
+			Assertion.check().isNotBlank(key);
 			//---
 			final HashMap<String, Serializable> map = new HashMap<>(object);
 			put(key, map);

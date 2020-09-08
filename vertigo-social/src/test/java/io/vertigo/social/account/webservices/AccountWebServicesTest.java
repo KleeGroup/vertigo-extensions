@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +26,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.restassured.RestAssured;
-import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.util.InjectorUtil;
 import io.vertigo.social.MyNodeConfig;
 import io.vertigo.social.data.MockIdentities;
-import io.vertigo.util.InjectorUtil;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -39,7 +38,7 @@ import redis.clients.jedis.Jedis;
  * @author npiedeloup
  */
 public final class AccountWebServicesTest {
-	private static AutoCloseableApp app;
+	private static AutoCloseableNode node;
 
 	@Inject
 	private MockIdentities mockIdentities;
@@ -52,14 +51,14 @@ public final class AccountWebServicesTest {
 
 	@BeforeAll
 	public static void setUp() {
-		app = new AutoCloseableApp(MyNodeConfig.vegaConfig());
+		node = new AutoCloseableNode(MyNodeConfig.vegaConfig());
 	}
 
 	@BeforeEach
 	public void setUpInstance() {
 		InjectorUtil.injectMembers(this);
 		//-----
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			jedis.flushAll();
 		} //populate accounts
 		mockIdentities.initData();
@@ -67,8 +66,8 @@ public final class AccountWebServicesTest {
 
 	@AfterAll
 	public static void tearDown() {
-		if (app != null) {
-			app.close();
+		if (node != null) {
+			node.close();
 		}
 	}
 

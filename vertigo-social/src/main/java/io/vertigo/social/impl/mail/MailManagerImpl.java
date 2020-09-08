@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +19,10 @@ package io.vertigo.social.impl.mail;
 
 import javax.inject.Inject;
 
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.locale.LocaleManager;
-import io.vertigo.lang.Assertion;
-import io.vertigo.social.services.mail.Mail;
-import io.vertigo.social.services.mail.MailManager;
+import io.vertigo.social.mail.Mail;
+import io.vertigo.social.mail.MailManager;
 
 /**
  * This class is the standard impl of the mailManager.
@@ -41,8 +40,9 @@ public final class MailManagerImpl implements MailManager {
 	 */
 	@Inject
 	public MailManagerImpl(final LocaleManager localeManager, final SendMailPlugin sendMailPlugin) {
-		Assertion.checkNotNull(localeManager);
-		Assertion.checkNotNull(sendMailPlugin);
+		Assertion.check()
+				.isNotNull(localeManager)
+				.isNotNull(sendMailPlugin);
 		//-----
 		localeManager.add("io.vertigo.social.impl.mail.Mail", io.vertigo.social.impl.mail.Resources.values());
 		this.sendMailPlugin = sendMailPlugin;
@@ -51,7 +51,7 @@ public final class MailManagerImpl implements MailManager {
 	/** {@inheritDoc} */
 	@Override
 	public void sendMail(final Mail mail) {
-		Assertion.checkNotNull(mail);
+		Assertion.check().isNotNull(mail);
 		//-----
 		sendMailPlugin.sendMail(mail);
 	}

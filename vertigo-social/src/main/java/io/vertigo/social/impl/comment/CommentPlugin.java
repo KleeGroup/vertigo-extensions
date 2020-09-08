@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +20,10 @@ package io.vertigo.social.impl.comment;
 import java.util.List;
 import java.util.UUID;
 
-import io.vertigo.core.component.Plugin;
-import io.vertigo.dynamo.domain.model.KeyConcept;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.social.services.comment.Comment;
+import io.vertigo.core.node.component.Plugin;
+import io.vertigo.datamodel.structure.model.KeyConcept;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.comment.Comment;
 
 /**
  * @author pchretien

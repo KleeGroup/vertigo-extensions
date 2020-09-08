@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,18 +41,19 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import io.vertigo.commons.analytics.health.HealthChecked;
-import io.vertigo.commons.analytics.health.HealthMeasure;
+import io.vertigo.connectors.mail.MailSessionConnector;
+import io.vertigo.core.analytics.health.HealthChecked;
+import io.vertigo.core.analytics.health.HealthMeasure;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.VUserException;
+import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.locale.MessageKey;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.dynamo.file.FileManager;
-import io.vertigo.dynamo.file.model.VFile;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.VUserException;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.datastore.filestore.model.VFile;
+import io.vertigo.datastore.filestore.util.FileUtil;
 import io.vertigo.social.impl.mail.Resources;
 import io.vertigo.social.impl.mail.SendMailPlugin;
-import io.vertigo.social.services.mail.Mail;
+import io.vertigo.social.mail.Mail;
 
 /**
  * Plugin de gestion des mails, pour l'implémentation du jdk.
@@ -66,7 +66,6 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	public static final String HEALTH_COMPONENT_NAME = "Mailer";
 
 	private final String charset;
-	private final FileManager fileManager;
 	private final MailSessionConnector mailSessionConnector;
 	private final boolean developmentMode;
 	private final String developmentMailTo;
@@ -82,17 +81,20 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	 */
 	@Inject
 	public JavaxSendMailPlugin(
-			final FileManager fileManager,
-			final MailSessionConnector mailSessionConnector,
+			final List<MailSessionConnector> mailSessionConnectors,
+			@ParamValue("connectorName") final Optional<String> connectorNameOpt,
 			@ParamValue("developmentMode") final boolean developmentMode,
 			@ParamValue("developmentMailTo") final String developmentMailTo,
 			@ParamValue("charset") final Optional<String> charsetOpt) {
-		Assertion.checkNotNull(fileManager);
-		Assertion.checkNotNull(mailSessionConnector);
-		Assertion.checkArgNotEmpty(developmentMailTo);
+		Assertion.check()
+				.isNotNull(connectorNameOpt)
+				.isNotNull(mailSessionConnectors)
+				.isNotBlank(developmentMailTo);
 		//-----
-		this.fileManager = fileManager;
-		this.mailSessionConnector = mailSessionConnector;
+		final String connectorName = connectorNameOpt.orElse("main");
+		mailSessionConnector = mailSessionConnectors.stream()
+				.filter(connector -> connectorName.equals(connector.getName()))
+				.findFirst().get();
 		this.developmentMailTo = developmentMailTo;
 		this.developmentMode = developmentMode;
 		charset = charsetOpt.orElseGet(StandardCharsets.ISO_8859_1::name);
@@ -101,9 +103,9 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void sendMail(final Mail mail) {
-		Assertion.checkNotNull(mail);
+		Assertion.check().isNotNull(mail);
 		//-----
-		final Session session = mailSessionConnector.createSession();
+		final Session session = mailSessionConnector.getClient();
 		try {
 			final Message message = createMessage(mail, session);
 			Transport.send(message);
@@ -145,8 +147,9 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	}
 
 	private static void setFromAddress(final String from, final Message message) throws MessagingException {
-		Assertion.checkNotNull(from);
-		Assertion.checkNotNull(message);
+		Assertion.check()
+				.isNotNull(from)
+				.isNotNull(message);
 		//-----
 		try {
 			message.setFrom(createInternetAddress(from));
@@ -157,8 +160,9 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	}
 
 	private static void setReplyToAddress(final String replyTo, final Message message) throws MessagingException {
-		Assertion.checkNotNull(message);
-		Assertion.checkNotNull(replyTo);
+		Assertion.check()
+				.isNotNull(message)
+				.isNotNull(replyTo);
 		//-----
 		try {
 			final InternetAddress[] replyToArray = { createInternetAddress(replyTo) };
@@ -186,9 +190,10 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	}
 
 	private void setDestAddress(final List<String> addressList, final Message message, final Message.RecipientType type) throws MessagingException {
-		Assertion.checkNotNull(addressList);
-		Assertion.checkArgument(!addressList.isEmpty(), "La liste des destinataires ne doit pas être vide");
-		Assertion.checkNotNull(message);
+		Assertion.check()
+				.isNotNull(addressList)
+				.isFalse(addressList.isEmpty(), "La liste des destinataires ne doit pas être vide")
+				.isNotNull(message);
 		//-----
 		final InternetAddress[] addresses = new InternetAddress[addressList.size()];
 		for (int i = 0; i < addressList.size(); i++) {
@@ -207,8 +212,9 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	}
 
 	private void setBodyContent(final String textContent, final String htmlContent, final Part bodyPart) throws MessagingException {
-		Assertion.checkArgument(textContent != null || htmlContent != null, "Le mail n'a pas de contenu, ni en text, ni en html");
-		Assertion.checkNotNull(bodyPart);
+		Assertion.check()
+				.isTrue(textContent != null || htmlContent != null, "Le mail n'a pas de contenu, ni en text, ni en html")
+				.isNotNull(bodyPart);
 		//-----
 		if (textContent != null && htmlContent != null) {
 			final Multipart multipart = new MimeMultipart("alternative");
@@ -228,7 +234,7 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 
 	private BodyPart createBodyFile(final VFile vFile) throws MessagingException {
 		try {
-			final File file = fileManager.obtainReadOnlyFile(vFile);
+			final File file = FileUtil.obtainReadOnlyPath(vFile).toFile();
 			final MimeBodyPart bodyFile = new MimeBodyPart();
 			bodyFile.attachFile(file);
 			bodyFile.setFileName(vFile.getFileName());
@@ -253,11 +259,10 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 	public HealthMeasure checkConnexion() {
 		// -----
 		try {
-			final Session session = mailSessionConnector.createSession();
+			final Session session = mailSessionConnector.getClient();
 			try (final Transport transport = session.getTransport()) {
 				// On tente la connexion
 				transport.connect();
-				transport.close();
 			} // La connexion s'est passée correctement. On peut la fermer
 				// si on est ici, c'est que tout va bien
 			return HealthMeasure.builder().withGreenStatus("Connection OK to Mail Server " + session.getProperty("mail.host")).build();

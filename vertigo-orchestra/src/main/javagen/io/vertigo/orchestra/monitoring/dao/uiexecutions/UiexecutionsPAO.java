@@ -1,15 +1,32 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.monitoring.dao.uiexecutions;
 
 import javax.inject.Inject;
 
-import io.vertigo.app.Home;
-import io.vertigo.dynamo.task.TaskManager;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
-import io.vertigo.dynamo.task.model.Task;
-import io.vertigo.dynamo.task.model.TaskBuilder;
-import io.vertigo.dynamo.store.StoreServices;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.task.TaskManager;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
+import io.vertigo.datamodel.task.model.Task;
+import io.vertigo.datamodel.task.model.TaskBuilder;
+import io.vertigo.datastore.impl.dao.StoreServices;
 
 /**
  * This class is automatically generated.
@@ -25,7 +42,7 @@ public final class UiexecutionsPAO implements StoreServices {
 	 */
 	@Inject
 	public UiexecutionsPAO(final TaskManager taskManager) {
-		Assertion.checkNotNull(taskManager);
+		Assertion.check().isNotNull(taskManager);
 		//-----
 		this.taskManager = taskManager;
 	}
@@ -36,18 +53,40 @@ public final class UiexecutionsPAO implements StoreServices {
 	 * @return the builder 
 	 */
 	private static TaskBuilder createTaskBuilder(final String name) {
-		final TaskDefinition taskDefinition = Home.getApp().getDefinitionSpace().resolve(name, TaskDefinition.class);
+		final TaskDefinition taskDefinition = Node.getNode().getDefinitionSpace().resolve(name, TaskDefinition.class);
 		return Task.builder(taskDefinition);
 	}
 
 	/**
 	 * Execute la tache TkGetActivitiesByPreId.
-	 * @param preId Long 
+	 * @param preId Long
 	 * @return DtList de OActivityExecutionUi dtcOActivityExecutionUi
 	*/
-	public io.vertigo.dynamo.domain.model.DtList<io.vertigo.orchestra.monitoring.domain.uiexecutions.OActivityExecutionUi> getActivitiesByPreId(final Long preId) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetActivitiesByPreId",
+			request = "select  ace.ACE_ID as ACE_ID," + 
+ "        			act.LABEL as LABEL," + 
+ "        			ace.BEGIN_TIME as BEGIN_TIME," + 
+ "        			ace.END_TIME as END_TIME," + 
+ "        			round(extract('epoch' from (ace.END_TIME-ace.BEGIN_TIME))) as EXECUTION_TIME," + 
+ "        			ace.EST_CD as STATUS," + 
+ "        			max((case when acw.IS_IN is true then acw.WORKSPACE else null end)) as WORKSPACE_IN," + 
+ "        			max((case when acw.IS_IN is false then acw.WORKSPACE else null end)) as WORKSPACE_OUT," + 
+ "        			acl.ATTACHMENT is not null as HAS_ATTACHMENT," + 
+ "        			acl.LOG is not null as HAS_TECHNICAL_LOG" + 
+ "        	from o_activity_execution ace" + 
+ "        	join o_activity act on act.ACT_ID = ace.ACT_ID" + 
+ "        	join o_activity_workspace acw on acw.ACE_ID = ace.ACE_ID" + 
+ "        	left join o_activity_log acl on acl.ACE_ID = ace.ACE_ID" + 
+ "        	where ace.PRE_ID = #preId#" + 
+ "        	group by ace.ACE_ID, act.LABEL, ace.BEGIN_TIME, ace.END_TIME, acl.ATTACHMENT, acl.LOG, ace.EST_CD",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOActivityExecutionUi")
+	public io.vertigo.datamodel.structure.model.DtList<io.vertigo.orchestra.monitoring.domain.uiexecutions.OActivityExecutionUi> getActivitiesByPreId(@io.vertigo.datamodel.task.proxy.TaskInput(name = "preId", smartType = "STyOIdentifiant") final Long preId) {
 		final Task task = createTaskBuilder("TkGetActivitiesByPreId")
 				.addValue("preId", preId)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)
@@ -56,12 +95,34 @@ public final class UiexecutionsPAO implements StoreServices {
 
 	/**
 	 * Execute la tache TkGetActivitiyByAceId.
-	 * @param aceId Long 
+	 * @param aceId Long
 	 * @return OActivityExecutionUi dtOActivityExecutionUi
 	*/
-	public io.vertigo.orchestra.monitoring.domain.uiexecutions.OActivityExecutionUi getActivitiyByAceId(final Long aceId) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetActivitiyByAceId",
+			request = "select  ace.ACE_ID as ACE_ID," + 
+ "        			act.LABEL as LABEL," + 
+ "        			ace.BEGIN_TIME as BEGIN_TIME," + 
+ "        			ace.END_TIME as END_TIME," + 
+ "        			round(extract('epoch' from (ace.END_TIME-ace.BEGIN_TIME))) as EXECUTION_TIME," + 
+ "        			ace.EST_CD as STATUS," + 
+ "        			max((case when acw.IS_IN is true then acw.WORKSPACE else null end)) as WORKSPACE_IN," + 
+ "        			max((case when acw.IS_IN is false then acw.WORKSPACE else null end)) as WORKSPACE_OUT," + 
+ "        			acl.ATTACHMENT is not null as HAS_ATTACHMENT," + 
+ "        			acl.LOG is not null as HAS_TECHNICAL_LOG" + 
+ "        	from o_activity_execution ace" + 
+ "        	join o_activity act on act.ACT_ID = ace.ACT_ID" + 
+ "        	join o_activity_workspace acw on acw.ACE_ID = ace.ACE_ID" + 
+ "        	left join o_activity_log acl on acl.ACE_ID = ace.ACE_ID" + 
+ "        	where ace.ACE_ID = #aceId#" + 
+ "        	group by ace.ACE_ID, act.LABEL, ace.BEGIN_TIME, ace.END_TIME, acl.ATTACHMENT, acl.LOG, ace.EST_CD",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOActivityExecutionUi")
+	public io.vertigo.orchestra.monitoring.domain.uiexecutions.OActivityExecutionUi getActivitiyByAceId(@io.vertigo.datamodel.task.proxy.TaskInput(name = "aceId", smartType = "STyOIdentifiant") final Long aceId) {
 		final Task task = createTaskBuilder("TkGetActivitiyByAceId")
 				.addValue("aceId", aceId)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)
@@ -70,12 +131,34 @@ public final class UiexecutionsPAO implements StoreServices {
 
 	/**
 	 * Execute la tache TkGetExecutionByPreId.
-	 * @param preId Long 
+	 * @param preId Long
 	 * @return OProcessExecutionUi dtOProcessExecutionUi
 	*/
-	public io.vertigo.orchestra.monitoring.domain.uiexecutions.OProcessExecutionUi getExecutionByPreId(final Long preId) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetExecutionByPreId",
+			request = "select  pre.PRE_ID as PRE_ID," + 
+ "        			pre.BEGIN_TIME as BEGIN_TIME," + 
+ "        			pre.END_TIME as END_TIME," + 
+ "        			round(extract('epoch' from (pre.END_TIME-pre.BEGIN_TIME))) as EXECUTION_TIME," + 
+ "        			pre.EST_CD as STATUS," + 
+ "        			pre.CHECKED as CHECKED," + 
+ "        			pre.CHECKING_DATE as CHECKING_DATE," + 
+ "        			pre.CHECKING_COMMENT as CHECKING_COMMENT," + 
+ "        			(select " + 
+ "			        	acl.attachment is not null" + 
+ "						from o_activity_execution ace" + 
+ "						left join o_activity_log acl on acl.ACE_ID = ace.ACE_ID" + 
+ "						where ace.PRE_ID = #preId#" + 
+ "						order by ace.end_time desc limit 1) as HAS_ATTACHMENT" + 
+ "        	from o_process_execution pre   " + 
+ "        	where pre.PRE_ID = #preId#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOProcessExecutionUi")
+	public io.vertigo.orchestra.monitoring.domain.uiexecutions.OProcessExecutionUi getExecutionByPreId(@io.vertigo.datamodel.task.proxy.TaskInput(name = "preId", smartType = "STyOIdentifiant") final Long preId) {
 		final Task task = createTaskBuilder("TkGetExecutionByPreId")
 				.addValue("preId", preId)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)
@@ -84,18 +167,38 @@ public final class UiexecutionsPAO implements StoreServices {
 
 	/**
 	 * Execute la tache TkGetExecutionsByProcessName.
-	 * @param name String 
-	 * @param status String 
-	 * @param limit Integer 
-	 * @param offset Integer 
+	 * @param name String
+	 * @param status String
+	 * @param limit Integer
+	 * @param offset Integer
 	 * @return DtList de OProcessExecutionUi dtcOProcessExecutionUi
 	*/
-	public io.vertigo.dynamo.domain.model.DtList<io.vertigo.orchestra.monitoring.domain.uiexecutions.OProcessExecutionUi> getExecutionsByProcessName(final String name, final String status, final Integer limit, final Integer offset) {
+	@io.vertigo.datamodel.task.proxy.TaskAnnotation(
+			dataSpace = "orchestra",
+			name = "TkGetExecutionsByProcessName",
+			request = "select  pre.PRE_ID as PRE_ID," + 
+ "        			pre.BEGIN_TIME as BEGIN_TIME," + 
+ "        			pre.END_TIME as END_TIME," + 
+ "        			round(extract('epoch' from (pre.END_TIME-pre.BEGIN_TIME))) as EXECUTION_TIME," + 
+ "        			pre.EST_CD as STATUS" + 
+ "        	from o_process pro" + 
+ "        	join o_process_execution pre on pro.PRO_ID = pre.PRO_ID" + 
+ "        	where pro.NAME = #name#" + 
+ "        	<%if (status != \"\") {%>" + 
+ "        		and pre.EST_CD = #status#" + 
+ "        	<%}%>" + 
+ "        	order by pre.begin_time desc" + 
+ "        	limit #limit#" + 
+ "        	offset #offset#",
+			taskEngineClass = io.vertigo.basics.task.TaskEngineSelect.class)
+	@io.vertigo.datamodel.task.proxy.TaskOutput(smartType = "STyDtOProcessExecutionUi")
+	public io.vertigo.datamodel.structure.model.DtList<io.vertigo.orchestra.monitoring.domain.uiexecutions.OProcessExecutionUi> getExecutionsByProcessName(@io.vertigo.datamodel.task.proxy.TaskInput(name = "name", smartType = "STyOLibelle") final String name, @io.vertigo.datamodel.task.proxy.TaskInput(name = "status", smartType = "STyOCodeIdentifiant") final String status, @io.vertigo.datamodel.task.proxy.TaskInput(name = "limit", smartType = "STyONombre") final Integer limit, @io.vertigo.datamodel.task.proxy.TaskInput(name = "offset", smartType = "STyONombre") final Integer offset) {
 		final Task task = createTaskBuilder("TkGetExecutionsByProcessName")
 				.addValue("name", name)
 				.addValue("status", status)
 				.addValue("limit", limit)
 				.addValue("offset", offset)
+				.addContextProperty("connectionName", io.vertigo.datastore.impl.dao.StoreUtil.getConnectionName("orchestra"))
 				.build();
 		return getTaskManager()
 				.execute(task)

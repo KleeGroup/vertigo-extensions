@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +25,7 @@ import javax.inject.Inject;
 
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,24 +35,25 @@ import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.vertigo.account.account.Account;
 import io.vertigo.account.account.AccountGroup;
-import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.dynamo.domain.metamodel.DtDefinition;
-import io.vertigo.dynamo.domain.model.KeyConcept;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.util.InjectorUtil;
+import io.vertigo.core.util.MapBuilder;
+import io.vertigo.datamodel.structure.definitions.DtDefinition;
+import io.vertigo.datamodel.structure.model.KeyConcept;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 import io.vertigo.social.MyNodeConfig;
+import io.vertigo.social.comment.Comment;
+import io.vertigo.social.comment.CommentManager;
 import io.vertigo.social.data.MockIdentities;
-import io.vertigo.social.services.comment.Comment;
-import io.vertigo.social.services.comment.CommentServices;
-import io.vertigo.util.InjectorUtil;
-import io.vertigo.util.MapBuilder;
+import io.vertigo.vega.engines.webservice.json.UTCDateUtil;
 import redis.clients.jedis.Jedis;
 
 public final class CommentWebServicesTest {
 	private static final int WS_PORT = 8088;
 	private final SessionFilter sessionFilter = new SessionFilter();
-	private static AutoCloseableApp app;
+	private AutoCloseableNode node;
 
 	private static String CONCEPT_KEY_NAME;
 	private static UID<Account> account1Uri;
@@ -64,20 +63,20 @@ public final class CommentWebServicesTest {
 	@Inject
 	private RedisConnector redisConnector;
 	@Inject
-	private CommentServices commentServices;
+	private CommentManager commentServices;
 	@Inject
 	private MockIdentities mockIdentities;
 
-	@BeforeAll
-	public static void setUp() {
-		beforeSetUp();
-		app = new AutoCloseableApp(MyNodeConfig.vegaConfig());
-	}
-
 	@BeforeEach
-	public void setUpInstance() {
+	public void setUp() {
+		//RestAsssured init
+		RestAssured.baseURI = "http://localhost";
+		RestAssured.port = WS_PORT;
+		//---
+		node = new AutoCloseableNode(MyNodeConfig.vegaConfig());
 		InjectorUtil.injectMembers(this);
-		try (final Jedis jedis = redisConnector.getResource()) {
+		//---
+		try (final Jedis jedis = redisConnector.getClient()) {
 			jedis.flushAll();
 		}
 		mockIdentities.initData();
@@ -92,17 +91,11 @@ public final class CommentWebServicesTest {
 		preTestLogin();
 	}
 
-	@AfterAll
-	public static void tearDown() {
-		if (app != null) {
-			app.close();
+	@AfterEach
+	public void tearDown() {
+		if (node != null) {
+			node.close();
 		}
-	}
-
-	private static void beforeSetUp() {
-		//RestAsssured init
-		RestAssured.baseURI = "http://localhost";
-		RestAssured.port = WS_PORT;
 	}
 
 	private void preTestLogin() {
@@ -277,7 +270,7 @@ public final class CommentWebServicesTest {
 	}*/
 
 	private static String convertDate(final Instant instant) {
-		return instant == null ? null : instant.toString();
+		return instant == null ? null : UTCDateUtil.formatInstant(instant);
 	}
 
 	private static Map<String, Object> commentToMap(final Comment comment) {

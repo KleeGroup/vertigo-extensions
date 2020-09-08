@@ -3,64 +3,63 @@ package io.vertigo.orchestra.dao.planification
 
 create Task TkGetProcessToExecute {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select prp.*
         	from o_process_planification prp
         	where prp.SST_CD = 'RESERVED'
         	and prp.NOD_ID = #nodId#
-        	
 			"
-	attribute dtcOProcessPlanification	 	{domain : DoDtOProcessPlanificationDtc		required:"true" 	inOut :"out"}
-	attribute nodId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
+	in nodId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+	out dtcOProcessPlanification	 	{domain : DoDtOProcessPlanification		cardinality: "*" 	}
 }
 
 
 create Task TkReserveProcessToExecute {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update o_process_planification
         	set SST_CD = 'RESERVED', NOD_ID = #nodId#
         	where (SST_CD = 'WAITING' and expected_time >= #lowerLimit# and expected_time <= #upperLimit#) 
         			or (SST_CD = 'RESCUED')
 			"
-	 attribute lowerLimit	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-	 attribute upperLimit	 	{domain : DoOTimestamp 		required:"true" 	inOut :"in"}
-	 attribute nodId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
+	 in lowerLimit	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+	 in upperLimit	 	{domain : DoOTimestamp 		cardinality: "1" 	}
+	 in nodId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
 }
 
 create Task TkGetLastPlanificationByProId {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select prp.* from  o_process_planification prp
         	where prp.PRO_ID = (select pro.PRO_ID from o_process pro where pro.PRO_ID = #proId# for update) and prp.SST_CD = 'WAITING'
         	order by prp.expected_time desc
         	limit 1
 			"
-		attribute proId	 	{domain : DoOIdentifiant 		required:"true" 	inOut :"in"}
-		attribute dtOProcessPlanification	 	{domain : DoDtOProcessPlanificationDto		required:"false" 	inOut :"out"}
+		in proId	 	{domain : DoOIdentifiant 		cardinality: "1" 	}
+		out dtOProcessPlanification	 	{domain : DoDtOProcessPlanification		cardinality: "?" 	}
 }
 
 
 create Task TkGetAllLastPastPlanifications {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineSelect"
+    className : "io.vertigo.basics.task.TaskEngineSelect"
         request : "
         	select prp.* from  o_process_planification prp
 			where prp.expected_time < #currentDate# and prp.SST_CD = 'WAITING'
 			for update
 			
 			"
-		attribute currentDate 	{domain : DoOTimestamp 			required:"true" 	inOut :"in"}
-		attribute processPlanifications	 	{domain : DoDtOProcessPlanificationDtc		required:"true" 	inOut :"out"}
+		in currentDate 	{domain : DoOTimestamp 			cardinality: "1" 	}
+		out processPlanifications	 	{domain : DoDtOProcessPlanification		cardinality: "*" 	}
 }
 
 
 create Task TkCleanPlanificationsOnBoot {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	update o_process_planification set 
 			SST_CD = 'MISFIRED'
@@ -71,18 +70,18 @@ create Task TkCleanPlanificationsOnBoot {
 				    group by pro_id
 				) pp on pp.pro_id = prp.pro_id and pp.MaxDate = prp.expected_time)
 			"
-		attribute currentDate 	{domain : DoOTimestamp 			required:"true" 	inOut :"in"}
+		in currentDate 	{domain : DoOTimestamp 			cardinality: "1" 	}
 }
 
 
 create Task TkCleanFuturePlanifications {
 	storeName : "orchestra"
-    className : "io.vertigo.dynamox.task.TaskEngineProc"
+    className : "io.vertigo.basics.task.TaskEngineProc"
         request : "
         	delete from o_process_planification prp
         	where prp.PRO_ID in (select pro.PRO_ID from o_process pro where pro.NAME = #processName#) and prp.SST_CD = 'WAITING' and prp.expected_time > current_timestamp
 			"
-	 attribute processName	 	{domain : DoOLibelle 		required:"true" 	inOut :"in"}
+	 in processName	 	{domain : DoOLibelle 		cardinality: "1" 	}
 }
 
 

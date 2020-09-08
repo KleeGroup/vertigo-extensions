@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,20 +37,20 @@ import io.restassured.parsing.Parser;
 import io.vertigo.account.account.Account;
 import io.vertigo.account.account.AccountGroup;
 import io.vertigo.account.account.AccountManager;
-import io.vertigo.app.AutoCloseableApp;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.dynamo.domain.model.UID;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.util.InjectorUtil;
+import io.vertigo.datamodel.structure.model.UID;
 import io.vertigo.social.MyNodeConfig;
 import io.vertigo.social.data.MockIdentities;
-import io.vertigo.social.services.notification.Notification;
-import io.vertigo.social.services.notification.NotificationServices;
-import io.vertigo.util.InjectorUtil;
+import io.vertigo.social.notification.Notification;
+import io.vertigo.social.notification.NotificationManager;
 import redis.clients.jedis.Jedis;
 
 public final class NotificationWebServicesTest {
 	private static final int WS_PORT = 8088;
 	private final SessionFilter sessionFilter = new SessionFilter();
-	private static AutoCloseableApp app;
+	private static AutoCloseableNode node;
 
 	@Inject
 	private MockIdentities mockIdentities;
@@ -60,19 +59,19 @@ public final class NotificationWebServicesTest {
 	@Inject
 	private RedisConnector redisConnector;
 	@Inject
-	private NotificationServices notificationServices;
+	private NotificationManager NotificationManager;
 
 	@BeforeAll
 	public static void setUp() {
 		beforeSetUp();
-		app = new AutoCloseableApp(MyNodeConfig.vegaConfig());
+		node = new AutoCloseableNode(MyNodeConfig.vegaConfig());
 	}
 
 	@BeforeEach
 	public void setUpInstance() {
 		InjectorUtil.injectMembers(this);
 		//---
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			jedis.flushAll();
 		}
 		mockIdentities.initData();
@@ -90,16 +89,16 @@ public final class NotificationWebServicesTest {
 	@AfterEach
 	public void purgeNotifications() {
 		final UID<Account> accountUID = UID.of(Account.class, "1");
-		final List<Notification> notifications = notificationServices.getCurrentNotifications(accountUID);
+		final List<Notification> notifications = NotificationManager.getCurrentNotifications(accountUID);
 		for (final Notification notification : notifications) {
-			notificationServices.remove(accountUID, notification.getUuid());
+			NotificationManager.remove(accountUID, notification.getUuid());
 		}
 	}
 
 	@AfterAll
 	public static void tearDown() {
-		if (app != null) {
-			app.close();
+		if (node != null) {
+			node.close();
 		}
 	}
 
@@ -119,7 +118,7 @@ public final class NotificationWebServicesTest {
 				.withContent("Lorem ipsum")
 				.build();
 		final Set<UID<Account>> accountUIDs = identityManager.getAccountUIDs(UID.of(AccountGroup.class, "100"));
-		notificationServices.send(notification, accountUIDs);
+		NotificationManager.send(notification, accountUIDs);
 
 		RestAssured.given().filter(sessionFilter)
 				.expect()
@@ -140,7 +139,7 @@ public final class NotificationWebServicesTest {
 				.withContent("Lorem ipsum")
 				.build();
 		final Set<UID<Account>> accountUIDs = identityManager.getAccountUIDs(UID.of(AccountGroup.class, "100"));
-		notificationServices.send(notification, accountUIDs);
+		NotificationManager.send(notification, accountUIDs);
 
 		RestAssured.given().filter(sessionFilter)
 				.expect()
@@ -184,8 +183,8 @@ public final class NotificationWebServicesTest {
 				.withContent("Lorem ipsum")
 				.build();
 		final Set<UID<Account>> accountUIDs = identityManager.getAccountUIDs(UID.of(AccountGroup.class, "100"));
-		notificationServices.send(notification1, accountUIDs);
-		notificationServices.send(notification2, accountUIDs);
+		NotificationManager.send(notification1, accountUIDs);
+		NotificationManager.send(notification2, accountUIDs);
 
 		RestAssured.given().filter(sessionFilter)
 				.expect()

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
  */
 package io.vertigo.ui.impl.springmvc.argumentresolvers;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +35,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor;
 
-import io.vertigo.dynamo.domain.model.FileInfoURI;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.datastore.filestore.model.FileInfoURI;
 import io.vertigo.ui.core.ProtectedValueUtil;
 import io.vertigo.vega.webservice.stereotype.QueryParam;
 
@@ -47,7 +46,7 @@ public final class FileInfoURIConverterValueHandler extends AbstractMessageConve
 	private final ParameterizedTypeValueHandlerHelper<FileInfoURI> parameterizedTypeValueHandlerHelper;
 
 	public FileInfoURIConverterValueHandler() {
-		super(Collections.singletonList(new StringHttpMessageConverter(Charset.forName("utf-8"))));
+		super(Collections.singletonList(new StringHttpMessageConverter(StandardCharsets.UTF_8)));
 		parameterizedTypeValueHandlerHelper = new ParameterizedTypeValueHandlerHelper<>(FileInfoURI.class, FileInfoURIConverterValueHandler::toFileInfoURI);
 		parameterizedTypeValueHandlerHelper.addSupportedParameterizedType(Optional.class);
 		parameterizedTypeValueHandlerHelper.addSupportedParameterizedType(List.class);
@@ -86,7 +85,7 @@ public final class FileInfoURIConverterValueHandler extends AbstractMessageConve
 			final WebDataBinderFactory binderFactory) throws Exception {
 		final HttpServletRequest request = getRequest(webRequest);
 		final QueryParam requestParam = parameter.getParameterAnnotation(QueryParam.class);
-		Assertion.checkNotNull(requestParam, "Parameter name wasnt't found. Use @QueryParam('myFileParam') in your controller.");
+		Assertion.check().isNotNull(requestParam, "Parameter name wasnt't found. Use @QueryParam('myFileParam') in your controller.");
 		final String fileUriProtected = request.getParameter(requestParam.value());
 
 		return parameterizedTypeValueHandlerHelper.convert(fileUriProtected, parameter);

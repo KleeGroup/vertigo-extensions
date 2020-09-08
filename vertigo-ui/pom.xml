@@ -24,12 +24,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-vega-impl</artifactId>
-			<version>${vertigo.version}</version>
+			<artifactId>vertigo-vega</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertigo</groupId>
+			<artifactId>vertigo-datafactory</artifactId>
+			<version>${project.version}</version>
 		</dependency>		
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-studio</artifactId>
+			<artifactId>vertigo-spring-connector</artifactId>
 			<version>${vertigo.version}</version>
 		</dependency>	
 		<dependency>
@@ -42,7 +47,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>5.2.0.RELEASE</version>
+			<version>5.2.8.RELEASE</version>
 		</dependency>
 		<dependency>
         	<groupId>org.thymeleaf</groupId>
@@ -59,7 +64,7 @@
 		<!-- Connections Pool -->
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-studio</artifactId>
+			<artifactId>vertigo-elasticsearch-connector</artifactId>
 			<version>${vertigo.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -72,31 +77,31 @@
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.5.4</version>
+			<version>0.9.5.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>apache-jsp</artifactId>
-			<version>9.4.21.v20190926</version>
+			<version>9.4.31.v20200723</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>apache-jstl</artifactId>
-			<version>9.4.21.v20190926</version>
+			<version>9.4.31.v20200723</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-plus</artifactId>
-			<version>9.4.21.v20190926</version>
+			<version>9.4.31.v20200723</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-annotations</artifactId>
-			<version>9.4.21.v20190926</version>
+			<version>9.4.31.v20200723</version>
 			<scope>test</scope>
 		</dependency>
 		
@@ -113,24 +118,23 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.machinepublishers</groupId>
-			<artifactId>jbrowserdriver</artifactId>
-			<version>1.1.1</version>
+			<groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>htmlunit-driver</artifactId>
+		    <version>2.43.1</version>
 			<scope>test</scope>
 		</dependency>
-		
 		
 		<!-- CollectionsManager/LuceneIndexPlugin -->
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>8.2.0</version><!-- 8.0.0 compatible with ElasticSearch 7.1.0 -->
+			<version>8.6.0</version><!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-analyzers-common</artifactId>
-			<version>8.2.0</version> <!-- 8.0.0 compatible with ElasticSearch 7.1.0 -->
+			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
 			<scope>test</scope>
 		</dependency>
 
@@ -138,7 +142,7 @@
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
-			<version>7.4.1</version>
+			<version>7.9.0</version>
 			<scope>test</scope> <!-- EsTransportSearchServicesPlugin -->
 			<exclusions>
 				<exclusion>
@@ -150,50 +154,50 @@
 		<dependency>
 		    <groupId>org.elasticsearch.client</groupId>
 		    <artifactId>transport</artifactId>
-		    <version>7.4.1</version>
+		    <version>7.9.0</version>
 		    <scope>test</scope> <!-- EsTransportSearchServicesPlugin -->
 		</dependency>
 		<dependency>
 	        <groupId>org.codelibs.elasticsearch.module</groupId>
 	        <artifactId>analysis-common</artifactId> 
-	        <version>7.4.1</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
+	        <version>7.9.0</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
 	        <scope>test</scope>
 	    </dependency>
 	   	<dependency>
 		    <groupId>org.codelibs.elasticsearch.module</groupId>
 		    <artifactId>mapper-extras</artifactId>
-		    <version>7.4.1</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
+		    <version>7.9.0</version> <!-- required by ESEmbeddedSearchServicesPlugin -->
 	        <scope>test</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.10.0</version> <!-- version for spring -->
+			<version>2.11.2</version> <!-- version for spring -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
     		<artifactId>jackson-dataformat-smile</artifactId>
-    		<version>2.10.0</version> <!-- version for spring -->
+    		<version>2.11.2</version> <!-- version for spring -->
     		<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
     		<artifactId>jackson-dataformat-yaml</artifactId>
-    		<version>2.10.0</version> <!-- version for spring -->
+    		<version>2.11.2</version> <!-- version for spring -->
     		<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
     		<artifactId>jackson-dataformat-cbor</artifactId>
-    		<version>2.10.0</version> <!-- version for spring -->
+    		<version>2.11.2</version> <!-- version for spring -->
     		<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.10.0</version> <!-- version for spring -->
+			<version>2.11.2</version> <!-- version for spring -->
 			<scope>test</scope>
 		</dependency>
 		

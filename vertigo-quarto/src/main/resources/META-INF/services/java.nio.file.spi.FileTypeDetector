@@ -1,0 +1,3 @@
+# Providers of file mime type detection services
+# (a comment line begins with a pound sign)
+io.vertigo.quarto.impl.converter.MimeTypesFileTypeDetector

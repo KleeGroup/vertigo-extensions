@@ -1,9 +1,26 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.orchestra.monitoring.domain.summary;
 
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.stereotype.Field;
-import io.vertigo.dynamo.domain.util.DtObjectUtil;
-import io.vertigo.lang.Generated;
+import io.vertigo.core.lang.Generated;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.stereotype.Field;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 
 /**
  * This class is automatically generated.
@@ -30,7 +47,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Id du processus'.
 	 * @return Long proId <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOIdentifiant", required = true, label = "Id du processus")
+	@Field(smartType = "STyOIdentifiant", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Id du processus")
 	public Long getProId() {
 		return proId;
 	}
@@ -49,7 +66,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Nom du processus'.
 	 * @return String processName <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOLibelle", required = true, label = "Nom du processus")
+	@Field(smartType = "STyOLibelle", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Nom du processus")
 	public String getProcessName() {
 		return processName;
 	}
@@ -68,7 +85,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Libellé du processus'.
 	 * @return String processLabel <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOLibelle", required = true, label = "Libellé du processus")
+	@Field(smartType = "STyOLibelle", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Libellé du processus")
 	public String getProcessLabel() {
 		return processLabel;
 	}
@@ -87,7 +104,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Dernière exécution le'.
 	 * @return Instant lastExecutionTime
 	 */
-	@Field(domain = "DoOTimestamp", label = "Dernière exécution le")
+	@Field(smartType = "STyOTimestamp", label = "Dernière exécution le")
 	public java.time.Instant getLastExecutionTime() {
 		return lastExecutionTime;
 	}
@@ -106,7 +123,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Prochaine exécution le'.
 	 * @return Instant nextExecutionTime
 	 */
-	@Field(domain = "DoOTimestamp", label = "Prochaine exécution le")
+	@Field(smartType = "STyOTimestamp", label = "Prochaine exécution le")
 	public java.time.Instant getNextExecutionTime() {
 		return nextExecutionTime;
 	}
@@ -125,7 +142,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Nombre en erreur'.
 	 * @return Integer errorsCount
 	 */
-	@Field(domain = "DoONombre", label = "Nombre en erreur")
+	@Field(smartType = "STyONombre", label = "Nombre en erreur")
 	public Integer getErrorsCount() {
 		return errorsCount;
 	}
@@ -144,7 +161,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Nombre non executés'.
 	 * @return Integer misfiredCount
 	 */
-	@Field(domain = "DoONombre", label = "Nombre non executés")
+	@Field(smartType = "STyONombre", label = "Nombre non executés")
 	public Integer getMisfiredCount() {
 		return misfiredCount;
 	}
@@ -163,7 +180,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Nombre en succès'.
 	 * @return Integer successfulCount
 	 */
-	@Field(domain = "DoONombre", label = "Nombre en succès")
+	@Field(smartType = "STyONombre", label = "Nombre en succès")
 	public Integer getSuccessfulCount() {
 		return successfulCount;
 	}
@@ -182,7 +199,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Nombre en cours'.
 	 * @return Integer runningCount
 	 */
-	@Field(domain = "DoONombre", label = "Nombre en cours")
+	@Field(smartType = "STyONombre", label = "Nombre en cours")
 	public Integer getRunningCount() {
 		return runningCount;
 	}
@@ -201,7 +218,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Durée moyenne d'exécution'.
 	 * @return Integer averageExecutionTime
 	 */
-	@Field(domain = "DoONombre", label = "Durée moyenne d'exécution")
+	@Field(smartType = "STyONombre", label = "Durée moyenne d'exécution")
 	public Integer getAverageExecutionTime() {
 		return averageExecutionTime;
 	}
@@ -220,7 +237,7 @@ public final class OExecutionSummary implements DtObject {
 	 * Récupère la valeur de la propriété 'Santé du processus'.
 	 * @return String health <b>Obligatoire</b>
 	 */
-	@Field(domain = "DoOCodeIdentifiant", required = true, label = "Santé du processus")
+	@Field(smartType = "STyOCodeIdentifiant", cardinality = io.vertigo.core.lang.Cardinality.ONE, label = "Santé du processus")
 	public String getHealth() {
 		return health;
 	}

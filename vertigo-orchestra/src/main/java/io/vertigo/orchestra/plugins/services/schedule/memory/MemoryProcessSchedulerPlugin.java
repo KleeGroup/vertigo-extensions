@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +35,16 @@ import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.vertigo.core.component.Activeable;
-import io.vertigo.lang.Assertion;
-import io.vertigo.lang.WrappedException;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.node.Node;
+import io.vertigo.core.node.component.Activeable;
 import io.vertigo.orchestra.definitions.OrchestraDefinitionManager;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.definitions.ProcessType;
 import io.vertigo.orchestra.impl.services.schedule.CronExpression;
 import io.vertigo.orchestra.impl.services.schedule.ProcessSchedulerPlugin;
 import io.vertigo.orchestra.services.execution.ProcessExecutor;
-import io.vertigo.util.DateUtil;
 
 public class MemoryProcessSchedulerPlugin implements ProcessSchedulerPlugin, Activeable {
 	private ProcessExecutor myProcessExecutor;
@@ -53,28 +52,29 @@ public class MemoryProcessSchedulerPlugin implements ProcessSchedulerPlugin, Act
 	 * Pool de timers permettant l'exécution des Jobs.
 	 */
 	private final TimerPool timerPool = new TimerPool();
-	private final OrchestraDefinitionManager orchestraDefinitionManager;
 
 	@Inject
 	public MemoryProcessSchedulerPlugin(
 			final OrchestraDefinitionManager orchestraDefinitionManager) {
-		Assertion.checkNotNull(orchestraDefinitionManager);
+		Assertion.check().isNotNull(orchestraDefinitionManager);
 		//---
-		this.orchestraDefinitionManager = orchestraDefinitionManager;
+		Node.getNode().registerPreActivateFunction(() -> {
+			orchestraDefinitionManager.getAllProcessDefinitionsByType(getHandledProcessType())
+					.stream()
+					.filter(processDefinition -> processDefinition.getTriggeringStrategy().getCronExpression().isPresent())
+					.forEach(this::scheduleWithCron);
+		});
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void start() {
-		orchestraDefinitionManager.getAllProcessDefinitionsByType(getHandledProcessType())
-				.stream()
-				.filter(processDefinition -> processDefinition.getTriggeringStrategy().getCronExpression().isPresent())
-				.forEach(this::scheduleWithCron);
+		//
 	}
 
 	@Override
 	public void setProcessExecutor(final ProcessExecutor processExecutor) {
-		Assertion.checkNotNull(processExecutor);
+		Assertion.check().isNotNull(processExecutor);
 		//---
 		myProcessExecutor = processExecutor;
 	}
@@ -86,7 +86,7 @@ public class MemoryProcessSchedulerPlugin implements ProcessSchedulerPlugin, Act
 	}
 
 	private void scheduleWithCron(final ProcessDefinition processDefinition) {
-		scheduleAtRecurrent(processDefinition, DateUtil.newInstant(), Collections.emptyMap());
+		scheduleAtRecurrent(processDefinition, Instant.now(), Collections.emptyMap());
 
 	}
 
@@ -106,9 +106,10 @@ public class MemoryProcessSchedulerPlugin implements ProcessSchedulerPlugin, Act
 	/** {@inheritDoc} */
 	@Override
 	public void scheduleAt(final ProcessDefinition processDefinition, final Instant planifiedTime, final Map<String, String> initialParams) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(planifiedTime);
-		Assertion.checkNotNull(initialParams);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(planifiedTime)
+				.isNotNull(initialParams);
 		//---
 		final TimerTask task = createTimerTask(processDefinition, initialParams);
 		timerPool.getTimer(processDefinition.getName()).schedule(task, new Date(planifiedTime.toEpochMilli()));

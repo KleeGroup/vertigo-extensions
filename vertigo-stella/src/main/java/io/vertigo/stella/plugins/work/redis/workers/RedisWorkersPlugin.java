@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +17,15 @@
  */
 package io.vertigo.stella.plugins.work.redis.workers;
 
+import java.util.List;
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import io.vertigo.commons.codec.CodecManager;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.lang.Assertion;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.param.ParamValue;
 import io.vertigo.stella.impl.work.WorkItem;
 import io.vertigo.stella.impl.workers.WorkersPlugin;
 import io.vertigo.stella.plugins.work.redis.RedisDB;
@@ -44,11 +47,17 @@ public final class RedisWorkersPlugin implements WorkersPlugin {
 	 */
 	@Inject
 	public RedisWorkersPlugin(
-			final CodecManager codecManager,
-			final RedisConnector redisConnector) {
-		Assertion.checkNotNull(codecManager);
-		Assertion.checkNotNull(redisConnector);
+			@ParamValue("connectorName") final Optional<String> connectorNameOpt,
+			final List<RedisConnector> redisConnectors,
+			final CodecManager codecManager) {
+		Assertion.check()
+				.isNotNull(codecManager)
+				.isNotNull(redisConnectors);
 		//-----
+		final String connectorName = connectorNameOpt.orElse("main");
+		final RedisConnector redisConnector = redisConnectors.stream()
+				.filter(connector -> connectorName.equals(connector.getName()))
+				.findFirst().get();
 		redisDB = new RedisDB(codecManager, redisConnector);
 	}
 

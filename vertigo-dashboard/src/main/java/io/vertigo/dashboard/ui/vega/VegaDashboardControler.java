@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +17,20 @@
  */
 package io.vertigo.dashboard.ui.vega;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import io.vertigo.app.App;
+import io.vertigo.core.lang.VUserException;
+import io.vertigo.core.node.Node;
 import io.vertigo.dashboard.ui.AbstractDashboardModuleControler;
 import io.vertigo.database.timeseries.DataFilter;
 import io.vertigo.database.timeseries.TimeFilter;
 import io.vertigo.database.timeseries.TimedDatas;
-import io.vertigo.lang.VUserException;
 
 public final class VegaDashboardControler extends AbstractDashboardModuleControler {
 
 	@Override
-	public void doBuildModel(final App app, final Map<String, Object> model) {
+	public void doBuildModel(final Node node, final Map<String, Object> model) {
 		addGlobalIndicators(model);
 		//
 	}
@@ -43,8 +42,8 @@ public final class VegaDashboardControler extends AbstractDashboardModuleControl
 				.build();
 		final TimeFilter timeFilter = TimeFilter.builder("now() - 1w", "now()").withTimeDim("3w").build();
 		//---
-		final TimedDatas countAndMeanDuration = getDataProvider().getTimeSeries(Arrays.asList("duration:count", "duration:mean"), dataFilter, timeFilter);
-		final TimedDatas numOfTechnicalExceptions = getDataProvider().getTimeSeries(Arrays.asList("duration:count"), dataFilterExceptions, timeFilter);
+		final TimedDatas countAndMeanDuration = getDataProvider().getTimeSeries(List.of("duration:count", "duration:mean"), dataFilter, timeFilter);
+		final TimedDatas numOfTechnicalExceptions = getDataProvider().getTimeSeries(List.of("duration:count"), dataFilterExceptions, timeFilter);
 
 		double count = 0;
 		final double meanDuration = 0;

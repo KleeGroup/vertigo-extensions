@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +32,8 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.ucb.XFileIdentifierConverter;
 import com.sun.star.uno.UnoRuntime;
 
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.param.ParamValue;
-import io.vertigo.dynamo.file.FileManager;
-import io.vertigo.lang.Assertion;
 
 /**
  * Conversion des fichiers à partir de OpenOffice.
@@ -46,16 +44,14 @@ public final class OpenOfficeLocalConverterPlugin extends AbstractOpenOfficeConv
 
 	/**
 	 * Constructeur.
-	 * @param fileManager Manager de gestion des fichiers
 	 * @param unoPort Port de connexion au serveur OpenOffice
-	 * @param convertTimeoutSeconds Timeout de conversion des documents
+	 * @param convertTimeoutSecondsOpt Timeout de conversion des documents
 	 */
 	@Inject
 	public OpenOfficeLocalConverterPlugin(
-			final FileManager fileManager,
 			@ParamValue("unoport") final String unoPort,
-			@ParamValue("convertTimeoutSeconds") final Optional<Integer> convertTimeoutSeconds) {
-		super(fileManager, "localhost", unoPort, convertTimeoutSeconds.orElse(60));
+			@ParamValue("convertTimeoutSeconds") final Optional<Integer> convertTimeoutSecondsOpt) {
+		super("localhost", unoPort, convertTimeoutSecondsOpt.orElse(60));
 
 	}
 
@@ -86,7 +82,7 @@ public final class OpenOfficeLocalConverterPlugin extends AbstractOpenOfficeConv
 			LOGGER.debug("Openning document... {}", inputUrl);
 		}
 		final XComponent xDoc = openOfficeConnection.getDesktop().loadComponentFromURL(inputUrl, "_blank", 0, loadProps);
-		Assertion.checkNotNull(xDoc, "Le document n''a pas été chargé : {0}", inputUrl);
+		Assertion.check().isNotNull(xDoc, "Le document n''a pas été chargé : {0}", inputUrl);
 
 		return xDoc;
 	}

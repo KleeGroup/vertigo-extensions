@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +25,15 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
-import io.vertigo.app.AutoCloseableApp;
+import io.vertigo.basics.task.TaskEngineProc;
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
-import io.vertigo.dynamo.task.TaskManager;
-import io.vertigo.dynamo.task.metamodel.TaskDefinition;
-import io.vertigo.dynamo.task.model.Task;
-import io.vertigo.dynamox.task.TaskEngineProc;
-import io.vertigo.util.InjectorUtil;
-import io.vertigo.util.ListBuilder;
+import io.vertigo.core.node.AutoCloseableNode;
+import io.vertigo.core.util.InjectorUtil;
+import io.vertigo.datamodel.task.TaskManager;
+import io.vertigo.datamodel.task.definitions.TaskDefinition;
+import io.vertigo.datamodel.task.model.Task;
+import io.vertigo.datastore.impl.dao.StoreUtil;
 
 /**
  * Test Junit de Vertigo Orchestra.
@@ -43,7 +42,7 @@ import io.vertigo.util.ListBuilder;
  * @version $Id$
  */
 public abstract class AbstractOrchestraTestCase {
-	private static AutoCloseableApp app;
+	private static AutoCloseableNode node;
 
 	@Inject
 	private VTransactionManager transactionManager;
@@ -51,37 +50,36 @@ public abstract class AbstractOrchestraTestCase {
 	private TaskManager taskManager;
 
 	@BeforeAll
-	public static final void setUp() throws Exception {
-		app = new AutoCloseableApp(MyNodeConfig.config());
+	public static final void setUp() {
+		node = new AutoCloseableNode(MyNodeConfig.config());
 	}
 
 	@AfterAll
-	public static final void tearDown() throws Exception {
-		if (app != null) {
-			app.close();
+	public static final void tearDown() {
+		if (node != null) {
+			node.close();
 		}
 	}
 
-	public final void setUpInjection() throws Exception {
-		if (app != null) {
+	public final void setUpInjection() {
+		if (node != null) {
 			InjectorUtil.injectMembers(this);
 		}
 	}
 
 	@BeforeEach
-	public void doSetUp() throws Exception {
+	public void doSetUp() {
 		setUpInjection();
 		//A chaque test on supprime tout
 		try (VTransactionWritable transaction = transactionManager.createCurrentTransaction()) {
-			final List<String> requests = new ListBuilder<String>()
-					.add(" delete from o_activity_log;")
-					.add(" delete from o_activity_workspace;")
-					.add(" delete from o_process_planification;")
-					.add(" delete from o_activity_execution;")
-					.add(" delete from o_process_execution;")
-					.add(" delete from o_activity;")
-					.add(" delete from o_process;")
-					.build();
+			final List<String> requests = List.of(
+					" delete from o_activity_log;",
+					" delete from o_activity_workspace;",
+					" delete from o_process_planification;",
+					" delete from o_activity_execution;",
+					" delete from o_process_execution;",
+					" delete from o_activity;",
+					" delete from o_process;");
 
 			for (final String request : requests) {
 				final TaskDefinition taskDefinition = TaskDefinition.builder("TkClean")
@@ -89,7 +87,8 @@ public abstract class AbstractOrchestraTestCase {
 						.withEngine(TaskEngineProc.class)
 						.withRequest(request)
 						.build();
-				final Task task = Task.builder(taskDefinition).build();
+				final Task task = Task.builder(taskDefinition)
+						.addContextProperty("connectionName", StoreUtil.getConnectionName("orchestra")).build();
 				taskManager.execute(task);
 			}
 			transaction.commit();

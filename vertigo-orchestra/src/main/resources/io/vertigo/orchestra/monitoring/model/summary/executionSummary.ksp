@@ -1,17 +1,17 @@
 package io.vertigo.orchestra.monitoring.domain.summary
 
 create DtDefinition DtOExecutionSummary {
-	field proId   					{domain : DoOIdentifiant, label :"Id du processus", required:"true",},
-	field processName   			{domain : DoOLibelle, label :"Nom du processus", required:"true",},
-	field processLabel   			{domain : DoOLibelle, label :"Libellé du processus", required:"true",},
-	field lastExecutionTime		   	{domain : DoOTimestamp, label :"Dernière exécution le", required:"false",},
-	field nextExecutionTime 	  	{domain : DoOTimestamp, label :"Prochaine exécution le", required:"false",},
-	field errorsCount   			{domain : DoONombre, label :"Nombre en erreur", required:"false",},
-	field misfiredCount   			{domain : DoONombre, label :"Nombre non executés", required:"false",},
-	field successfulCount   		{domain : DoONombre, label :"Nombre en succès", required:"false",},
-	field runningCount   			{domain : DoONombre, label :"Nombre en cours", required:"false",},
-	field averageExecutionTime   	{domain : DoONombre, label :"Durée moyenne d'exécution", required:"false",},
-	field health   					{domain : DoOCodeIdentifiant, label :"Santé du processus", required:"true",},
+	field proId   					{domain : DoOIdentifiant, label :"Id du processus", cardinality: "1",},
+	field processName   			{domain : DoOLibelle, label :"Nom du processus", cardinality: "1",},
+	field processLabel   			{domain : DoOLibelle, label :"Libellé du processus", cardinality: "1",},
+	field lastExecutionTime		   	{domain : DoOTimestamp, label :"Dernière exécution le", cardinality: "?",},
+	field nextExecutionTime 	  	{domain : DoOTimestamp, label :"Prochaine exécution le", cardinality: "?",},
+	field errorsCount   			{domain : DoONombre, label :"Nombre en erreur", cardinality: "?",},
+	field misfiredCount   			{domain : DoONombre, label :"Nombre non executés", cardinality: "?",},
+	field successfulCount   		{domain : DoONombre, label :"Nombre en succès", cardinality: "?",},
+	field runningCount   			{domain : DoONombre, label :"Nombre en cours", cardinality: "?",},
+	field averageExecutionTime   	{domain : DoONombre, label :"Durée moyenne d'exécution", cardinality: "?",},
+	field health   					{domain : DoOCodeIdentifiant, label :"Santé du processus", cardinality: "1",},
   
-},
+}
 

@@ -3,11 +3,11 @@ package io.vertigo.orchestra.domain.definition
 create DtDefinition DtOActivity {
 	storeName : "orchestra"
 	id actId		{domain : DoOIdentifiant, label :"Id Activité", 					}
-	field name   	{domain : DoOLibelle, 	label :"Nom de l'activité", 			required:"false" }
-	field label   	{domain : DoOLibelle, 	label :"Libellé de l'activité", 		required:"false" }
-	field number   	{domain : DoONombre, 		label :"Numéro de l'activité", 			required:"false" }
-	field milestone {domain : DoOBooleen, 	label :"Jalon", 						required:"false" }
-	field engine   	{domain : DoOClasse, 		label :"Implémentation de l'activité", 	required:"false" }
+	field name   	{domain : DoOLibelle, 	label :"Nom de l'activité", 			 }
+	field label   	{domain : DoOLibelle, 	label :"Libellé de l'activité", 		cardinality: "?" }
+	field number   	{domain : DoONombre, 		label :"Numéro de l'activité", 			cardinality: "?" }
+	field milestone {domain : DoOBooleen, 	label :"Jalon", 						cardinality: "?" }
+	field engine   	{domain : DoOClasse, 		label :"Implémentation de l'activité", 	cardinality: "?" }
 }
 
 create Association AActPro {

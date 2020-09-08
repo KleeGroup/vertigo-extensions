@@ -17,26 +17,34 @@
 			<artifactId>vertigo-core</artifactId>
 			<version>${vertigo.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-dynamo-api</artifactId>
-			<version>${vertigo.version}</version>
+			<artifactId>vertigo-commons</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Tests -->
 		<dependency>
 			<groupId>io.vertigo</groupId>
-			<artifactId>vertigo-core</artifactId>
-			<version>${vertigo.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
+			<artifactId>vertigo-datamodel</artifactId>
+			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>core</artifactId>
+			<version>5.0.0</version>
+		    <optional>true</optional>
+		</dependency>
+		
+		<!-- Tests -->
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.14.0</version>
+			<version>3.17.1</version>
 			<scope>test</scope>
 		</dependency>
+	
 	</dependencies>
 
 </project>

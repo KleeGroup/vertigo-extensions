@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +29,18 @@ import java.util.function.Function;
 
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
-import io.vertigo.core.definition.DefinitionReference;
-import io.vertigo.dynamo.domain.metamodel.DtDefinition;
-import io.vertigo.dynamo.domain.metamodel.DtField;
-import io.vertigo.dynamo.domain.metamodel.DtFieldName;
-import io.vertigo.dynamo.domain.metamodel.FormatterException;
-import io.vertigo.dynamo.domain.model.DtList;
-import io.vertigo.dynamo.domain.model.DtObject;
-import io.vertigo.dynamo.domain.model.Entity;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.dynamo.store.StoreManager;
-import io.vertigo.lang.Assertion;
-import io.vertigo.util.ClassUtil;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.node.definition.DefinitionReference;
+import io.vertigo.core.util.ClassUtil;
+import io.vertigo.datamodel.structure.definitions.DtDefinition;
+import io.vertigo.datamodel.structure.definitions.DtField;
+import io.vertigo.datamodel.structure.definitions.DtFieldName;
+import io.vertigo.datamodel.structure.definitions.FormatterException;
+import io.vertigo.datamodel.structure.model.DtList;
+import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.model.Entity;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.datastore.entitystore.EntityStoreManager;
 import io.vertigo.vega.engines.webservice.json.VegaUiObject;
 import io.vertigo.vega.webservice.model.UiList;
 import io.vertigo.vega.webservice.model.UiObject;
@@ -59,7 +58,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	/**
 	 * Accès au storeManager.
 	 */
-	protected final ComponentRef<StoreManager> storeManager = ComponentRef.makeLazyRef(StoreManager.class);
+	protected final ComponentRef<EntityStoreManager> entityStoreManager = ComponentRef.makeLazyRef(EntityStoreManager.class);
 	/**
 	 * Accès au transactionManager.
 	 */
@@ -77,14 +76,14 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @param dtDefinition DtDefinition
 	 */
 	AbstractUiListUnmodifiable(final DtDefinition dtDefinition, final Optional<DtFieldName<O>> keyFieldNameOpt) {
-		Assertion.checkNotNull(dtDefinition);
+		Assertion.check().isNotNull(dtDefinition);
 		//-----
 		dtDefinitionRef = new DefinitionReference<>(dtDefinition);
-		final Optional<DtField> idFieldOption = getDtDefinition().getIdField();
-		if (idFieldOption.isPresent()) {
-			camelIdFieldName = idFieldOption.get().getName();
+		final Optional<DtField> idFieldOpt = getDtDefinition().getIdField();
+		if (idFieldOpt.isPresent()) {
+			camelIdFieldName = idFieldOpt.get().getName();
 		} else {
-			Assertion.checkState(keyFieldNameOpt.isPresent(), "DtDefinition : {0} is not an entity, you must provide a keyFieldName", dtDefinition.getName());
+			Assertion.check().isTrue(keyFieldNameOpt.isPresent(), "DtDefinition : {0} is not an entity, you must provide a keyFieldName", dtDefinition.getName());
 			camelIdFieldName = keyFieldNameOpt.get().name();
 		}
 	}
@@ -140,7 +139,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	@Override
 	public final UiObject<O> get(final int index) {
 		return uiObjectByIndex.computeIfAbsent(index, i -> {
-			Assertion.checkState(uiObjectByIndex.size() < 1000, "Trop d'élément dans le buffer uiObjectByIndex de la liste de {0}", getDtDefinition().getName());
+			Assertion.check().isTrue(uiObjectByIndex.size() < 1000, "Trop d'élément dans le buffer uiObjectByIndex de la liste de {0}", getDtDefinition().getName());
 			return new MapUiObject<>(obtainDtList().get(i));
 		});
 	}
@@ -167,7 +166,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @return index de l'objet dans la liste
 	 */
 	private int indexOfUiObject(final UiObject<O> uiObject) {
-		Assertion.checkNotNull(uiObject);
+		Assertion.check().isNotNull(uiObject);
 		//-----
 		return obtainDtList().indexOf(uiObject.getServerSideObject());
 	}
@@ -177,7 +176,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @return index de l'objet dans la liste
 	 */
 	private int indexOfDtObject(final DtObject dtObject) {
-		Assertion.checkNotNull(dtObject);
+		Assertion.check().isNotNull(dtObject);
 		//-----
 		return obtainDtList().indexOf(dtObject);
 	}
@@ -191,7 +190,7 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	 * @throws FormatterException Format error
 	 */
 	public UiObject<O> getById(final String keyFieldName, final Serializable keyValue) {
-		Assertion.checkNotNull(keyValue);
+		Assertion.check().isNotNull(keyValue);
 		//-----
 		final Map<Serializable, UiObject<O>> uiObjectById = obtainUiObjectByIdMap(keyFieldName);
 		UiObject<O> uiObject = uiObjectById.get(keyValue);
@@ -204,23 +203,23 @@ public abstract class AbstractUiListUnmodifiable<O extends DtObject> extends Abs
 	private UiObject<O> loadMissingEntity(final String keyFieldName, final Serializable keyValue, final Map<Serializable, UiObject<O>> uiObjectById) {
 		final DtDefinition dtDefinition = getDtDefinition();
 		// ---
-		Assertion.checkState(dtDefinition.getIdField().isPresent(), "The definition : {0} must have an id to retrieve elements by Id", dtDefinition);
+		Assertion.check().isTrue(dtDefinition.getIdField().isPresent(), "The definition : {0} must have an id to retrieve elements by Id", dtDefinition);
 		// ---
 		UiObject<O> uiObject;
 		final DtField dtField = dtDefinition.getField(keyFieldName);
-		Assertion.checkArgument(dtField.getType().isId(), "La clé {0} de la liste doit être la PK", keyFieldName);
+		Assertion.check().isTrue(dtField.getType().isId(), "La clé {0} de la liste doit être la PK", keyFieldName);
 
 		final O entity = (O) loadDto(keyValue);
 		uiObject = new MapUiObject<>(entity);
 		uiObjectById.put(keyValue, uiObject);
-		Assertion.checkState(uiObjectById.size() < NB_MAX_ELEMENTS, "Trop d'élément dans le buffer uiObjectById de la liste de {0}", getDtDefinition().getName());
+		Assertion.check().isTrue(uiObjectById.size() < NB_MAX_ELEMENTS, "Trop d'élément dans le buffer uiObjectById de la liste de {0}", getDtDefinition().getName());
 		return uiObject;
 	}
 
 	private Entity loadDto(final Object key) {
 		//-- Transaction BEGIN
 		try (final VTransactionWritable transaction = transactionManager.get().createCurrentTransaction()) {
-			return storeManager.get().getDataStore().<Entity> readOne(UID.of(getDtDefinition(), key));
+			return entityStoreManager.get().<Entity> readOne(UID.of(getDtDefinition(), key));
 		}
 	}
 

@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TimerTask;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.plugins.services.MapCodec;
 import io.vertigo.orchestra.services.execution.ProcessExecutor;
@@ -44,9 +43,10 @@ final class BasicTimerTask extends TimerTask {
 	 * @param jobManager Manager des jobs.
 	 */
 	BasicTimerTask(final ProcessDefinition processDefinition, final Map<String, String> params, final ProcessExecutor processExecutor) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkNotNull(params);
-		Assertion.checkNotNull(processExecutor);
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isNotNull(params)
+				.isNotNull(processExecutor);
 		//-----
 		this.processDefinition = processDefinition;
 		this.params = params;

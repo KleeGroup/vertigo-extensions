@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,11 +62,12 @@ public final class VSpringMvcViewContextInterceptor implements HandlerIntercepto
 				if (!controller.isViewContextDirty()) {
 					controller.storeContext();
 				}
-				if (response.getStatus() / 100 == 2 || response.getStatus() / 100 == 4) {
-					//we reset uiMessageStack only in case of viewable page 2xx or 4xx. We are sure to keep it on error page 5xx or redirect 3xx.
+				if (response.getStatus() / 100 == 2 || UiRequestUtil.isJsonRequest(request) || response.getStatus() / 100 == 4) {
+					//we reset uiMessageStack only in case of viewable page 2xx or 4xx or ajax request. We are sure to keep it on error page 5xx or redirect 3xx.
 					UiRequestUtil.removeCurrentUiMessageStack();
 				}
 			}
 		}
 	}
+
 }

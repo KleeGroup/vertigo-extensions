@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +21,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.dashboard.services.data.DataProvider;
 import io.vertigo.database.timeseries.ClusteredMeasure;
 import io.vertigo.database.timeseries.DataFilter;
 import io.vertigo.database.timeseries.TabularDatas;
 import io.vertigo.database.timeseries.TimeFilter;
 import io.vertigo.database.timeseries.TimedDatas;
-import io.vertigo.lang.Assertion;
 import io.vertigo.vega.webservice.WebServices;
 import io.vertigo.vega.webservice.stereotype.AnonymousAccessAllowed;
 import io.vertigo.vega.webservice.stereotype.InnerBodyParam;
@@ -85,7 +84,7 @@ public class DashboardDataProviderWebServices implements WebServices {
 			@InnerBodyParam("timeFilter") final TimeFilter timeFilter,
 			@InnerBodyParam("groupBy") final String groupBy,
 			@InnerBodyParam("maxRows") final int maxRows) {
-		Assertion.checkState(measures.size() == 1, "One and only one measure must be queried for a top request");
+		Assertion.check().isTrue(measures.size() == 1, "One and only one measure must be queried for a top request");
 		//---
 		return dataProvider.getTops(measures.get(0), dataFilter, timeFilter, groupBy, maxRows);
 	}

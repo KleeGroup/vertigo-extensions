@@ -12,10 +12,15 @@ modules:
   io.vertigo.commons.CommonsFeatures:
     features:
       - script:
-      - cache:
     featuresConfig:
       - script.janino:
-      - cache.memory:
+  io.vertigo.connectors.elasticsearch.ElasticSearchFeatures:
+    features:
+      - embeddedServer:
+          home: esconfig
+      - transport:
+          servers.names: localhost:9300
+          cluster.name: vertigo-elasticsearch-embedded
   io.vertigo.database.DatabaseFeatures:
     features:
       - sql:
@@ -24,22 +29,27 @@ modules:
           dataBaseClass: io.vertigo.database.impl.sql.vendor.h2.H2DataBase
           jdbcDriver: org.h2.Driver
           jdbcUrl: jdbc:h2:mem:test
-  io.vertigo.dynamo.DynamoFeatures:
+  io.vertigo.datamodel.DataModelFeatures:
+  io.vertigo.datastore.DataStoreFeatures:
     features:
-      - store:
+      - cache:
+      - entitystore:
       - kvStore:
-      - search:
     featuresConfig:
-      - store.data.sql:
-      - collections.luceneIndex:
-      - search.elasticsearchEmbedded:
-          home: esconfig
-          envIndex: tuTest
-          rowsPerQuery: 50
-          config.file: esconfig/elasticsearch.yml
+      - cache.memory:
+      - entitystore.sql:
       - kvStore.berkeley:
           collections: VViewContext;TTL=43200
           dbFilePath: ${java.io.tmpdir}/vertigo/TestVViewContext
+  io.vertigo.datafactory.DataFactoryFeatures:
+    features:
+      - search:
+    featuresConfig:
+      - collections.luceneIndex:
+      - search.elasticsearch.client:          
+          envIndexPrefix: tuTest
+          rowsPerQuery: 50
+          config.file: esconfig/elasticsearch.yml
   io.vertigo.account.AccountFeatures:
     features:
       - security:

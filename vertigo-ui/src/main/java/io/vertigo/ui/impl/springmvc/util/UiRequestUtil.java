@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +19,14 @@ package io.vertigo.ui.impl.springmvc.util;
 
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.ui.core.ViewContext;
 import io.vertigo.ui.impl.springmvc.controller.VSpringMvcUiMessageStack;
 import io.vertigo.vega.webservice.validation.UiMessageStack;
@@ -55,7 +55,7 @@ public final class UiRequestUtil {
 		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
 		final ViewContext viewContext = (ViewContext) attributes.getAttribute("viewContext", RequestAttributes.SCOPE_REQUEST);
 		//---
-		Assertion.checkNotNull(viewContext);
+		Assertion.check().isNotNull(viewContext);
 		//---
 		return viewContext;
 	}
@@ -78,18 +78,24 @@ public final class UiRequestUtil {
 	}
 
 	public static void setRequestScopedAttribute(final String name, final Object value) {
-		Assertion.checkArgNotEmpty(name);
+		Assertion.check().isNotBlank(name);
 		//---
 		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
 		attributes.setAttribute(name, value, RequestAttributes.SCOPE_REQUEST);
 	}
 
-	public static <O extends Object> Optional<O> getRequestScopedAttribute(final String name, final Class<O> valueClass) {
-		Assertion.checkArgNotEmpty(name);
-		Assertion.checkNotNull(valueClass);
+	public static <O> Optional<O> getRequestScopedAttribute(final String name, final Class<O> valueClass) {
+		Assertion.check()
+				.isNotBlank(name)
+				.isNotNull(valueClass);
 		//---
 		final RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
 		final O value = valueClass.cast(attributes.getAttribute(name, RequestAttributes.SCOPE_REQUEST));
 		return Optional.ofNullable(value);
+	}
+
+	public static boolean isJsonRequest(final HttpServletRequest request) {
+		final String acceptHeader = request.getHeader("Accept");
+		return acceptHeader != null && acceptHeader.contains("application/json");
 	}
 }

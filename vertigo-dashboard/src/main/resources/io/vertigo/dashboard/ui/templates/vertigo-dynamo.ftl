@@ -104,7 +104,7 @@
 	</@module.standardPanel>
 	
 	
-	<@module.standardPanel 'Domains' 'domain' >
+	<@module.standardPanel 'SmartTypes' 'smarttypes' >
 		<@module.standardList>
 			<table class="table table-sm table-striped">
 				<thead>
@@ -115,22 +115,22 @@
 					</tr>
 				</thead>
 				<tbody>
-			<#list domains as domain>
-				<tr id="domainDetail-${domain.name}-list" data-toggle="list" href="#domainDetail-${domain.name}" role="tab" class="${(domain.orphan)?then('table-danger', '')}">
-					<th scope="row">${domain.name}</th>
-					<td>${domain.taskCount!'N/A'}</td>
-					<td>${domain.dtDefinitionCount!'N/A'}</td>
+			<#list smartTypes as smartType>
+				<tr id="smartTypeDetail-${smartType.name}-list" data-toggle="list" href="#smartTypeDetail-${smartType.name}" role="tab" class="${(smartType.orphan)?then('table-danger', '')}">
+					<th scope="row">${smartType.name}</th>
+					<td>${smartType.taskCount!'N/A'}</td>
+					<td>${smartType.dtDefinitionCount!'N/A'}</td>
 				</tr>
 			</#list>
 				</tbody>
 			</table>
 		</@module.standardList>
 		<@module.standardDetail>
-			<#list domains as domain>
-				<@module.lineDetail  type='domain' name=domain.name >
+			<#list smartTypes as smartType>
+				<@module.lineDetail  type='smartType' name=smartType.name >
 					<@module.formGroup>
-					 	<@module.property 'Used by ' domain.taskCount!'N/A'+' tasks' />
-					 	<@module.property 'Used by' domain.dtDefinitionCount!'N/A'+' DtDefinitions' />
+					 	<@module.property 'Used by ' smartType.taskCount!'N/A'+' tasks' />
+					 	<@module.property 'Used by' smartType.dtDefinitionCount!'N/A'+' DtDefinitions' />
 					  </@module.formGroup>
 				</@module.lineDetail >
 			</#list>

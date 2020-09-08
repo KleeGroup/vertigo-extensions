@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +21,20 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
 
 import io.vertigo.account.account.Account;
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.dynamo.domain.model.KeyConcept;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.lang.Assertion;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.param.ParamValue;
+import io.vertigo.core.util.MapBuilder;
+import io.vertigo.datamodel.structure.model.KeyConcept;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.comment.Comment;
 import io.vertigo.social.impl.comment.CommentPlugin;
-import io.vertigo.social.services.comment.Comment;
-import io.vertigo.util.MapBuilder;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
@@ -48,16 +49,23 @@ public final class RedisCommentPlugin implements CommentPlugin {
 	 * @param redisConnector Redis connector
 	 */
 	@Inject
-	public RedisCommentPlugin(final RedisConnector redisConnector) {
-		Assertion.checkNotNull(redisConnector);
+	public RedisCommentPlugin(
+			@ParamValue("connectorName") final Optional<String> connectorNameOpt,
+			final List<RedisConnector> redisConnectors) {
+		Assertion.check()
+				.isNotNull(connectorNameOpt)
+				.isNotNull(redisConnectors);
 		//-----
-		this.redisConnector = redisConnector;
+		final String connectorName = connectorNameOpt.orElse("main");
+		redisConnector = redisConnectors.stream()
+				.filter(connector -> connectorName.equals(connector.getName()))
+				.findFirst().get();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public <S extends KeyConcept> void publish(final Comment comment, final UID<S> keyConceptUri) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			try (final Transaction tx = jedis.multi()) {
 				tx.hmset("comment:" + comment.getUuid(), toMap(comment));
 				tx.lpush("comments:" + keyConceptUri.urn(), comment.getUuid().toString());
@@ -70,7 +78,7 @@ public final class RedisCommentPlugin implements CommentPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public void update(final Comment comment) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			//On vérifie la présence de l'élément en base pour s'assurer la cohérence du stockage,
 			//et notament qu'il soit référencé dans "comments:keyConceptUrn"
 			final boolean elementExist = jedis.exists("comment:" + comment.getUuid());
@@ -84,7 +92,7 @@ public final class RedisCommentPlugin implements CommentPlugin {
 	/** {@inheritDoc} */
 	@Override
 	public Comment get(final UUID uuid) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			return fromMap(jedis.hgetAll("comment:" + uuid));
 		}
 	}
@@ -93,7 +101,7 @@ public final class RedisCommentPlugin implements CommentPlugin {
 	@Override
 	public <S extends KeyConcept> List<Comment> getComments(final UID<S> keyConceptUri) {
 		final List<Response<Map<String, String>>> responses = new ArrayList<>();
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final List<String> uuids = jedis.lrange("comments:" + keyConceptUri.urn(), 0, -1);
 			try (final Transaction tx = jedis.multi()) {
 				for (final String uuid : uuids) {

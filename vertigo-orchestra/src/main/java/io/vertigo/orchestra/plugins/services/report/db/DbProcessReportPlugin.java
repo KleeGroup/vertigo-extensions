@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import io.vertigo.commons.transaction.Transactional;
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 import io.vertigo.orchestra.definitions.ProcessDefinition;
 import io.vertigo.orchestra.definitions.ProcessType;
 import io.vertigo.orchestra.impl.services.ProcessReportPlugin;
@@ -53,8 +52,9 @@ public class DbProcessReportPlugin implements ProcessReportPlugin {
 	private SummaryPAO summaryPAO;
 
 	private static void checkProcessDefinition(final ProcessDefinition processDefinition) {
-		Assertion.checkNotNull(processDefinition);
-		Assertion.checkState(processDefinition.getProcessType() == ProcessType.SUPERVISED, "Only supervised process can retrieve executions. Process {0} isn't", processDefinition.getName());
+		Assertion.check()
+				.isNotNull(processDefinition)
+				.isTrue(processDefinition.getProcessType() == ProcessType.SUPERVISED, "Only supervised process can retrieve executions. Process {0} isn't", processDefinition.getName());
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class DbProcessReportPlugin implements ProcessReportPlugin {
 	private static List<ExecutionSummary> decodeSummaryList(final List<OExecutionSummary> summaries) {
 		return summaries
 				.stream()
-				.map(summary -> decodeSummary(summary))
+				.map(DbProcessReportPlugin::decodeSummary)
 				.collect(Collectors.toList());
 
 	}
@@ -131,7 +131,7 @@ public class DbProcessReportPlugin implements ProcessReportPlugin {
 	private static List<ProcessExecution> decodeExecutionList(final List<OProcessExecutionUi> executions) {
 		return executions
 				.stream()
-				.map(execution -> decodeExecution(execution))
+				.map(DbProcessReportPlugin::decodeExecution)
 				.collect(Collectors.toList());
 
 	}
@@ -153,7 +153,7 @@ public class DbProcessReportPlugin implements ProcessReportPlugin {
 	private static List<ActivityExecution> decodeActivityExecutionList(final List<OActivityExecutionUi> executions) {
 		return executions
 				.stream()
-				.map(execution -> decodeActivityExecution(execution))
+				.map(DbProcessReportPlugin::decodeActivityExecution)
 				.collect(Collectors.toList());
 
 	}

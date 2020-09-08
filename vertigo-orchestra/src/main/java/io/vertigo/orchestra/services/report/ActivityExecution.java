@@ -1,8 +1,7 @@
 /**
- * vertigo - simple java starter
+ * vertigo - application development platform
  *
- * Copyright (C) 2013-2019, vertigo-io, KleeGroup, direction.technique@kleegroup.com (http://www.kleegroup.com)
- * KleeGroup, Centre d'affaire la Boursidiere - BP 159 - 92357 Le Plessis Robinson Cedex - France
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +20,7 @@ package io.vertigo.orchestra.services.report;
 import java.io.Serializable;
 import java.time.Instant;
 
-import io.vertigo.lang.Assertion;
+import io.vertigo.core.lang.Assertion;
 
 /**
  * Representation of an activityExecution
@@ -68,7 +67,7 @@ public final class ActivityExecution implements Serializable {
 			final String workspaceOut,
 			final Boolean hasLogFile,
 			final Boolean hasTechnicalLog) {
-		Assertion.checkNotNull(aceId);
+		Assertion.check().isNotNull(aceId);
 		// ---
 		this.aceId = aceId;
 		this.label = label;

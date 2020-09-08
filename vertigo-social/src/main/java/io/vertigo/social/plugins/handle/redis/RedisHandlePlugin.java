@@ -1,17 +1,36 @@
+/**
+ * vertigo - application development platform
+ *
+ * Copyright (C) 2013-2020, Vertigo.io, team@vertigo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.vertigo.social.plugins.handle.redis;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
-import io.vertigo.commons.impl.connectors.redis.RedisConnector;
-import io.vertigo.dynamo.domain.model.UID;
-import io.vertigo.lang.Assertion;
+import io.vertigo.connectors.redis.RedisConnector;
+import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.param.ParamValue;
+import io.vertigo.core.util.MapBuilder;
+import io.vertigo.datamodel.structure.model.UID;
+import io.vertigo.social.handle.Handle;
 import io.vertigo.social.impl.handle.HandlePlugin;
-import io.vertigo.social.services.handle.Handle;
-import io.vertigo.util.MapBuilder;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
@@ -21,15 +40,22 @@ public class RedisHandlePlugin implements HandlePlugin {
 	private final RedisConnector redisConnector;
 
 	@Inject
-	public RedisHandlePlugin(final RedisConnector redisConnector) {
-		Assertion.checkNotNull(redisConnector);
+	public RedisHandlePlugin(
+			@ParamValue("connectorName") final Optional<String> connectorNameOpt,
+			final List<RedisConnector> redisConnectors) {
+		Assertion.check()
+				.isNotNull(connectorNameOpt)
+				.isNotNull(redisConnectors);
 		//---
-		this.redisConnector = redisConnector;
+		final String connectorName = connectorNameOpt.orElse("main");
+		redisConnector = redisConnectors.stream()
+				.filter(connector -> connectorName.equals(connector.getName()))
+				.findFirst().get();
 	}
 
 	@Override
 	public void add(final List<Handle> handles) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			for (final Handle handle : handles) {
 				if (jedis.exists("urn_handle:" + handle.getUid().urn())) {
 					// if exist we need to clean the index and the reverse index
@@ -46,7 +72,7 @@ public class RedisHandlePlugin implements HandlePlugin {
 
 	@Override
 	public void remove(final List<UID> uids) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			for (final UID uid : uids) {
 				if (jedis.exists("urn_handle:" + uid.urn())) {
 					// if exist we need to clean the index and the reverse index
@@ -61,7 +87,7 @@ public class RedisHandlePlugin implements HandlePlugin {
 
 	@Override
 	public List<Handle> search(final String prefix) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			final List<Handle> handleResults = new ArrayList<>();
 			String cursor = "0";
 			final ScanParams scanParams = new ScanParams();
@@ -84,14 +110,14 @@ public class RedisHandlePlugin implements HandlePlugin {
 
 	@Override
 	public Handle getByCode(final String handleCode) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			return fromMap(jedis.hgetAll("handle:" + handleCode));
 		}
 	}
 
 	@Override
 	public Handle getByUid(final UID uid) {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			return fromMap(jedis.hgetAll("urn_handle:" + uid.urn()));
 		}
 	}
@@ -110,7 +136,7 @@ public class RedisHandlePlugin implements HandlePlugin {
 
 	@Override
 	public void removeAll() {
-		try (final Jedis jedis = redisConnector.getResource()) {
+		try (final Jedis jedis = redisConnector.getClient()) {
 			String cursor = "0";
 			final ScanParams handleScanParams = new ScanParams();
 			handleScanParams.match("handle:*");
@@ -119,7 +145,7 @@ public class RedisHandlePlugin implements HandlePlugin {
 				final ScanResult<String> scanResult = jedis.scan(cursor, handleScanParams);
 				cursor = scanResult.getCursor();
 				scanResult.getResult()
-						.forEach(key -> jedis.del(key));
+						.forEach(jedis::del);
 
 			} while (!"0".equals(cursor));
 			// cursor is 0... but still
@@ -131,7 +157,7 @@ public class RedisHandlePlugin implements HandlePlugin {
 				final ScanResult<String> scanResult = jedis.scan(cursor, urnScanParams);
 				cursor = scanResult.getCursor();
 				scanResult.getResult()
-						.forEach(key -> jedis.del(key));
+						.forEach(jedis::del);
 
 			} while (!"0".equals(cursor));
 
