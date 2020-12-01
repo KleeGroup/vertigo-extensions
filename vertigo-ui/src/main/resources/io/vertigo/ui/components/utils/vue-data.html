@@ -1,7 +1,10 @@
 <th:block th:fragment="vue-data">
-    <script th:inline="javascript">
-       	VertigoUi.vueData = [(${viewContextAsJson.get()})];
-       	VertigoUi.componentStates = [[${model['componentStates']}]];
-       	VertigoUi.uiMessageStack = [[${uiMessageStack}]];
+    <script id="vui-init-data" th:inline="javascript" type="application/json">
+    	{
+       		"vueData" : [(${viewContextAsJson.get()})],
+       		"componentStates" : [[${model['componentStates']}]],
+       		"uiMessageStack" : [[${uiMessageStack}]],
+			"vuiLang": [[${model.util.getCurrentLocaleForQuasar()}]] 
+    	}
 	</script>
 </th:block>

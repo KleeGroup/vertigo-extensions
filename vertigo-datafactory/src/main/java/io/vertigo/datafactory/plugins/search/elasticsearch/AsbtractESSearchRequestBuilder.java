@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.unit.DistanceUnit;
@@ -47,6 +50,7 @@ import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.lang.BasicType;
 import io.vertigo.core.lang.BasicTypeAdapter;
 import io.vertigo.core.lang.Builder;
+import io.vertigo.core.util.BeanUtil;
 import io.vertigo.datafactory.collections.ListFilter;
 import io.vertigo.datafactory.collections.definitions.FacetDefinition;
 import io.vertigo.datafactory.collections.definitions.FacetedQueryDefinition;
@@ -78,6 +82,7 @@ public abstract class AsbtractESSearchRequestBuilder<R, S, T extends AsbtractESS
 	private static final String TOPHITS_SUBAGGREGATION_NAME = "top";
 	private static final String DATE_PATTERN = "dd/MM/yyyy";
 	private static final Pattern RANGE_PATTERN = Pattern.compile("([a-z][a-zA-Z0-9]*):([\\[\\{])(.*) TO (.*)([\\}\\]])");
+	private static final Pattern SIMPLE_CRITERIA_PATTERN = Pattern.compile("#([a-z][a-zA-Z0-9]*)#");
 
 	private final Map<Class, BasicTypeAdapter> myTypeAdapters;
 	private SearchIndexDefinition myIndexDefinition;
@@ -373,7 +378,25 @@ public abstract class AsbtractESSearchRequestBuilder<R, S, T extends AsbtractESS
 	}
 
 	private static AggregationBuilder customFacetToAggregationBuilder(final FacetDefinition facetDefinition, final DtField dtField, final Object myCriteria, final Map<Class, BasicTypeAdapter> typeAdapters) {
-		return new CustomAggregationBuilder(facetDefinition.getName(), facetDefinition.getCustomParams());
+		final Map<String, String> customParams = replaceCriteria(facetDefinition.getCustomParams(), myCriteria);
+		return new CustomAggregationBuilder(facetDefinition.getName(), customParams);
+	}
+
+	private static Map<String, String> replaceCriteria(final Map<String, String> customParams, final Object myCriteria) {
+		return customParams.entrySet().stream()
+				.collect(Collectors.toMap(Entry::getKey,
+						v -> {
+							final Matcher matcher = SIMPLE_CRITERIA_PATTERN.matcher(v.getValue());
+							String result = v.getValue();
+							while (matcher.find()) {
+								final String fieldName = matcher.group(1);
+								final Object fieldValue = BeanUtil.getValue(myCriteria, fieldName);
+								if (fieldValue != null) {
+									result = result.replaceAll("#" + fieldName + "#", String.valueOf(fieldValue));
+								}
+							}
+							return result;
+						}));
 	}
 
 	private static AggregationBuilder rangeFacetToAggregationBuilder(final FacetDefinition facetDefinition, final DtField dtField, final Object myCriteria, final Map<Class, BasicTypeAdapter> typeAdapters) {

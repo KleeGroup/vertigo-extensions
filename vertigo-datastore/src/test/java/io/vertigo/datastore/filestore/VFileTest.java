@@ -43,7 +43,7 @@ import io.vertigo.datastore.TestUtil;
 import io.vertigo.datastore.filestore.data.TestSmartTypes;
 import io.vertigo.datastore.filestore.model.InputStreamBuilder;
 import io.vertigo.datastore.filestore.model.VFile;
-import io.vertigo.datastore.filestore.util.FileUtil;
+import io.vertigo.datastore.filestore.util.VFileUtil;
 import io.vertigo.datastore.impl.filestore.model.FSFile;
 import io.vertigo.datastore.impl.filestore.model.StreamFile;
 
@@ -97,7 +97,7 @@ public final class VFileTest {
 	public void testObtainReadOnlyFile() {
 		final Path file = TestUtil.getFile("data/testFile.txt", getClass());
 		final VFile vFile = FSFile.of(file);
-		checVFile(FileUtil.obtainReadOnlyPath(vFile), file);
+		checVFile(VFileUtil.obtainReadOnlyPath(vFile), file);
 	}
 
 	@Test

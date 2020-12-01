@@ -45,6 +45,7 @@ public final class Item implements KeyConcept {
 	private String optionalString;
 	private Instant lastModified;
 	private GeoPoint localisation;
+	private Integer precision;
 
 	/** {@inheritDoc} */
 	@Override
@@ -176,6 +177,15 @@ public final class Item implements KeyConcept {
 
 	public void setLocalisation(final GeoPoint localisation) {
 		this.localisation = localisation;
+	}
+
+	@Field(smartType = "STyInteger", cardinality = Cardinality.ONE, label = "GeoPrecision")
+	public Integer getPrecision() {
+		return precision;
+	}
+
+	public void setPrecision(final Integer precision) {
+		this.precision = precision;
 	}
 
 	/*@Field(domain = "STy_KEYWORD", type = "COMPUTED", persistent = false, label = "model sort")

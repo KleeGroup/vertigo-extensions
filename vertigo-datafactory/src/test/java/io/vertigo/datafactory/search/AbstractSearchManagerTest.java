@@ -1553,6 +1553,7 @@ public abstract class AbstractSearchManagerTest {
 		final GeoPoint origin = new GeoPoint(48.80f, 2.36f);
 		final Item criteria = new Item();
 		criteria.setLocalisation(origin);
+		criteria.setPrecision(5);
 		final SearchQuery searchQuery = SearchQuery.builder("QryItemFacetGeo")
 				.withCriteria(criteria)
 				.withFacet(EMPTY_SELECTED_FACET_VALUES)

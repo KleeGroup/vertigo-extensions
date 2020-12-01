@@ -63,7 +63,7 @@ public enum VuiTestSmartTypes {
 
 	@SmartTypeDefinition(String.class)
 	@Formatter(clazz = FormatterDefault.class)
-	@Constraint(clazz = ConstraintRegex.class, arg = "^[0-9]{5}$", msg = "")
+	@Constraint(clazz = ConstraintRegex.class, arg = "^[0-9]{5}$", msg = "Code postal erroné")
 	@SmartTypeProperty(property = "storeType", value = "VARCHAR(5)")
 	CodePostal,
 

@@ -44,7 +44,7 @@ import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.node.component.Activeable;
 import io.vertigo.core.util.TempFile;
 import io.vertigo.datastore.filestore.model.VFile;
-import io.vertigo.datastore.filestore.util.FileUtil;
+import io.vertigo.datastore.filestore.util.VFileUtil;
 import io.vertigo.datastore.impl.filestore.model.FSFile;
 import io.vertigo.quarto.impl.converter.ConverterPlugin;
 
@@ -108,7 +108,7 @@ abstract class AbstractOpenOfficeConverterPlugin implements ConverterPlugin, Act
 				// si le format de sortie est celui d'entrée la convertion est inutile
 				.isFalse(targetFormat.getTypeMime().equals(file.getMimeType()), "Le format de sortie est identique à celui d'entrée ; la conversion est inutile");
 		//-----
-		final Path inputFile = FileUtil.obtainReadOnlyPath(file);
+		final Path inputFile = VFileUtil.obtainReadOnlyPath(file);
 		final Callable<Path> convertTask = () -> doConvertToFormat(inputFile.toFile(), targetFormat).toPath();
 		final Path targetFile;
 		try {

@@ -62,7 +62,7 @@ export default {
             }
             this.$http.post(this.baseUrl+'api/vertigo/commands/_search', {prefix: val} )
                 .then( function (response) { //Ok
-                    this.$data.commands = response.body;
+                    this.$data.commands = response.data;
                     update(function() {
                         this.$data.commandAutocompleteOptions = this.$data.commands.map(function(command) {
                              return {
@@ -76,7 +76,7 @@ export default {
                     if (this.$data.commands.length > 0) {
                         this.chooseCommand(this.$data.commands[0], false);
                     }
-                });
+                }.bind(this));
             
         },
         selectCommand : function (selection) {
@@ -116,8 +116,8 @@ export default {
                 this.$http.post(this.baseUrl+'api/vertigo/commands/_execute', {command: this.$data.selectedCommand.commandName, params: actualParams} )
                     .then( function (response) { //Ok
                         this.$data.isExecuted = true;
-                        this.$data.commandResult = response.body;
-                    });
+                        this.$data.commandResult = response.data;
+                    }.bind(this));
             } else {
                 return false;
             }
@@ -138,7 +138,7 @@ export default {
                 .then( function (response) {
                     update(function() {
                         var newOptions = this.$data.paramsAutocompleteOptions.slice();
-                        newOptions[index] = response.body.map(function(element) {
+                        newOptions[index] = response.data.map(function(element) {
                             return {
                                 label: element.label,
                                 value: element.urn,
@@ -146,7 +146,7 @@ export default {
                         });
                         this.$data.paramsAutocompleteOptions = newOptions;
                     }.bind(this));
-                });
+                }.bind(this));
             
         },
         selectParam : function (selection, index) {

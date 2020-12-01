@@ -50,7 +50,7 @@ import io.vertigo.core.lang.WrappedException;
 import io.vertigo.core.locale.MessageKey;
 import io.vertigo.core.param.ParamValue;
 import io.vertigo.datastore.filestore.model.VFile;
-import io.vertigo.datastore.filestore.util.FileUtil;
+import io.vertigo.datastore.filestore.util.VFileUtil;
 import io.vertigo.social.impl.mail.Resources;
 import io.vertigo.social.impl.mail.SendMailPlugin;
 import io.vertigo.social.mail.Mail;
@@ -234,7 +234,7 @@ public final class JavaxSendMailPlugin implements SendMailPlugin {
 
 	private BodyPart createBodyFile(final VFile vFile) throws MessagingException {
 		try {
-			final File file = FileUtil.obtainReadOnlyPath(vFile).toFile();
+			final File file = VFileUtil.obtainReadOnlyPath(vFile).toFile();
 			final MimeBodyPart bodyFile = new MimeBodyPart();
 			bodyFile.attachFile(file);
 			bodyFile.setFileName(vFile.getFileName());

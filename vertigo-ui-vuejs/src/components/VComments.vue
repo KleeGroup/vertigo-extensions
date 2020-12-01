@@ -59,9 +59,9 @@ export default {
         fetchCommentsList: function() {
             this.$http.get(this.baseUrl+'x/comment/api/comments?concept='+this.concept+'&id='+this.id)
             .then( function (response) { //Ok
-                this.list = response.body;
+                this.list = response.data;
                 this.count = this.list.length;
-            });
+            }.bind(this));
         },
         publishComment: function() {
             var newComment = {
@@ -74,7 +74,7 @@ export default {
                 .then( function () { //Ok
                     this.commentTextArea = '';
                     this.fetchCommentsList();
-                });
+                }.bind(this));
             }
         },
         updateComment: function(newComment) {
@@ -82,7 +82,7 @@ export default {
             .then( function () { //Ok
                 this.commentTextArea = '';
                 this.fetchCommentsList();
-            });
+            }.bind(this));
         },
         toDelay : function(creationDate) {
             let diff = Quasar.utils.date.getDateDiff(Date.now(),creationDate, 'days');

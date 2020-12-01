@@ -13,6 +13,8 @@
 	th:assert="${object} != null and ${field} != null" 
 	th:with="mySuffix=${model.util.smartTypeUnit(object, field, suffix)}, useSuffix=${model.vContext[__${object}__][__${field}__]!='' && mySuffix!=''}">
 	<vu:label-read label=${label} th:attr="__${label_attrs}__" >
-		<v-map  tabindex="1" style="width:100%;" th:id="|map_${object}_${field}|" marker-color="#027BE3" initial-zoom-level="11" th::list="|[{'geoLocation' : '${model.vContext[__${object}__][__${field}__]}' }]|" field="geoLocation" ></v-map>
+		<v-map  tabindex="1" style="width:100%;" th:id="|map_${object}_${field}|" :initial-zoom-level="11" >
+			<v-map-layer th::object="|{'geoLocation' : '${model.vContext[__${object}__][__${field}__]}' }|" field="geoLocation" marker-color="#027BE3"></v-map-layer>
+		</v-map>
 	</vu:label-read>
 </th:block>

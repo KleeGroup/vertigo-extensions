@@ -65,19 +65,44 @@ public final class ListAutocompleteController extends AbstractVSpringMvcControll
 			@RequestParam("list") final String list,
 			@RequestParam("valueField") final String valueField,
 			@RequestParam("labelField") final String labelField) {
-		final UiList contextList = viewContext.getUiList(() -> list);
-		final DtList dtList = contextList.mergeAndCheckInput(Collections.EMPTY_LIST, getUiMessageStack());
-		final DtDefinition dtDefinition = dtList.getDefinition();
-		//-----
-		final DtField labelDtField = dtDefinition.getField(labelField);
 
+		final DtList dtList = obtainDtList(viewContext, list);
+		final DtDefinition dtDefinition = dtList.getDefinition();
+		final DtField labelDtField = dtDefinition.getField(labelField);
 		final Collection<DtField> searchedFields = Collections.singletonList(labelDtField);
+		//-----
+		final UnaryOperator<DtList<DtObject>> fullTextFilter = collectionsManager.createIndexDtListFunctionBuilder()
+				.filter(terms != null ? terms : "", 20, searchedFields)
+				.build();
+		return loadList(fullTextFilter, dtList, valueField, labelField);
+	}
+
+	@PostMapping("/_searchByValue")
+	@ResponseBody
+	public List searchByValue(
+			final ViewContext viewContext,
+			@RequestParam("value") final String value,
+			@RequestParam("list") final String list,
+			@RequestParam("valueField") final String valueField,
+			@RequestParam("labelField") final String labelField) {
+		final DtList dtList = obtainDtList(viewContext, list);
+		final UnaryOperator<DtList<DtObject>> byValueFilter = collectionsManager.createIndexDtListFunctionBuilder()
+				.filterByValue(valueField, value)
+				.build();
+		return loadList(byValueFilter, dtList, valueField, labelField);
+	}
+
+	private DtList obtainDtList(final ViewContext viewContext, final String list) {
+		final UiList contextList = viewContext.getUiList(() -> list);
+		return contextList.mergeAndCheckInput(Collections.EMPTY_LIST, getUiMessageStack());
+	}
+
+	private List loadList(final UnaryOperator<DtList<DtObject>> listFilter, final DtList dtList, final String valueField,
+			final String labelField) {
+		//-----
 		final DtList results;
 		try (final VTransactionWritable transaction = transactionManager.createCurrentTransaction()) { //Open a transaction because all fields are indexed. If there is a MDL it was load too.
-			final UnaryOperator<DtList<DtObject>> fullTextFilter = collectionsManager.createIndexDtListFunctionBuilder()
-					.filter(terms != null ? terms : "", 20, searchedFields)
-					.build();
-			results = fullTextFilter.apply(dtList);
+			results = listFilter.apply(dtList);
 		}
 
 		final HashSet<String> fieldsForClient = new HashSet<>();

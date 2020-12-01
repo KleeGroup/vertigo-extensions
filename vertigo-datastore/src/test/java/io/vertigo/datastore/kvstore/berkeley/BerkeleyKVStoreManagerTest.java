@@ -54,7 +54,7 @@ public final class BerkeleyKVStoreManagerTest extends AbstractKVStoreManagerTest
 						.withKVStore()
 						.withBerkleyKV(
 								Param.of("collections", "flowers;TTL=10, trees;inMemory"),
-								Param.of("dbFilePath", "d:/dynamo-tmp"))
+								Param.of("dbFilePath", "${user.home}/datastore-tmp"))
 						.build())
 				.build();
 	}

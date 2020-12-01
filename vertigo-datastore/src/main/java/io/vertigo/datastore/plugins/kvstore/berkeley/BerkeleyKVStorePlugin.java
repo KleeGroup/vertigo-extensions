@@ -40,8 +40,8 @@ import io.vertigo.core.daemon.DaemonScheduled;
 import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.node.component.Activeable;
 import io.vertigo.core.param.ParamValue;
+import io.vertigo.core.util.FileUtil;
 import io.vertigo.core.util.ListBuilder;
-import io.vertigo.datastore.filestore.util.FileUtil;
 import io.vertigo.datastore.impl.kvstore.KVStorePlugin;
 
 /**

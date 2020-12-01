@@ -73,8 +73,8 @@ import io.vertigo.datafactory.collections.model.FacetedQueryResult;
 import io.vertigo.datafactory.collections.model.SelectedFacetValues;
 import io.vertigo.datamodel.smarttype.SmartTypeManager;
 import io.vertigo.datamodel.structure.definitions.DtDefinition;
-import io.vertigo.datamodel.structure.definitions.FormatterException;
 import io.vertigo.datamodel.structure.definitions.DtField.FieldType;
+import io.vertigo.datamodel.structure.definitions.FormatterException;
 import io.vertigo.datamodel.structure.model.DtList;
 import io.vertigo.datamodel.structure.model.DtListState;
 import io.vertigo.datamodel.structure.model.DtObject;
@@ -283,7 +283,7 @@ public final class GoogleJsonEngine implements JsonEngine, Activeable {
 		}
 	}
 
-	private final class EntityJsonAdapter<D extends DtObject> implements JsonSerializer<D>, JsonDeserializer<D> {
+	private final class DtObjectJsonAdapter<D extends DtObject> implements JsonSerializer<D>, JsonDeserializer<D> {
 
 		/** {@inheritDoc} */
 		@Override
@@ -365,16 +365,6 @@ public final class GoogleJsonEngine implements JsonEngine, Activeable {
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw WrappedException.wrap(e);
 		}
-	}
-
-	private static final class VAccessorJsonSerializer implements JsonSerializer<VAccessor> {
-		/** {@inheritDoc} */
-		@Override
-		public JsonElement serialize(final VAccessor src, final Type typeOfSrc, final JsonSerializationContext context) {
-			return null;
-
-		}
-
 	}
 
 	private static final class DefinitionReferenceJsonSerializer implements JsonSerializer<DefinitionReference> {
@@ -549,10 +539,10 @@ public final class GoogleJsonEngine implements JsonEngine, Activeable {
 			jsonBasicTypeAdapters.entrySet()
 					.forEach(entry -> gsonBuilder.registerTypeAdapter(entry.getKey(), new SmartTypeAdapter(entry.getKey(), entry.getValue())));
 
-			return gsonBuilder
+			gsonBuilder
 					.setPrettyPrinting()
 					//.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-					.registerTypeHierarchyAdapter(Entity.class, new EntityJsonAdapter())
+					.registerTypeHierarchyAdapter(DtObject.class, new DtObjectJsonAdapter())
 					.registerTypeAdapter(Date.class, new UTCDateAdapter())
 					.registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
 					.registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
@@ -564,16 +554,21 @@ public final class GoogleJsonEngine implements JsonEngine, Activeable {
 					.registerTypeAdapter(DtList.class, new DtListDeserializer<>())
 					.registerTypeAdapter(DtListState.class, new DtListStateDeserializer())
 					.registerTypeAdapter(FacetedQueryResult.class, searchApiVersion.getJsonSerializerClass().newInstance())
-					.registerTypeAdapter(SelectedFacetValues.class, new SelectedFacetValuesDeserializer())
-					.registerTypeAdapter(List.class, new ListJsonSerializer())
-					.registerTypeAdapter(Map.class, new MapJsonSerializer())
+					.registerTypeAdapter(SelectedFacetValues.class, new SelectedFacetValuesDeserializer());
+
+			if (!serializeNulls) {
+				gsonBuilder
+						.registerTypeAdapter(List.class, new ListJsonSerializer())
+						.registerTypeAdapter(Map.class, new MapJsonSerializer());
+			}
+
+			gsonBuilder
 					.registerTypeAdapter(DefinitionReference.class, new DefinitionReferenceJsonSerializer())
 					.registerTypeAdapter(Optional.class, new OptionJsonSerializer())
-					.registerTypeAdapter(VAccessor.class, new VAccessorJsonSerializer())
 					.registerTypeAdapter(Class.class, new ClassJsonSerializer())
 					.registerTypeAdapter(UID.class, new URIJsonAdapter())
-					.addSerializationExclusionStrategy(new JsonExclusionStrategy())
-					.create();
+					.addSerializationExclusionStrategy(new JsonExclusionStrategy());
+			return gsonBuilder.create();
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw WrappedException.wrap(e, "Can't create Gson");
 		}

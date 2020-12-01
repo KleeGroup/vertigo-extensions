@@ -1,0 +1,40 @@
+<th:block th:fragment="checkbox-multiple-edit(object,list,field, label, valueField, labelField, layout, label_attrs, input_attrs)" vu:alias="checkbox-multiple" vu:selector="${viewMode=='edit'}"
+	  th:assert="${object} != null and ${field} != null and ${list} != null"
+	  th:with="myValueField=${valueField != null ? valueField : model.util.getIdField(list)}, myLabelField=${labelField != null ? labelField : model.util.getDisplayField(list)}, inline=${(layout != null && layout == 'horizontal') ? true : false }">
+	<vu:include-data object="${object}" field="${field}"/>
+	<vu:include-data object="${list}" field="${myValueField}"/>
+	<vu:include-data object="${list}" field="${myLabelField}"/>
+	<vu:label-edit object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
+		<q-option-group
+			th:@hook:created="|function() { if (!vueData.${object}.${field}) { vueData.${object}.${field} = []}}|"
+			th:name="|vContext[${object}][${field}]|"
+			th::inline="${inline}"
+		    type="checkbox"
+		   	th:v-model="|vueData.${object}.${field}|" 
+			th::options="|transformListForSelection('${list}', '${myValueField}', '${myLabelField}')|"
+			dense
+			th:attr="__${input_attrs}__"
+		 ></q-option-group>
+	</vu:label-edit>
+</th:block> 
+
+<th:block th:fragment="checkbox-multiple-read(object, field, label, list, valueField, labelField, layout, label_attrs, input_attrs)" vu:alias="checkbox-multiple" vu:selector="${viewMode=='read'}" 
+  th:assert="${object} != null and ${field} != null and ${list} != null"
+	th:with="myValueField=${valueField != null ? valueField : model.util.getIdField(list)}, myLabelField=${labelField != null ? labelField : model.util.getDisplayField(list)}, inline=${(layout != null && layout == 'horizontal') ? true : false }">
+	<vu:include-data object="${object}" field="${field}"/>
+	<vu:include-data object="${list}" field="${myValueField}"/>
+	<vu:include-data object="${list}" field="${myLabelField}"/>
+	<vu:label-read object="${object}" field="${field}" label="${label}" th:attr="__${label_attrs}__">
+		<q-option-group
+			th:@hook:created="|function() { if (!vueData.${object}.${field}) { vueData.${object}.${field} = []}}|"
+			th:name="|vContext[${object}][${field}]|"
+			th::inline="${inline}"
+		    type="checkbox"
+		   	th:v-model="|vueData.${object}.${field}|" 
+			th::options="|transformListForSelection('${list}', '${myValueField}', '${myLabelField}')|"
+			dense
+			disable
+			th:attr="__${input_attrs}__"
+		 ></q-option-group>
+	</vu:label-read>
+</th:block>

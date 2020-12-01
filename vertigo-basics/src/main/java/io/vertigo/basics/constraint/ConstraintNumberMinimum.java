@@ -50,10 +50,8 @@ public final class ConstraintNumberMinimum implements Constraint<Number, Number>
 	/** {@inheritDoc} */
 	@Override
 	public boolean checkConstraint(final Number value) {
-		if (value == null) {
-			return true;
-		}
-		return value.doubleValue() >= minValue;
+		return value == null
+				|| value.doubleValue() >= minValue;
 	}
 
 	/** {@inheritDoc} */

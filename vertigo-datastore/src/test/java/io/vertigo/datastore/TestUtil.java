@@ -26,9 +26,9 @@ import java.nio.file.Path;
 
 import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.lang.WrappedException;
+import io.vertigo.core.util.FileUtil;
 import io.vertigo.core.util.TempFile;
 import io.vertigo.datastore.filestore.model.VFile;
-import io.vertigo.datastore.filestore.util.FileUtil;
 import io.vertigo.datastore.impl.filestore.model.FSFile;
 
 /**

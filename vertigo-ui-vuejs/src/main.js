@@ -9,7 +9,7 @@ import VHandles from './components/VHandles.vue'
 import VJsonEditor from './components/VJsonEditor.vue'
 import VNotifications from './components/VNotifications.vue'
 import VMap from './components/VMap.vue'
-
+import VMapLayer from './components/VMapLayer.vue'
 
 import VMinify from './directives/VMinify'
 import VScrollSpy from './directives/VScrollSpy'
@@ -26,7 +26,7 @@ export function getBoundMethods(obj, methods) {
     return boundMethods;
 }
 
-export function install (Vue , /*options*/) {
+export function install (Vue , options) {
       
     // components
     Vue.component("v-chatbot", VChatbot);
@@ -39,15 +39,41 @@ export function install (Vue , /*options*/) {
     Vue.component("v-json-editor", VJsonEditor);
     Vue.component("v-notifications", VNotifications);
     Vue.component("v-map", VMap);
+    Vue.component("v-map-layer", VMapLayer);
     
     // directives
     Vue.directive("minify", VMinify);
     Vue.directive("scroll-spy", VScrollSpy);
 
-    Vue.http.interceptors.push(function(/*request*/) {
-        return function(response) { if(!response.ok) { VMethods.onAjaxError.bind(this)(response); } };
-     });
+    if (!options.axios) {
+        console.error('You have to install axios')
+        return
+    }
 
+    Vue.axios = options.axios;
+    Vue.$http = options.axios;
+
+    Object.defineProperties(Vue.prototype, {
+        axios: {
+            get() {
+            return options.axios
+            }
+        },
+    
+        $http: {
+            get() {
+            return options.axios
+            }
+        },
+
+        $vui: {
+            get() {
+                return getBoundMethods(this, VMethods);
+            }
+        }
+    });
+    
+    
     if (Quasar.lang.enUs) {
         Quasar.lang.enUs.vui = EnUs;
     }
@@ -59,3 +85,10 @@ export function install (Vue , /*options*/) {
 }
 
 export let methods = VMethods
+
+export function initData(instance, json) {
+    instance.vueData = json.vueData;
+	instance.componentStates = json.componentStates;
+    instance.uiMessageStack = json.uiMessageStack;
+    instance.vuiLang = json.vuiLang;
+}

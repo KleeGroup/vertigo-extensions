@@ -19,6 +19,7 @@ package io.vertigo.vega.engines.webservice.json;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -26,8 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.vertigo.core.lang.Assertion;
+import io.vertigo.core.lang.BasicTypeAdapter;
+import io.vertigo.core.lang.Tuple;
+import io.vertigo.core.locale.MessageText;
 import io.vertigo.core.node.Node;
 import io.vertigo.core.node.definition.DefinitionReference;
 import io.vertigo.datamodel.smarttype.SmartTypeManager;
@@ -60,7 +65,7 @@ public class VegaUiObject<D extends DtObject> implements io.vertigo.vega.webserv
 
 	private String inputKey;
 	private D inputDto;
-	private final Map<String, String> inputBuffer = new LinkedHashMap<>();
+	private final Map<String, String[]> inputBuffer = new LinkedHashMap<>();
 
 	private transient boolean isChecked; //init a false
 
@@ -263,7 +268,14 @@ public class VegaUiObject<D extends DtObject> implements io.vertigo.vega.webserv
 
 	/** {@inheritDoc} */
 	@Override
-	public String getInputValue(final String fieldName) {
+	public String getSingleInputValue(final String fieldName) {
+		final String[] inputValues = getInputValue(fieldName);
+		return inputValues != null ? inputValues[0] : null;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String[] getInputValue(final String fieldName) {
 		Assertion.check()
 				.isNotBlank(fieldName)
 				.isTrue(Character.isLowerCase(fieldName.charAt(0)) && !fieldName.contains("_"), "Le nom du champs doit-être en camelCase ({0}).", fieldName);
@@ -274,21 +286,38 @@ public class VegaUiObject<D extends DtObject> implements io.vertigo.vega.webserv
 		final Object value = doGetTypedValue(fieldName);
 		final DtField dtField = getDtField(fieldName);
 		final SmartTypeDefinition smartType = dtField.getSmartTypeDefinition();
-		if (!dtField.getCardinality().hasMany()) {
-			final SmartTypeManager smartTypeManager = Node.getNode().getComponentSpace().resolve(SmartTypeManager.class);
-			if (smartType.getScope().isPrimitive()) {
-				return smartTypeManager.valueToString(smartType, value);// encodeValue
+		final List<String> inputValues = new ArrayList<>();
+
+		final SmartTypeManager smartTypeManager = Node.getNode().getComponentSpace().resolve(SmartTypeManager.class);
+		if (dtField.getSmartTypeDefinition().getScope().isPrimitive()) {
+			if (!dtField.getCardinality().hasMany()) {
+				inputValues.add(smartTypeManager.valueToString(smartType, value));// encodeValue
+				return inputValues.isEmpty() ? null : inputValues.toArray(String[]::new);
 			}
-			// find an adapter we are complex
-			return smartTypeManager.getTypeAdapters("ui").get(smartType.getJavaClass()).toBasic(value).toString();// encodeValue
+			if (value != null) {
+				((List) value).forEach(val -> inputValues.add(smartTypeManager.valueToString(smartType, val)));
+			}
+			return inputValues.toArray(String[]::new);
 
 		}
-		return null; // only non multiple are supported (from user input)
+		final BasicTypeAdapter basicTypeAdapter = smartTypeManager.getTypeAdapters("ui").get(smartType.getJavaClass());
+		if (basicTypeAdapter != null) {
+			if (!dtField.getCardinality().hasMany()) {
+				inputValues.add(basicTypeAdapter.toBasic(value).toString());
+				return inputValues.isEmpty() ? null : inputValues.toArray(String[]::new);
+			}
+			if (value != null) {
+				((List) value).forEach(val -> inputValues.add(basicTypeAdapter.toBasic(val).toString()));
+			}
+			return inputValues.toArray(String[]::new);
+		}
+		return null;
+
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void setInputValue(final String fieldName, final String stringValue) {
+	public void setInputValue(final String fieldName, final String... stringValue) {
 		Assertion.check()
 				.isNotBlank(fieldName)
 				.isNotNull(stringValue, "formatted value can't be null, but may be empty : {0}", fieldName);
@@ -298,29 +327,81 @@ public class VegaUiObject<D extends DtObject> implements io.vertigo.vega.webserv
 		//---
 		isChecked = false;
 		getDtObjectErrors().clearErrors(dtField.getName());
-		String formattedValue;
-		try {
-			final SmartTypeDefinition smartTypeDefinition = dtField.getSmartTypeDefinition();
-			final Serializable typedValue;
-			if (smartTypeDefinition.getScope().isPrimitive()) {
-				typedValue = (Serializable) smartTypeManager.stringToValue(smartTypeDefinition, stringValue);// we should use an encoder instead
-				// succesful encoding we can format and put in the inputbuffer
-				formattedValue = smartTypeManager.valueToString(dtField.getSmartTypeDefinition(), typedValue);
+		final List<String> formattedValue = new ArrayList<>();
+		final SmartTypeDefinition smartTypeDefinition = dtField.getSmartTypeDefinition();
+		final Serializable typedValue;
+		if (smartTypeDefinition.getScope().isPrimitive()) {
+			if (!dtField.getCardinality().hasMany()) {
+				Assertion.check().isTrue(stringValue.length <= 1, "dqqdsqd");
+				//------
+				final Tuple<String, Serializable> tuple = tryFormat(smartTypeManager, dtField, stringValue[0]);
+				formattedValue.add(tuple.getVal1());
+				typedValue = tuple.getVal2();
 			} else {
-				typedValue = (Serializable) smartTypeManager.getTypeAdapters("ui").get(smartTypeDefinition.getJavaClass()).toJava(stringValue, smartTypeDefinition.getJavaClass());
-				formattedValue = stringValue;
+				final ArrayList list = new ArrayList<>();
+				Stream.of(stringValue)
+						.map(val -> tryFormat(smartTypeManager, dtField, val))
+						.forEach(tuple -> {
+							formattedValue.add(tuple.getVal1());
+							list.add(tuple.getVal2());
+						});
+				typedValue = list;
 			}
-			doSetTypedValue(dtField, typedValue);
+		} else {
+			final BasicTypeAdapter basicTypeAdapter = smartTypeManager.getTypeAdapters("ui").get(smartTypeDefinition.getJavaClass());
+			if (!dtField.getCardinality().hasMany()) {
+				Assertion.check().isTrue(stringValue.length <= 1, "dqqdsqd");
+				//------
+				final Tuple<String, Serializable> tuple = tryFormatWithAdapter(basicTypeAdapter, dtField, stringValue[0]);
+				formattedValue.add(tuple.getVal1());
+				typedValue = tuple.getVal2();
+			} else {
+				final ArrayList list = new ArrayList<>();
+				Stream.of(stringValue)
+						.map(val -> tryFormatWithAdapter(basicTypeAdapter, dtField, val))
+						.forEach(tuple -> {
+							formattedValue.add(tuple.getVal1());
+							list.add(tuple.getVal2());
+						});
+				typedValue = list;
+			}
+		}
+		doSetTypedValue(dtField, typedValue);
 
+		inputBuffer.put(fieldName, formattedValue.toArray(String[]::new));
+
+	}
+
+	private Tuple<String, Serializable> tryFormat(final SmartTypeManager smartTypeManager, final DtField dtField, final String inputValue) {
+		String formattedValue;
+		Serializable typedValue = null;
+		try {
+			typedValue = (Serializable) smartTypeManager.stringToValue(dtField.getSmartTypeDefinition(), inputValue);// we should use an encoder instead
+			// succesful encoding we can format and put in the inputbuffer
+			formattedValue = smartTypeManager.valueToString(dtField.getSmartTypeDefinition(), typedValue);
 		} catch (final FormatterException e) { //We don't log nor rethrow this exception // it should be an encoding exception
 			/** Erreur de typage.	 */
 			//encoding error
 			getDtObjectErrors().addError(dtField.getName(), e.getMessageText());
-			formattedValue = stringValue;
+			formattedValue = inputValue;
 		}
+		return Tuple.of(formattedValue, typedValue);
+	}
 
-		inputBuffer.put(fieldName, formattedValue);
-
+	private Tuple<String, Serializable> tryFormatWithAdapter(final BasicTypeAdapter basicTypeAdapter, final DtField dtField, final String inputValue) {
+		String formattedValue;
+		Serializable typedValue = null;
+		try {
+			typedValue = (Serializable) basicTypeAdapter.toJava(inputValue, dtField.getSmartTypeDefinition().getJavaClass());
+			// succesful encoding we can format and put in the inputbuffer
+			formattedValue = inputValue;
+		} catch (final Exception e) { //We don't log nor rethrow this exception // it should be an encoding exception
+			/** Erreur de typage.	 */
+			//encoding error
+			getDtObjectErrors().addError(dtField.getName(), MessageText.of(e.getMessage()));
+			formattedValue = inputValue;
+		}
+		return Tuple.of(formattedValue, typedValue);
 	}
 
 	/**

@@ -28,8 +28,8 @@ export default {
             if(val) {
                 this.$http.post(this.baseUrl+'api/vertigo/handle/_search', {prefix: val} )
                     .then( function (response) { //Ok
-                        this.$data.handles = response.body;
-                });
+                        this.$data.handles = response.data;
+                }.bind(this));
             }
         }
     } 

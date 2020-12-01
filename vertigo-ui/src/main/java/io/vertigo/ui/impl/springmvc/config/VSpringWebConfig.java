@@ -75,7 +75,7 @@ public class VSpringWebConfig implements WebMvcConfigurer, ApplicationContextAwa
 			"layout/page", "layout/head", "layout/form", "layout/modal", "layout/block", //layout components
 			"layout/grid", "layout/grid-cell", //grid
 			"layout/messages", //messages
-			"inputs/label", "inputs/text-field", "inputs/text-area", "inputs/checkbox", "inputs/slider", "inputs/knob", "inputs/fileupload", //standard controls components
+			"inputs/label", "inputs/text-field", "inputs/text-area", "inputs/checkbox", "inputs/checkbox-multiple", "inputs/slider", "inputs/knob", "inputs/fileupload", //standard controls components
 			"inputs/select", "inputs/radio", //select controls components
 			"inputs/autocomplete", "inputs/date", "inputs/datetime", "inputs/chips-autocomplete", //with client-worflow controls components
 			"inputs/geolocation", // geoLocation

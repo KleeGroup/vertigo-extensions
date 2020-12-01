@@ -80,14 +80,17 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 				.isTrue(Character.isLowerCase(keyFieldName.charAt(0)) && !keyFieldName.contains("_"), "Le nom du champs doit-être en camelCase ({0}).", keyFieldName);
 		//-----
 		final DtField dtField = getDtField(keyFieldName);
+		if (dtField.getCardinality().hasMany()) {
+			return getInputValue(keyFieldName);
+		}
 		if (isMultiple(dtField)) {
-			final String strValue = getInputValue(keyFieldName);
+			final String strValue = getSingleInputValue(keyFieldName);
 			return parseMultipleValue(strValue);
 		} else if (isBoolean(dtField)) {
 			final Boolean value = getTypedValue(keyFieldName, Boolean.class);
 			return value != null ? String.valueOf(value) : null;
 		} else {
-			return getInputValue(keyFieldName);
+			return getSingleInputValue(keyFieldName);
 		}
 	}
 
@@ -100,22 +103,26 @@ public final class MapUiObject<D extends DtObject> extends VegaUiObject<D> imple
 				.isTrue(value instanceof String || value instanceof String[], "Les données saisies doivent être de type String ou String[] ({0} : {1})", fieldName, value.getClass());
 		//-----
 		final DtField dtField = getDtField(fieldName);
-		String strValue;
-		if (isMultiple(dtField)) {
-			strValue = formatMultipleValue(value);
-		} else if (isAboutDate(dtField)) {
-			strValue = requestParameterToString(value);
-			try {
-				final SmartTypeManager smartTypeManager = Node.getNode().getComponentSpace().resolve(SmartTypeManager.class);
-				final Object typedValue = EncoderDate.stringToValue(strValue, dtField.getSmartTypeDefinition().getBasicType());
-				strValue = smartTypeManager.valueToString(dtField.getSmartTypeDefinition(), typedValue);// we fall back in the normal case if everything is right -> go to formatter
-			} catch (final FormatterException e) {
-				// do nothing we keep the input value
-			}
+		if (dtField.getCardinality().hasMany()) {
+			setInputValue(fieldName, value instanceof String[] ? (String[]) value : new String[] { (String) value });
 		} else {
-			strValue = requestParameterToString(value);
+			String strValue;
+			if (isMultiple(dtField)) {
+				strValue = formatMultipleValue(value);
+			} else if (isAboutDate(dtField)) {
+				strValue = requestParameterToString(value);
+				try {
+					final SmartTypeManager smartTypeManager = Node.getNode().getComponentSpace().resolve(SmartTypeManager.class);
+					final Object typedValue = EncoderDate.stringToValue(strValue, dtField.getSmartTypeDefinition().getBasicType());
+					strValue = smartTypeManager.valueToString(dtField.getSmartTypeDefinition(), typedValue);// we fall back in the normal case if everything is right -> go to formatter
+				} catch (final FormatterException e) {
+					// do nothing we keep the input value
+				}
+			} else {
+				strValue = requestParameterToString(value);
+			}
+			setInputValue(fieldName, new String[] { strValue });
 		}
-		setInputValue(fieldName, strValue);
 		return null;
 	}
 

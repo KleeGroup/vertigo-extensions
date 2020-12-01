@@ -99,18 +99,20 @@ public final class CacheDataStore implements SimpleDefinitionProvider {
 		return entity;
 	}
 
-	private synchronized <E extends Entity> E loadNullable(final DtDefinition dtDefinition, final UID<E> uid) {
+	private <E extends Entity> E loadNullable(final DtDefinition dtDefinition, final UID<E> uid) {
 		final E entity;
-		if (cacheDataStoreConfig.isReloadedByList(dtDefinition)) {
-			//On ne charge pas les cache de façon atomique.
-			final DtListURI dtcURIAll = new DtListURIForCriteria<>(dtDefinition, Criterions.alwaysTrue(), DtListState.of(null));
-			loadList(dtcURIAll); //on charge la liste complete (et on remplit les caches)
-			entity = cacheDataStoreConfig.getDataCache().getDtObject(uid);
-		} else {
-			//On charge le cache de façon atomique à partir du dataStore
-			entity = getPhysicalStore(dtDefinition).readNullable(dtDefinition, uid);
-			if (entity != null) {
-				cacheDataStoreConfig.getDataCache().putDtObject(entity);
+		synchronized (CacheData.getContextLock(dtDefinition)) {
+			if (cacheDataStoreConfig.isReloadedByList(dtDefinition)) {
+				//On ne charge pas les cache de façon atomique.
+				final DtListURI dtcURIAll = new DtListURIForCriteria<>(dtDefinition, Criterions.alwaysTrue(), DtListState.of(null));
+				loadList(dtcURIAll); //on charge la liste complete (et on remplit les caches)
+				entity = cacheDataStoreConfig.getDataCache().getDtObject(uid);
+			} else {
+				//On charge le cache de façon atomique à partir du dataStore
+				entity = getPhysicalStore(dtDefinition).readNullable(dtDefinition, uid);
+				if (entity != null) {
+					cacheDataStoreConfig.getDataCache().putDtObject(entity);
+				}
 			}
 		}
 		return entity;
@@ -181,12 +183,14 @@ public final class CacheDataStore implements SimpleDefinitionProvider {
 		return uri instanceof DtListURIForNNAssociation;
 	}
 
-	private synchronized <E extends Entity> DtList<E> loadList(final DtListURI uri) {
-		// On charge la liste initiale avec les critéres définis en amont
-		final DtList<E> list = doLoadList(uri.getDtDefinition(), uri);
-		// Mise en cache de la liste et des éléments.
-		cacheDataStoreConfig.getDataCache().putDtList(list);
-		return list;
+	private <E extends Entity> DtList<E> loadList(final DtListURI uri) {
+		synchronized (CacheData.getContextLock(uri.getDtDefinition())) {
+			// On charge la liste initiale avec les critéres définis en amont
+			final DtList<E> list = doLoadList(uri.getDtDefinition(), uri);
+			// Mise en cache de la liste et des éléments.
+			cacheDataStoreConfig.getDataCache().putDtList(list);
+			return list;
+		}
 	}
 
 	/* On notifie la mise à jour du cache, celui-ci est donc vidé. */

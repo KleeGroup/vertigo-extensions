@@ -41,6 +41,9 @@ modules:
       - kvStore.berkeley:
           collections: VViewContext;TTL=43200
           dbFilePath: ${java.io.tmpdir}/vertigo/TestVViewContext
+      - kvStore.delayedMemory:
+          collections: protected-value
+          timeToLiveSeconds: 3600
   io.vertigo.datafactory.DataFactoryFeatures:
     features:
       - search:

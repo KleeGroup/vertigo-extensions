@@ -6,70 +6,81 @@
 >
 
 <head>
-	<title>Movie Detail</title>
+    <title>Movie Detail</title>
+    <script type="text/javascript" th:src="@{/vertigo-ui/static/js/vertigo-ui-extensions.js}"></script>
 </head>
 
 <body>
-	<div layout:fragment="content">
-		<vu:message />
-			<vu:form>
-				<vu:block id="movie" title="Movie Information">
-					<vu:grid cols="3">
-						<vu:text-field object="movie" field="movId"/>
-						<vu:text-field object="movie" field="title"/>
-						<vu:text-field object="movie" field="year"  debounce="500" hint="Debouncing 500ms" />
-						<vu:slider object="movie" field="year"  />
-						<vu:knob object="movie" field="year"/>
-						<vu:select object="movie" field="movId" list="movies" />
-						<vu:grid-cell>
-							<vu:text-area object="movie" field="title"/>
-						</vu:grid-cell>
-						<vu:date object="movie" field="released"  />
-						<vu:datetime object="movie" field="lastModified" />
-						<vu:autocomplete object="movie" field="movId" list="movies" />
-						<vu:radio object="movie" field="movId" list="movies" layout="horizontal" labelField="movId"/>
-						<vu:radio object="movie" field="movId" list="movies" />
-						<vu:text-field object="movie" field="movId"/>
-						<vu:text-field object="movie" field="title" />
-						<vu:chips-autocomplete object="movie" field="tags" list="movies" staticData="false"/>
-					
-						<vu:grid-cell>
-							<a th:href="@{/componentsDemo/myFiles}">insee.csv</a>
-							<div v-for="(item, index) in vueData.myFiles" :name="index" > 
-								<a href="|'@{/componentsDemo/myFiles/}'+item|">{{item}}</a>
-							</div>
-							<vu:fileupload float-label="Upload file" th:url="'@{/componentsDemo/upload}'" key="myFilesUris" multiple />
-						</vu:grid-cell>
-						<vu:modal componentId="myModal" closeLabel="Close"/>
-						<vu:grid-cell>
-							<vu:button-submit th:if="${!model.modeReadOnly}" label="Read" action="@{_read}" color="primary"/>
-							<vu:button-submit th:if="${model.modeReadOnly}" label="Edit" action="@{_edit}" color="primary"/>
-							<vu:button-submit th:if="${!model.modeReadOnly}"  id="saveAction" label="Save" action="@{_save}" color="primary" />
-							<vu:button-link th:if="${model.modeEdit}"  label="Movies" url="@{/movies/}" color="primary" />
-							<q-btn  th:label="OpenModal" th:@click="|openModal('myModal', '@{/movies/}')|"></q-btn>
-						</vu:grid-cell>
-					</vu:grid>
-				</vu:block>				
-			</vu:form>
-			
-			<vu:cards list="movies" componentId="movieCards" cardClass="col-lg-3 col-md-6 col-xs-12" sortUrl="@{/movies/_sort}" rowsPerPage="8" showMore="true" showMoreLabel="Show more" >
-				<div class="nav" th:@click="|goTo('@{/basemanagement/base/information/}'+item.baseId)|">
-					<a th::href="|'@{/movie/}'+item.movId|" >{{item.movId}}</a>
-				</div>
-			</vu:cards>
-			
-			<vu:table list="movies" componentId="movieTable" selectable="true" sortUrl="@{/movies/_sort}"
-				tr_@click.native="|goTo('@{/movie/}'+props.row.movId)|" tr_class="nav">
-				<vu:slot name="actions_slot"><q-btn label="View detail" th:@click="|openModal('movieDetailModal', '@{/movie/}'+props.row.movId, {  })|"></q-btn></vu:slot>
-				<vu:include-data object="movies" field="movId" />
-				<vu:column field="movId" >
-					<a th::href="|'@{/movie/}'+props.row.movId|" >{{props.row.movId}}</a>
-				</vu:column>
-				<vu:column field="title" sortable="true" />
-				<vu:column name="tata" label="Tata">
-					another column  : {{props.row.movId}} : {{props.row.title}}
-				</vu:column>
-			</vu:table>
-	</div>
+    <div layout:fragment="content">
+        <vu:message />
+            <vu:form>
+                <vu:block id="movie" title="Movie Information">
+                       <vu:include-data-primitive key='timeZoneList'/>
+                       <vu:include-data-primitive key='selectedTimeZoneList'/>
+                       <vu:grid cols="3">
+                        <vu:text-field object="movie" field="movId"/>
+                        <vu:text-field object="movie" field="title" class="fieldTitle"/>
+                        <vu:text-field object="movie" field="year"  debounce="500" hint="Debouncing 500ms" />
+                        <vu:slider object="movie" field="year"  />
+                        <vu:knob object="movie" field="year"/>
+                        <vu:select object="movie" field="movId" list="movies" />
+                        <vu:grid-cell>
+                            <vu:text-area object="movie" field="title"/>
+                        </vu:grid-cell>
+                        <vu:date object="movie" field="released"  />
+                        <vu:datetime object="movie" field="lastModified" />
+                        <vu:autocomplete object="movie" field="movId" list="moviesMdl" />
+                        <vu:radio object="movie" field="movId" list="movies" layout="horizontal" labelField="movId"/>
+                        <vu:radio object="movie" field="movId" list="movies" />
+                        <vu:text-field object="movie" field="movId"/>
+                        <vu:text-field object="movie" field="title" />
+                        <vu:chips-autocomplete object="movie" field="tags" list="movies" staticData="false"/>
+                        <vu:grid-cell/>
+                        <vu:grid-cell col="md-4">
+                            <script>
+                            VUiExtensions.dataX.selectedTimeZoneListArray = '[[${model[selectedTimeZoneList]}]]'.split(';');
+                            </script>
+                            <q-checkbox v-model="dataX.selectedTimeZoneListArray" v-for="item in vueData.timeZoneList" :val="item" :label="item" @input="function() {vueData.selectedTimeZoneList = dataX.selectedTimeZoneListArray.join(';')}"></q-checkbox>
+                        </vu:grid-cell>
+                        <q-btn th:@click="|httpPostAjax('@{_ajaxArray}', vueDataParams(['selectedTimeZoneList']))|" color="primary" label="Ajax save" ></q-btn>
+                        
+                        <vu:grid-cell>
+                            <a th:href="@{/componentsDemo/myFiles}">insee.csv</a>
+                            <div v-for="(item, index) in vueData.myFiles" :name="index" > 
+                                <a href="|'@{/componentsDemo/myFiles/}'+item|">{{item}}</a>
+                            </div>
+                            <vu:fileupload float-label="Upload file" th:url="'@{/componentsDemo/upload}'" key="myFilesUris" multiple />
+                        </vu:grid-cell>
+                        <vu:modal componentId="myModal" closeLabel="Close"/>
+                        <vu:grid-cell>
+                            <vu:button-submit th:if="${!model.modeReadOnly}" label="Read" action="@{_read}" color="primary"/>
+                            <vu:button-submit th:if="${model.modeReadOnly}" label="Edit" action="@{_edit}" color="primary"/>
+                            <vu:button-submit th:if="${!model.modeReadOnly}"  id="saveAction" label="Save" action="@{_save}" color="primary" />
+                            <vu:button-link th:if="${model.modeEdit}"  label="Movies" url="@{/movies/}" color="primary" />
+                            <q-btn  th:label="OpenModal" th:@click="|openModal('myModal', '@{/movies/}')|"></q-btn>
+                        </vu:grid-cell>
+                    </vu:grid>
+                </vu:block>             
+            </vu:form>
+            
+            <vu:cards list="movies" componentId="movieCards" cardClass="col-lg-3 col-md-6 col-xs-12" sortUrl="@{/movies/_sort}" rowsPerPage="8" showMore="true" showMoreLabel="Show more" >
+                <div class="nav" th:@click="|goTo('@{/basemanagement/base/information/}'+item.baseId)|">
+                    <a th::href="|'@{/movie/}'+item.movId|" >{{item.movId}}</a>
+                </div>
+            </vu:cards>
+            
+            <vu:table list="movies" componentId="movieTable" selectable="true" sortUrl="@{/movies/_sort}"
+                tr_@click.native="|goTo('@{/movie/}'+props.row.movId)|" tr_class="nav">
+                <vu:slot name="actions_slot"><q-btn label="View detail" th:@click="|openModal('movieDetailModal', '@{/movie/}'+props.row.movId, {  })|"></q-btn></vu:slot>
+                <vu:include-data object="movies" field="movId" />
+                <vu:column field="movId" >
+                    <a th::href="|'@{/movie/}'+props.row.movId|" >{{props.row.movId}}</a>
+                </vu:column>
+                <vu:column field="title" sortable="true" />
+                <vu:column name="tata" label="Tata">
+                    another column  : {{props.row.movId}} : {{props.row.title}}
+                </vu:column>
+            </vu:table>
+    </div>
 </body>
 </html>

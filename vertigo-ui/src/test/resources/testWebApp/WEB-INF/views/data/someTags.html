@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+  xmlns:vu="https://vertigo.io/thymeleaf/vertigo-ui"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{templates/mmcLayout}"
+>
+
+<head>
+    <title>Movie Detail</title>
+    <script type="text/javascript" th:src="@{/vertigo-ui/static/js/vertigo-ui-extensions.js}"></script>
+</head>
+
+<body>
+    <div layout:fragment="content">     
+            <vu:form>
+                <vu:block id="movie" title="Movie Information">
+                     <vu:grid>
+                        <vu:grid-cell></vu:grid-cell>
+                        <vu:grid-cell>&nbsp;</vu:grid-cell>
+                        <vu:grid-cell/>
+                    </vu:grid>
+                </vu:block>             
+            </vu:form>
+    </div>
+</body>
+</html>

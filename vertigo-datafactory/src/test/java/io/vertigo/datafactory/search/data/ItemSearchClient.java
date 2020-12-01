@@ -28,10 +28,10 @@ import io.vertigo.core.node.definition.DefinitionProvider;
 import io.vertigo.core.node.definition.DefinitionSpace;
 import io.vertigo.core.node.definition.DefinitionSupplier;
 import io.vertigo.datafactory.collections.definitions.FacetCustomDefinitionSupplier;
+import io.vertigo.datafactory.collections.definitions.FacetDefinition.FacetOrder;
 import io.vertigo.datafactory.collections.definitions.FacetRangeDefinitionSupplier;
 import io.vertigo.datafactory.collections.definitions.FacetTermDefinitionSupplier;
 import io.vertigo.datafactory.collections.definitions.FacetedQueryDefinitionSupplier;
-import io.vertigo.datafactory.collections.definitions.FacetDefinition.FacetOrder;
 import io.vertigo.datafactory.collections.model.FacetedQueryResult;
 import io.vertigo.datafactory.collections.model.SelectedFacetValues;
 import io.vertigo.datafactory.search.SearchManager;
@@ -196,8 +196,8 @@ public class ItemSearchClient implements Component, DefinitionProvider {
 						.withDtDefinition("DtItem")
 						.withLabel("Par geohash")
 						.withFieldName("localisation") //fieldname in index
-						.withParams("geohash_grid", "{\"field\" : \"localisation\",\"precision\" : 5 }")
-						.withParams("innerWriteTo", "writeVInt(5);writeVInt(1000);writeVInt(-1);writeGeoPoint();writeGeoPoint();") //same as GeoGridAggregationBuilder.innerWriteTo
+						.withParams("geohash_grid", "{\"field\" : \"localisation\",\"precision\" : #precision# }")
+						.withParams("innerWriteTo", "writeVInt(#precision#);writeVInt(1000);writeVInt(-1);writeGeoPoint();writeGeoPoint();") //same as GeoGridAggregationBuilder.innerWriteTo
 						.withOrder(FacetOrder.count),
 				//---
 				// FacetedQueryDefinition

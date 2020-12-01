@@ -50,10 +50,8 @@ public final class ConstraintNumberMaximum implements Constraint<Number, Number>
 	/** {@inheritDoc} */
 	@Override
 	public boolean checkConstraint(final Number value) {
-		if (value == null) {
-			return true;
-		}
-		return value.doubleValue() <= maxValue;
+		return value == null
+				|| value.doubleValue() <= maxValue;
 	}
 
 	/** {@inheritDoc} */

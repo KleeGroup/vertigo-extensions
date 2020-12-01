@@ -31,7 +31,7 @@ import io.vertigo.core.lang.Assertion;
 import io.vertigo.core.lang.Tuple;
 import io.vertigo.core.lang.VSystemException;
 import io.vertigo.core.lang.WrappedException;
-import io.vertigo.datastore.filestore.util.FileUtil;
+import io.vertigo.core.util.FileUtil;
 
 /**
  * Handling saving file to disk.

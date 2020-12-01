@@ -50,11 +50,9 @@ public final class ConstraintRegex implements Constraint<String, String> {
 	/** {@inheritDoc} */
 	@Override
 	public boolean checkConstraint(final String value) {
-		if (value == null) {
-			return true;
-		}
-		return pattern.matcher(value)
-				.matches();
+		return value == null
+				|| pattern.matcher(value)
+						.matches();
 	}
 
 	/** {@inheritDoc} */

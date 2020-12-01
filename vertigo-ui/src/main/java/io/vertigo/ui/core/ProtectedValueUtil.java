@@ -18,6 +18,7 @@
 package io.vertigo.ui.core;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import io.vertigo.commons.transaction.VTransactionManager;
 import io.vertigo.commons.transaction.VTransactionWritable;
@@ -38,12 +39,19 @@ public final class ProtectedValueUtil {
 			return null;
 		}
 		//unprotectedValue is not null here
-		final String protectedUrl = "Prot-" + unprotectedValue.hashCode() + "-Prot";
+		final String protectedUrl = protectValue(unprotectedValue);
 		try (VTransactionWritable transactionWritable = getTransactionManager().createCurrentTransaction()) {
 			getKVStoreManager().put(PROTECTED_VALUE_COLLECTION_NAME, protectedUrl, unprotectedValue);
 			transactionWritable.commit();
 		}
 		return protectedUrl;
+	}
+
+	/**
+	 * @param unprotectedValue value to protect (may or may not used)
+	 */
+	private static String protectValue(final Serializable unprotectedValue) {
+		return UUID.randomUUID().toString();
 	}
 
 	/**

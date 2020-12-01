@@ -43,20 +43,20 @@ export default {
         fetchNotificationsList: function() {
             this.$http.get(this.baseUrl+'x/notifications/api/messages', { timeout:5*1000, })
             .then( function (response) { //Ok
-                this.updateNotificationsData(response.body);
+                this.updateNotificationsData(response.data);
                 if(this.wasError) {
                     clearInterval(this.timer);
                     this.timer = setInterval(this.fetchNotificationsList, 5000);
                 }
                 this.wasError = false;
-            })
+            }.bind(this))
             .catch(function  () { //Ko
                 if(!this.wasError) {
                     clearInterval(this.timer);
                     this.timer = setInterval(this.fetchNotificationsList, 60000);
                 }
                 this.wasError = true;
-            });
+            }.bind(this));
         },
         updateNotificationsData : function (newList) {
             // Tri par ordre décroissant de date de création

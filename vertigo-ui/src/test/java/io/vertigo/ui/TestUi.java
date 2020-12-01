@@ -129,18 +129,28 @@ public class TestUi {
 	public void testMovies() throws InterruptedException {
 		driver.get(baseUrl + "/test/movies/");
 		Thread.sleep(5000);
+		assertEquals("Home", findElement(By.xpath("/html/body//div[1]//div[3]")).getText());
 	}
 
 	@Test
 	public void testMovieDetail() throws InterruptedException {
 		driver.get(baseUrl + "/test/movie/1000");
 		Thread.sleep(5000);
+		assertEquals("Home", findElement(By.xpath("/html/body//div[1]//div[3]")).getText());
 	}
 
 	@Test
 	public void testDemo() throws InterruptedException {
 		driver.get(baseUrl + "/test/componentsDemo/");
 		Thread.sleep(5000);
+		assertEquals("Home", findElement(By.xpath("/html/body//div[1]//div[3]")).getText());
+	}
+
+	@Test
+	public void testSomeTags() throws InterruptedException {
+		driver.get(baseUrl + "/test/someTags/");
+		Thread.sleep(5000);
+		assertEquals("Home", findElement(By.xpath("/html/body//div[1]//div[3]")).getText());
 	}
 
 	@Test
@@ -154,9 +164,18 @@ public class TestUi {
 		findElement(By.name("vContext[movie][year]")).clear();
 		sendKeysJs(By.name("vContext[movie][year]"), "2020");
 		findElement(By.id("saveAction")).click();
-
+		Thread.sleep(5000);
 		assertEquals("Test 1", findElement(By.name("vContext[movie][title]")).getAttribute("value"));
 		assertEquals("2020", findElement(By.name("vContext[movie][year]")).getAttribute("value"));
+
+		findElement(By.name("vContext[movie][title]")).clear();
+		sendKeysJs(By.name("vContext[movie][title]"),
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
+						+ "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
+						+ "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ");
+		findElement(By.id("saveAction")).click();
+		Thread.sleep(5000);
+		assertEquals("la taille doit être inférieure à 250 caractères.", findElement(By.cssSelector(".fieldTitle .q-field__messages")).getText());
 	}
 
 	@Test
@@ -171,23 +190,37 @@ public class TestUi {
 		assertEquals(fileDownloader4Tests.getHTTPStatusOfLastDownloadAttempt(), 200);
 	}
 
-	@Test
 	@Disabled
-	public void testUpload() throws InterruptedException {
+	@Test
+	public void testUpload() {
 		driver.get(baseUrl + "/test/componentsDemo/");
 
-		final String fullPath = getClass().getResource("/data/insee.csv").getFile();
-		findElement(By.id("uploadFile_fileTest")).clear();
-		findElement(By.id("uploadFile_fileTest")).sendKeys(fullPath);
-		findElement(By.id("uploadFile_uploadFileAccueil")).click();
+		final File file = new File(getClass().getResource("/data/insee.csv").getFile());
+		dropFile("uploadermyFilesUris", file);
 
 		assertEquals("Fichier recu : insee.csv (application/octet-stream)", findElement(By.cssSelector("span")).getText());
 		assertEquals("Previous file : insee.csv (application/octet-stream)", findElement(By.id("uploadFile")).getText());
 	}
 
+	private static final String JS_SEND_FILE = "var targetName = arguments[0],"
+			+ "myFile = arguments[1];" +
+			"    VUiPage.$refs[targetName].addFiles(myFile.files);";
+	private static final String JS_CREATE_FILE = "var input = document.createElement('INPUT');" +
+			"input.type = 'file';" +
+			"input.onchange = function () {" +
+			"  setTimeout(function () { document.body.removeChild(input); }, 500);" +
+			"};" +
+			"document.body.appendChild(input);" +
+			"return input;";
+
+	static void dropFile(final String targetName, final File file) {
+		final WebElement createdInput = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_CREATE_FILE);
+		createdInput.sendKeys(file.getAbsolutePath());
+		((JavascriptExecutor) driver).executeScript(JS_SEND_FILE, targetName, createdInput);
+	}
+
 	private void sendKeysJs(final By elementBy, final String keysToSend) {
 		final WebElement element = findElement(elementBy);
-		//element.sendKeys(keysToSend);
 		((JavascriptExecutor) driver).executeScript("document.getElementById(\"" + element.getAttribute("id") + "\").value = \"" + keysToSend + "\";\n");
 	}
 

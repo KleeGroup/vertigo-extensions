@@ -18,6 +18,7 @@
 package io.vertigo.ui.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -352,18 +353,32 @@ public final class ViewContextMap extends HashMap<String, Serializable> {
 		viewContextMapForClient.put(CTX, get(CTX));
 		for (final Map.Entry<String, Serializable> entry : entrySet()) {
 			final String key = entry.getKey();
+			final Serializable value = entry.getValue();
 			if (keysForClient.containsKey(key) && (subFilterOpt.isEmpty() || subFilterOpt.get().contains(key))) {
-				if (entry.getValue() instanceof MapUiObject) {
-					viewContextMapForClient.put(entry.getKey(), ((MapUiObject) entry.getValue()).mapForClient(keysForClient.get(key), createTransformers(key)));
-				} else if (entry.getValue() instanceof AbstractUiListUnmodifiable) {
+				if (value instanceof MapUiObject) {
+					viewContextMapForClient.put(entry.getKey(), ((MapUiObject) value).mapForClient(keysForClient.get(key), createTransformers(key)));
+				} else if (value instanceof AbstractUiListUnmodifiable) {
 					//handle lists
-					viewContextMapForClient.put(entry.getKey(), ((AbstractUiListUnmodifiable) entry.getValue()).listForClient(keysForClient.get(key), createTransformers(key)));
-				} else if (entry.getValue() instanceof BasicUiListModifiable) {
+					viewContextMapForClient.put(entry.getKey(), ((AbstractUiListUnmodifiable) value).listForClient(keysForClient.get(key), createTransformers(key)));
+				} else if (value instanceof BasicUiListModifiable) {
 					//handle lists modifiable
-					viewContextMapForClient.put(entry.getKey(), ((BasicUiListModifiable) entry.getValue()).listForClient(keysForClient.get(key), createTransformers(key)));
+					viewContextMapForClient.put(entry.getKey(), ((BasicUiListModifiable) value).listForClient(keysForClient.get(key), createTransformers(key)));
+				} else if (value instanceof ArrayList && !((ArrayList) value).isEmpty() && ((ArrayList) value).get(0) instanceof ClusterUiList) {
+					//handle List Of ClusterUiList
+					final ArrayList<HashMap<String, Serializable>> result = new ArrayList();
+					for (final ClusterUiList clusterUiList : (List<ClusterUiList>) value) {
+						final HashMap<String, Serializable> cluster = new HashMap<>();
+						cluster.put("code", clusterUiList.getCode());
+						cluster.put("label", clusterUiList.getLabel());
+						//cluster.put("listType", clusterUiList.getListType()); //present le json de Vega
+						cluster.put("totalCount", clusterUiList.getTotalCount());
+						cluster.put("list", clusterUiList.listForClient(keysForClient.get(key), createTransformers(key)));
+						result.add(cluster);
+					}
+					viewContextMapForClient.put(entry.getKey(), result);
 				} else {
 					// just copy it
-					viewContextMapForClient.put(entry.getKey(), entry.getValue());
+					viewContextMapForClient.put(entry.getKey(), value);
 				}
 			}
 		}

@@ -40,12 +40,12 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.javalin.Javalin;
 import io.vertigo.core.node.Node;
+import io.vertigo.core.util.FileUtil;
 import io.vertigo.core.util.InjectorUtil;
 import io.vertigo.dashboard.ui.commons.CommonsDashboardControler;
 import io.vertigo.dashboard.ui.dynamo.DynamoDashboardControler;
 import io.vertigo.dashboard.ui.vega.VegaDashboardControler;
 import io.vertigo.dashboard.ui.vui.VUiDashboardControler;
-import io.vertigo.datastore.filestore.util.FileUtil;
 
 public final class DashboardRouter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DashboardRouter.class);

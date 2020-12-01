@@ -2,7 +2,6 @@ bin/
 trash/
 target/
 .classpath
-.gitignore
 .project
 */.settings/
 *.prefs
@@ -11,8 +10,11 @@ target/
 *.iml
 *.idea
 .metadata/*
+*/node_modules/*
 vertigo-release/
 vertigo-x-release/
 mvn-release.txt
 createSymLink.bat
 .factorypath
+node_modules
+/vertigo-ui-vuejs/dist

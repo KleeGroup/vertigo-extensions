@@ -140,19 +140,20 @@ export default {
             this.$http.post(this.botUrl, {sender: this.convId, message: value})
                 .then(function(httpResponse) {
                     // success
-                    httpResponse.body.forEach(function(value) {
+                    httpResponse.data.forEach(function(value) {
                         this.watingMessagesStack.push(value);
                     }, this);
                     
                     this._displayMessages();
-                },
+                }.bind(this))
+                .catch(
                 function() {
                     // error
                     this.error = true;
                     
                     this.processing = false;
                     this._scrollToBottom();
-                });
+                }.bind(this));
                 
         },
         _displayMessages: function () {
@@ -218,7 +219,7 @@ export default {
             this.$http.post(this.botUrl, '{"sender":"' + this.convId + '","message":"/restart"}')
             .then(function() {
                 this.askBot("/start"); // lancement de la phrase d'accueil
-            });
+            }.bind(this));
         },
         reinitInput: function () {
             this.inputConfig.modeTextarea = false;

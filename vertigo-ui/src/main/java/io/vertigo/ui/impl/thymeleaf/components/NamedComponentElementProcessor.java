@@ -247,7 +247,7 @@ public class NamedComponentElementProcessor extends AbstractElementModelProcesso
 	private static void removeContainerTag(final IModel contentModel) {
 		//Remove container tag
 		contentModel.remove(0);
-		if (contentModel.size() > 1) {
+		if (contentModel.size() >= 1) {
 			contentModel.remove(contentModel.size() - 1);
 		}
 	}

@@ -181,9 +181,8 @@ abstract class AbstractWebServiceManagerTest {
 				.get("/test/docTest/myPass");
 	}
 
-	@Disabled //TODO reactivate when javalin support trailingSlashe
 	@Test
-	public void docTest3TrailingSlashe() {
+	public void docTest3TrailingSlashes() {
 		//Javalin don't match path which per / exactly, if there is a route without the final / it will matched
 		loggedAndExpect()
 				.statusCode(HttpStatus.SC_FORBIDDEN)
@@ -562,6 +561,20 @@ abstract class AbstractWebServiceManagerTest {
 		loggedAndExpect(given().body(newContact))
 				.body("fieldErrors.birthday", Matchers.contains("Test birthday after birthday")) //manual validation by Vega
 				.body("fieldErrors.email", Matchers.contains("Test error : email")) //manual validation by Vega
+				.statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY)
+				.when()
+				.post("/test/contactValidations")
+				.body().path("conId");
+	}
+
+	@Test
+	public void testPostContactAutoValidations() {
+		final Map<String, Object> newContact = createDefaultContact(null);
+		newContact.put("name", "Too lenght name, limited at 50 chars, but it's alread very long for a name");
+		newContact.put("email", "bad email format, may have @ or .fr, it's not and email");
+		loggedAndExpect(given().body(newContact))
+				.body("fieldErrors.name", Matchers.contains("<<fr:DYNAMO_CONSTRAINT_STRINGLENGTH_EXCEEDED[50]>>")) //autovalidation validation by Vega
+				.body("fieldErrors.email", Matchers.contains("Le courriel n'est pas valide")) //autovalidation validation by Vega
 				.statusCode(HttpStatus.SC_UNPROCESSABLE_ENTITY)
 				.when()
 				.post("/test/contactValidations")

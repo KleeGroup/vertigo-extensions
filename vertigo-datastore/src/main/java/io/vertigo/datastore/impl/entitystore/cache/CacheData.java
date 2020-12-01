@@ -50,6 +50,10 @@ public final class CacheData {
 		return "CacheData" + dtDefinition.getName();
 	}
 
+	public static Object getContextLock(final DtDefinition dtDefinition) {
+		return getContext(dtDefinition).intern();
+	}
+
 	/**
 	 * Récupération d'un objet potentiellement mis en cache
 	 * @param uid UID du DTO

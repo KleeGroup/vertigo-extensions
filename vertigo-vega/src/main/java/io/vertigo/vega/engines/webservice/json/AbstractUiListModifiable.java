@@ -33,6 +33,7 @@ import io.vertigo.core.util.ClassUtil;
 import io.vertigo.datamodel.structure.definitions.DtDefinition;
 import io.vertigo.datamodel.structure.model.DtList;
 import io.vertigo.datamodel.structure.model.DtObject;
+import io.vertigo.datamodel.structure.util.DtObjectUtil;
 import io.vertigo.vega.webservice.model.DtListDelta;
 import io.vertigo.vega.webservice.model.UiList;
 import io.vertigo.vega.webservice.model.UiObject;
@@ -192,7 +193,16 @@ public abstract class AbstractUiListModifiable<D extends DtObject> extends Abstr
 	@Override
 	public UiObject<D> get(final int row) {
 		//id>=0 : par index dans la UiList (pour boucle, uniquement dans la même request)
-		Assertion.check().isTrue(row >= 0, "Le getteur utilisé n'est pas le bon: utiliser getByRowId");
+		Assertion.check()
+		.isTrue(row >= 0, "Le getteur utilisé n'est pas le bon: utiliser getByRowId")
+		.isTrue(row < 200, "UiListModifiable is limited to 200 elements");
+		
+		//SKE MLA : lazy initialisation of buffer uiObjects for size changing uiListModifiable
+		final DtDefinition dtDefinition = dtDefinitionRef.get();
+		for (int i = bufferUiObjects.size(); i < row + 1; i++) {
+			add((D) DtObjectUtil.createDtObject(dtDefinition));
+		}
+		
 		final UiObject<D> uiObject = bufferUiObjects.get(row);
 		Assertion.check().isNotNull(uiObject);
 		return uiObject;

@@ -2,37 +2,11 @@
 	th:with="isVuiDevMode=${vuiDevMode != null ? vuiDevMode : false}">
 	<vu:content/>
 	
-	<script>
-	  window.quasarConfig = {
-	    loadingBar: { 'skip-hijack' : true } // disable quasar's ajaxbar
-	  }
-	</script>
-	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.12.13/dist/quasar.umd.min.js}"></script>
-	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.12.13/dist/lang/__${model.util.getCurrentLocalePrefixForQuasar()}__.umd.min.js}"></script>
+	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.14.3/dist/quasar.umd.min.js}"></script>
+	<script th:src="@{/vertigo-ui/static/3rdParty/cdn.jsdelivr.net/npm/quasar@1.14.3/dist/lang/__${model.util.getCurrentLocalePrefixForQuasar()}__.umd.min.js}"></script>
 	<script th:if="${!isVuiDevMode}" th:src="@{/vertigo-ui/static/js/vertigo-ui.umd.min.js}"></script>
 	<script th:if="${isVuiDevMode}" src="http://localhost:3000/js/chunk-vendors.js"></script>
 	<script th:if="${isVuiDevMode}" src="http://localhost:3000/js/app.js"></script>
 	<vu:vue-data/>
-	<script>
-		Vue.use(VertigoUi);
-		Quasar.lang.set(Quasar.lang.[[${model.util.getCurrentLocaleForQuasar()}]])
-		var data = {
-				  vueData : VertigoUi.vueData,
-				  componentStates : VertigoUi.componentStates,
-				  uiMessageStack: VertigoUi.uiMessageStack,
-				  dataX : VUiExtensions.dataX
-			  };
-		
-		var VUiPage = new Vue({
-		  el: '#page',
-		  data: data,
-		  methods: Vue.util.extend(VertigoUi.methods, VUiExtensions.methods ||  {}) 
-		});
-
-		// fixes wrong components states due to firefox bfcache (back-forward cache)
-		//https://developer.mozilla.org/en-US/docs/Archive/Misc_top_level/Working_with_BFCache
-		window.addEventListener('pageshow', function(event) {
-			VUiPage.$forceUpdate();
-		});
-	</script>
+	<script th:src="@{/vertigo-ui/static/js/vertigo-ui-mpa.js}"></script>
 </th:block>

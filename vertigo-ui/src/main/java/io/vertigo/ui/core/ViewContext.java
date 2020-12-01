@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -404,7 +405,14 @@ public final class ViewContext implements Serializable {
 	 */
 	public <O extends DtObject> void publishFacetedQueryResult(final ViewContextKey<FacetedQueryResult<O, SearchQuery>> contextKey,
 			final DtFieldName<O> keyFieldName, final FacetedQueryResult<O, SearchQuery> facetedQueryResult, final ViewContextKey<?> criteriaContextKey) {
-		publishDtList(() -> contextKey.get() + "_list", Optional.of(keyFieldName), facetedQueryResult.getDtList(), false);
+		if (facetedQueryResult.getClusterFacetDefinition().isPresent()) {
+			publishDtList(() -> contextKey.get() + "_list", Optional.of(keyFieldName), new DtList<O>(facetedQueryResult.getDtList().getDefinition()), false);
+			put(() -> contextKey.get() + "_cluster", translateClusters(facetedQueryResult, Optional.of(keyFieldName)));
+			//publishClustersList(contextKey.get() + "_list", facetedQueryResult, Optional.of(keyFieldName));
+		} else {
+			publishDtList(() -> contextKey.get() + "_list", Optional.of(keyFieldName), facetedQueryResult.getDtList(), false);
+			put(() -> contextKey.get() + "_cluster", new HashMap<>());
+		}
 		put(() -> contextKey.get() + "_facets", translateFacets(facetedQueryResult.getFacets()));
 
 		final FacetedQuery facetedQuery = facetedQueryResult.getSource().getFacetedQuery().get();
@@ -416,6 +424,48 @@ public final class ViewContext implements Serializable {
 						.collect(Collectors.toList())));
 		put(() -> contextKey.get() + "_totalcount", facetedQueryResult.getCount());
 		put(() -> contextKey.get() + "_criteriaContextKey", criteriaContextKey.get());
+	}
+
+	private <O extends DtObject> ArrayList<ClusterUiList> translateClusters(final FacetedQueryResult<O, SearchQuery> facetedQueryResult, final Optional<DtFieldName<O>> keyFieldNameOpt) {
+		//if it's a cluster add data's cluster
+		final Map<FacetValue, DtList<O>> clusters = facetedQueryResult.getClusters();
+		final ArrayList<ClusterUiList> jsonCluster = new ArrayList<>();
+		for (final Entry<FacetValue, DtList<O>> cluster : clusters.entrySet()) {
+			final DtList<O> dtList = cluster.getValue();
+			if (!dtList.isEmpty()) {
+				final ClusterUiList clusterElement = new ClusterUiList(
+						dtList, keyFieldNameOpt,
+						cluster.getKey().getCode(),
+						cluster.getKey().getLabel().getDisplay(),
+						dtList.getDefinition().getClassSimpleName(),
+						getFacetCount(cluster.getKey(), facetedQueryResult));
+				jsonCluster.add(clusterElement);
+			}
+		}
+		return jsonCluster;
+
+	}
+	/* private <O extends DtObject> void publishClustersList(final String prefix, final FacetedQueryResult<O, SearchQuery> facetedQueryResult, final Optional<DtFieldName<O>> keyFieldNameOpt) {
+			//if it's a cluster add data's cluster
+			final Map<FacetValue, DtList<O>> clusters = facetedQueryResult.getClusters();
+			for (final Entry<FacetValue, DtList<O>> cluster : clusters.entrySet()) {
+				final DtList<O> dtList = cluster.getValue();
+				if (!dtList.isEmpty()) {
+					publishDtList(() -> prefix + "_" + cluster.getKey().getCode(), keyFieldNameOpt, dtList, false);
+				}
+			}
+		}*/
+
+	private static Long getFacetCount(final FacetValue key, final FacetedQueryResult<?, ?> facetedQueryResult) {
+		final FacetDefinition clusterFacetDefinition = facetedQueryResult.getClusterFacetDefinition().get();
+		return facetedQueryResult.getFacets()
+				.stream()
+				.filter(facet -> clusterFacetDefinition.equals(facet.getDefinition()))
+				.flatMap(facet -> facet.getFacetValues().entrySet().stream())
+				.filter(facetEntry -> key.getCode().equals(facetEntry.getKey().getCode()))
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("Can't found facet for search cluster"))
+				.getValue();
 	}
 
 	private static ArrayList<Serializable> translateFacets(final List<Facet> facets) {

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>io.vertigo</groupId>
 		<artifactId>vertigo-extensions</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>vertigo-datafactory</artifactId>
@@ -57,19 +57,19 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>8.6.0</version><!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
+			<version>8.6.2</version><!-- 8.6.2 compatible with ElasticSearch 7.9.3 -->
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-analyzers-common</artifactId>
-			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
+			<version>8.6.2</version> <!-- 8.6.2 compatible with ElasticSearch 7.9.3 -->
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queryparser</artifactId>
-			<version>8.6.0</version> <!-- 8.6.0 compatible with ElasticSearch 7.9.0 -->
+			<version>8.6.2</version> <!-- 8.6.2 compatible with ElasticSearch 7.9.3 -->
 			<optional>true</optional>
 		</dependency>
 
@@ -85,25 +85,25 @@
 		<dependency>
 		    <groupId>org.elasticsearch.client</groupId>
 		    <artifactId>transport</artifactId>
-		    <version>7.9.0</version>
+		    <version>7.9.3</version>
 		    <scope>test</scope> <!-- TransportSearchServicesPlugin -->
 		</dependency>
 		<dependency>
 		    <groupId>org.elasticsearch.client</groupId>
 		    <artifactId>elasticsearch-rest-high-level-client</artifactId>
-		    <version>7.9.0</version>
+		    <version>7.9.3</version>
 		    <optional>true</optional> <!-- RestHighLevelSearchServicesPlugin -->
 		</dependency>
 		<dependency>
 	        <groupId>org.codelibs.elasticsearch.module</groupId>
 	        <artifactId>analysis-common</artifactId> 
-	        <version>7.9.0</version> <!-- required by EmbeddedSearchServicesPlugin -->
+	        <version>7.9.3</version> <!-- required by EmbeddedSearchServicesPlugin -->
 	        <scope>test</scope>
 	    </dependency>
 	   	<dependency>
 		    <groupId>org.codelibs.elasticsearch.module</groupId>
 		    <artifactId>mapper-extras</artifactId>
-		    <version>7.9.0</version> <!-- required by EmbeddedSearchServicesPlugin -->
+		    <version>7.9.3</version> <!-- required by EmbeddedSearchServicesPlugin -->
 	        <scope>test</scope>
 		</dependency>
 

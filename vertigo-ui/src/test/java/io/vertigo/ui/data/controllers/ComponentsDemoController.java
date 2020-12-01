@@ -37,7 +37,10 @@ import io.vertigo.account.security.VSecurityManager;
 import io.vertigo.core.locale.LocaleManager;
 import io.vertigo.datamodel.structure.model.DtList;
 import io.vertigo.datamodel.structure.model.DtListState;
+import io.vertigo.datastore.filestore.definitions.FileInfoDefinition;
+import io.vertigo.datastore.filestore.model.FileInfoURI;
 import io.vertigo.datastore.filestore.model.VFile;
+import io.vertigo.datastore.filestore.util.VFileUtil;
 import io.vertigo.datastore.impl.filestore.model.FSFile;
 import io.vertigo.ui.core.ProtectedValueUtil;
 import io.vertigo.ui.core.ViewContext;
@@ -76,6 +79,7 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 
 	private static final String[] timeZoneListStatic = { "Europe/Paris", "America/Cayenne", "Indian/Reunion" };
 	private final ViewContextKey<String[]> timeZoneList = ViewContextKey.of("timeZoneList");
+	private final ViewContextKey<String> selectedTimeZoneList = ViewContextKey.of("selectedTimeZoneList");
 	private final ViewContextKey<String> zoneId = ViewContextKey.of("zoneId");
 
 	public static final ViewContextKey<String[]> myFiles = ViewContextKey.of("myFiles");
@@ -90,7 +94,7 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 	private MovieServices movieServices;
 
 	@GetMapping("/")
-	public void initContext(final ViewContext viewContext) throws IOException, URISyntaxException {
+	public void initContext(final ViewContext viewContext) {
 		viewContext.publishDto(movieKey, new Movie());
 		viewContext.publishDto(castingKey, new Casting());
 		viewContext.publishDtList(movieList, movieServices.getMovies(DtListState.defaultOf(Movie.class)));
@@ -104,6 +108,7 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 		viewContext.publishRef(currentZoneId, localeManager.getCurrentZoneId().getId());
 		viewContext.publishRef(zoneId, timeZoneListStatic[0]);
 		viewContext.publishRef(timeZoneList, timeZoneListStatic);
+		viewContext.publishRef(selectedTimeZoneList, "");
 
 		viewContext.publishRef(myFiles, new String[0]);
 
@@ -111,7 +116,7 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 	}
 
 	@PostMapping("/movies/{movieId}")
-	public void doSaveMovie(final ViewContext viewContext,
+	public void doSaveMovieManualValidation(final ViewContext viewContext,
 			@ViewAttribute("movie") final UiObject<Movie> movieUiObject,
 			@PathVariable("movieId") final Long movieId,
 			final UiMessageStack uiMessageStack) {
@@ -121,6 +126,11 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 		}
 
 		viewContext.publishRef(currentInstant, Instant.now());
+	}
+
+	@PostMapping("/_save")
+	public void doSaveAutoValidation(final ViewContext viewContext, @ViewAttribute("movie") final Movie movie) {
+		viewContext.publishDto(movieKey, movie);
 	}
 
 	@PostMapping("/movies/_add")
@@ -153,11 +163,6 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 		viewContext.publishRef(currentZoneId, localeManager.getCurrentZoneId().getId());
 	}
 
-	@PostMapping("/_save")
-	public void doSave(final ViewContext viewContext, @ViewAttribute("movie") final Movie movie) {
-		viewContext.publishDto(movieKey, movie);
-	}
-
 	@PostMapping("/_read")
 	public void toRead() {
 		toModeReadOnly();
@@ -181,13 +186,17 @@ public class ComponentsDemoController extends AbstractVSpringMvcController {
 	}
 
 	@PostMapping("/upload")
-	public void uploadFile(@QueryParam("file") final VFile vFile) {
+	public FileInfoURI uploadFile(@QueryParam("file") final VFile vFile) {
 		getUiMessageStack().addGlobalMessage(Level.INFO, "Fichier recu : " + vFile.getFileName() + " (" + vFile.getMimeType() + ")");
-		//final String protectedPath = ProtectedValueUtil.generateProtectedValue(FileUtil.obtainReadOnlyPath(vFile).toFile().getAbsolutePath());
-		//final List<String> newFiles = Arrays.asList((String[]) viewContext.get(myFiles));
-		//newFiles.add(protectedPath);
-		//viewContext.publishRef(myFiles, newFiles.toArray(new String[newFiles.size()]));
-		//return FileUtil.obtainReadOnlyPath(vFile).toFile().getAbsolutePath();
+		final String protectedPath = ProtectedValueUtil.generateProtectedValue(VFileUtil.obtainReadOnlyPath(vFile).toFile().getAbsolutePath());
+		return new FileInfoURI(new FileInfoDefinition("FiDummy", "none"), protectedPath);
+	}
+
+	@PostMapping("/_ajaxArray")
+	public ViewContext doAjaxValidation(final ViewContext viewContext, @ViewAttribute("selectedTimeZoneList") final String selected) {
+		getUiMessageStack().addGlobalMessage(Level.INFO, "selected " + selected);
+		viewContext.publishRef(selectedTimeZoneList, selected);
+		return viewContext;
 	}
 
 	private void nop(final Object obj) {

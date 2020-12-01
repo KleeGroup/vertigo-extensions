@@ -60,7 +60,7 @@ public abstract class AbstractMasterDataDefinitionProvider implements SimpleDefi
 
 	}
 
-	protected <O extends DtObject> void registerDtMasterDatas(final Class<O> dtObjectClass, final Map<String, Predicate> namedLists, final boolean isReloadedByList) {
+	protected <O extends DtObject> void registerDtMasterDatas(final Class<O> dtObjectClass, final Map<String, Predicate<O>> namedLists, final boolean isReloadedByList) {
 		final DtDefinition dtDefinition = DtObjectUtil.findDtDefinition(dtObjectClass);
 		// Si la durée dans le cache n'est pas précisé, on se base sur le type de la clé primaire pour déterminer la durée
 		final int cacheDuration;

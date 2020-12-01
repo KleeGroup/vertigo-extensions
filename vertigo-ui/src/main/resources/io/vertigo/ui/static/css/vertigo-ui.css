@@ -1,4 +1,9 @@
 /******** CSS SPECIFIQUE A CERTAINES PAGES *******/
+
+[v-cloak] {
+  display: none;
+}
+		
 :root {
 	--q-color-primary-invert: rgba(255, 255, 255, 0.9);
 	--q-color-secondary-invert: rgba(255, 255, 255, 0.9);

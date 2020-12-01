@@ -36,10 +36,11 @@ import io.vertigo.core.node.AutoCloseableNode;
 import io.vertigo.core.node.component.di.DIInjector;
 import io.vertigo.core.node.config.NodeConfig;
 import io.vertigo.core.param.Param;
+import io.vertigo.core.util.FileUtil;
 import io.vertigo.core.util.TempFile;
 import io.vertigo.datastore.DataStoreFeatures;
 import io.vertigo.datastore.filestore.model.VFile;
-import io.vertigo.datastore.filestore.util.FileUtil;
+import io.vertigo.datastore.filestore.util.VFileUtil;
 import io.vertigo.datastore.impl.filestore.model.FSFile;
 import io.vertigo.quarto.QuartoFeatures;
 import io.vertigo.quarto.converter.ConverterManager;
@@ -201,7 +202,7 @@ public final class RemoteConverterManagerTest {
 	}
 
 	private void log(final String methode, final VFile vFile) {
-		log.info(methode + " => " + FileUtil.obtainReadOnlyPath(vFile).toFile()
+		log.info(methode + " => " + VFileUtil.obtainReadOnlyPath(vFile).toFile()
 				.getAbsolutePath());
 	}
 

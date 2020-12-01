@@ -2,7 +2,7 @@
 	  th:assert="${object} != null and ${field} != null and ${list} != null"
 	  th:with="myValueField=${valueField != null ? valueField : model.util.getIdField(list)}, myLabelField=${labelField != null ? labelField : model.util.getDisplayField(list)}, value=${model.vContext[__${object}__].getTypedValue('__${field}__')}, myComponentId=${componentId != null ? componentId : list + '_' + object + '_' + field}, myLabel=${label?:model.util.label(object + '.' + field)}">
 	<th:block th:with="valueLabel=${value != null ? model.vContext[__${list}__].getById('__${myValueField}__', value)['__${myLabelField}__'] : ''}"
-		th:attr="objectKey=${model.vContext['componentStates'].addComponentState(myComponentId).addList('options').add( { 'value' : value, 'label': valueLabel})}" />
+		th:attr="objectKey=${model.vContext['componentStates'].addComponentState(myComponentId).addList('options').add( { 'value' : value, 'label': valueLabel})}, objectKey1=${model.vContext['componentStates'].get(myComponentId).addPrimitive('loading', false)}" />
 	<vu:include-data object="${object}" field="${field}"/>
 	<vu:include-data object="${list}" field="${myValueField}"/>
 	<vu:include-data object="${list}" field="${myLabelField}"/>
@@ -20,8 +20,10 @@
         hide-selected
         map-options
         input-debounce="300"
-        emit-value
+		emit-value
+		th::loading="|componentStates.${myComponentId}.loading|"
         th::options="|componentStates.${myComponentId}.options|"
+		th:@input-value ="|function (val) {loadAutocompleteById('${list}', '${myValueField}', '${myLabelField}', '${myComponentId}', '@{/autocomplete/_searchByValue}','${object}','${field}')}|"
         th:@filter="|function (val, update, abort) { searchAutocomplete('${list}', '${myValueField}', '${myLabelField}', '${myComponentId}', '@{/autocomplete/_searchFullText}', val, update, abort)}|"
         th:attr="__${input_attrs}__"
      >
